@@ -1873,21 +1873,26 @@
   }
 
   /* ── MobileBottomNav ────────────────────────────────────────────────── */
-  function MobileBottomNav({ cartCount, orders, onCart, onAI, onOrders, onProfile, shoppingList, onShoppingList }) {
+  function MobileBottomNav({ cartCount, orders, onCart, onAI, onOrders, onProfile, onNotif, unreadNotif, onFavs, showFavs }) {
     const tabs = [
-      { id:'home',    icon:'🏠', label:'الرئيسية',  action:null },
-      { id:'cart',    icon:<CartIcon size={20} color={cartCount>0?GREEN:'#888'}/>, label:'السلة', action:onCart, badge:cartCount||0 },
-      { id:'ai',      icon:<BotIcon size={20} color="#888"/>,    label:'الذكاء', action:onAI },
-      { id:'orders',  icon:<ClockIcon size={20} color={orders.length>0?TEAL:'#888'}/>, label:'طلباتي', action:onOrders, badge:orders.length||0 },
-      { id:'profile', icon:<UserIcon size={20} color="#888"/>,   label:'حسابي',  action:onProfile },
+      { id:'favs',    icon:<HeartIcon size={21} color={showFavs?'#e74c3c':'#888'} filled={showFavs}/>, label:'المفضلة', action:onFavs },
+      { id:'cart',    icon:<CartIcon  size={21} color={cartCount>0?GREEN:'#888'}/>, label:'السلة',    action:onCart,   badge:cartCount||0 },
+      { id:'ai',      icon:<BotIcon   size={21} color="#888"/>, label:'الذكاء',   action:onAI },
+      { id:'orders',  icon:<ClockIcon size={21} color={orders.length>0?TEAL:'#888'}/>, label:'طلباتي', action:onOrders, badge:orders.length||0 },
+      { id:'profile', icon:<UserIcon  size={21} color="#888"/>, label:'حسابي',   action:onProfile },
     ];
     return (
-      <nav style={{ position:'fixed', bottom:0, left:0, right:0, zIndex:300, background:'#fff', borderTop:'1px solid #e8ecf0', display:'flex', alignItems:'center', boxShadow:'0 -4px 20px rgba(0,0,0,0.1)', paddingBottom:'env(safe-area-inset-bottom,0px)' }}>
+      <nav style={{ position:'fixed', bottom:0, left:0, right:0, zIndex:800, background:'#fff', borderTop:'1.5px solid #e8ecf0', display:'flex', alignItems:'stretch', boxShadow:'0 -3px 16px rgba(0,0,0,0.09)', paddingBottom:'env(safe-area-inset-bottom,0px)' }}>
         {tabs.map(t => (
-          <button key={t.id} onClick={t.action||undefined} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, padding:'8px 0 6px', background:'none', border:'none', cursor:t.action?'pointer':'default', fontFamily:'Tajawal,sans-serif', position:'relative' }}>
-            {t.badge > 0 && <span style={{ position:'absolute', top:4, right:'calc(50% - 16px)', minWidth:16, height:16, borderRadius:8, background:'#e74c3c', color:'#fff', fontSize:9, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 3px', border:'2px solid #fff' }}>{t.badge>9?'9+':t.badge}</span>}
-            {typeof t.icon==='string' ? <span style={{ fontSize:20, lineHeight:1 }}>{t.icon}</span> : <span style={{ display:'flex', alignItems:'center' }}>{t.icon}</span>}
-            <span style={{ fontSize:10, color:'#888', fontWeight:600 }}>{t.label}</span>
+          <button key={t.id} onClick={t.action||undefined}
+            style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, padding:'9px 0 7px', background:'none', border:'none', cursor:t.action?'pointer':'default', fontFamily:'Tajawal,sans-serif', position:'relative', minHeight:56 }}>
+            {t.badge > 0 && (
+              <span style={{ position:'absolute', top:6, right:'calc(50% - 18px)', minWidth:17, height:17, borderRadius:9, background:'#e74c3c', color:'#fff', fontSize:9, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 3px', border:'2px solid #fff' }}>
+                {t.badge>9?'9+':t.badge}
+              </span>
+            )}
+            <span style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>{t.icon}</span>
+            <span style={{ fontSize:10, color:'#888', fontWeight:600, marginTop:1 }}>{t.label}</span>
           </button>
         ))}
       </nav>
@@ -2847,8 +2852,8 @@
               <div style={{ fontSize:13, fontWeight:700, color:DARK }}>إشعارات الجهاز</div>
               <div style={{ fontSize:11, color:'#aaa', marginTop:2 }}>تنبيهات انخفاض الأسعار والعروض</div>
             </div>
-            <button onClick={onToggleNotif} style={{ width:44, height:24, borderRadius:12, background:notifOn?GREEN:'#e0e0e0', border:'none', cursor:'pointer', position:'relative', transition:'background 0.25s', flexShrink:0 }}>
-              <div style={{ width:18, height:18, borderRadius:'50%', background:'#fff', position:'absolute', top:3, transition:'right 0.25s', right:notifOn?3:23, boxShadow:'0 1px 4px rgba(0,0,0,0.2)' }}/>
+            <button onClick={onToggleNotif} style={{ width:48, height:26, borderRadius:13, background:notifOn?GREEN:'#ccc', border:'none', cursor:'pointer', position:'relative', transition:'background 0.25s', flexShrink:0, padding:0 }}>
+              <div style={{ width:20, height:20, borderRadius:'50%', background:'#fff', position:'absolute', top:3, left:notifOn?25:3, transition:'left 0.25s', boxShadow:'0 1px 5px rgba(0,0,0,0.25)' }}/>
             </button>
           </div>
           <div style={{ flex:1, overflowY:'auto' }}>
@@ -2860,17 +2865,20 @@
               </div>
             ) : (
               <div>
-                {notifications.map((n, i) => (
-                  <div key={n.id} style={{ padding:'11px 18px', borderBottom:'1px solid #f8f9fa', background:i%2===0?'#fff':'#fafbfc', display:'flex', gap:10, alignItems:'flex-start' }}>
-                    <div style={{ width:32, height:32, borderRadius:'50%', background:GREEN+'18', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:2 }}>
-                      <BellIcon size={14} color={GREEN}/>
+                {notifications.map((n, i) => {
+                  const isUnread = n.time > (notifications._lastRead || 0);
+                  return (
+                    <div key={n.id} style={{ padding:'11px 18px', borderBottom:'1px solid #f0f2f5', background:i===0?'#fffde7':'#fff', display:'flex', gap:10, alignItems:'flex-start' }}>
+                      <div style={{ width:34, height:34, borderRadius:'50%', background:GREEN+'18', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1, fontSize:16 }}>
+                        {n.icon||'🔔'}
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:13, color:DARK, fontWeight:600, lineHeight:1.6 }}>{n.msg}</div>
+                        <div style={{ fontSize:11, color:'#bbb', marginTop:3 }}>{timeAgo(n.time)}</div>
+                      </div>
                     </div>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:13, color:DARK, fontWeight:600, lineHeight:1.55 }}>{n.msg}</div>
-                      <div style={{ fontSize:11, color:'#bbb', marginTop:3 }}>{timeAgo(n.time)}</div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -3151,9 +3159,9 @@
     const [textReviews,    setTextReviews]    = useState(()=>lsGet('tq_text_reviews', {}));
     const [voiceActive,    setVoiceActive]    = useState(false);
     const [announcement,   setAnnouncement]   = useState(()=>lsGet('tq_announcement', ''));
-    const [notifications,  setNotifications]  = useState([]);
+    const [notifications,  setNotifications]  = useState(()=>lsGet('tq_notifications',[]));
     const [showNotifCenter,setShowNotifCenter]= useState(false);
-    const [lastNotifRead,  setLastNotifRead]  = useState(()=>Date.now());
+    const [lastNotifRead,  setLastNotifRead]  = useState(()=>lsGet('tq_notif_read', 0));
     const [showLuckyWheel, setShowLuckyWheel] = useState(false);
     const [freeGiftConfig, setFreeGiftConfig] = useState(()=>lsGet('tq_free_gift',{ productId:null, minOrder:100, enabled:false }));
     const [lastCheckIn,    setLastCheckIn]    = useState(()=>lsGet('tq_last_checkin',''));
@@ -3189,6 +3197,8 @@
     useEffect(() => { lsSet('tq_text_reviews',  textReviews);  }, [textReviews]);
     useEffect(() => { lsSet('tq_announcement',  announcement); }, [announcement]);
     useEffect(() => { lsSet('tq_free_gift',     freeGiftConfig); }, [freeGiftConfig]);
+    useEffect(() => { lsSet('tq_notifications', notifications.slice(0,40)); }, [notifications]);
+    useEffect(() => { lsSet('tq_notif_read',    lastNotifRead); }, [lastNotifRead]);
     useEffect(() => { lsSet('tq_last_checkin',  lastCheckIn);  }, [lastCheckIn]);
     useEffect(() => { lsSet('tq_checkin_streak',checkInStreak);}, [checkInStreak]);
     useEffect(() => {
@@ -3217,7 +3227,22 @@
     const cartCount = useMemo(()=>Object.values(cart).reduce((a,b)=>a+b,0),[cart]);
     const smartTip  = useMemo(()=>Object.keys(cart).length>0?getSmartSuggestion(cart,products):null,[cart,products]);
     const maxP         = useMemo(()=>products.length?Math.ceil(Math.max(...products.map(p=>p.price))):100,[products]);
-    const showToast    = useCallback((msg)=>{ setToast(msg); setNotifications(prev=>[{id:Date.now(),msg,time:Date.now()},...prev].slice(0,60)); },[]);
+    const showToast    = useCallback((msg)=>{
+      setToast(msg);
+      const icon = msg.includes('سلة')||msg.includes('أُضيف')?'🛒'
+        : msg.includes('طلب')||msg.includes('استلام')?'📦'
+        : msg.includes('نقطة')||msg.includes('ولاء')?'⭐'
+        : msg.includes('خصم')||msg.includes('كوبون')||msg.includes('عرض')?'🏷️'
+        : msg.includes('سعر')||msg.includes('انخفض')?'📉'
+        : msg.includes('مراجعة')?'💬'
+        : msg.includes('هدية')||msg.includes('مجان')?'🎁'
+        : msg.includes('عجلة')?'🎰'
+        : msg.includes('تسجيل')||msg.includes('يومي')?'🔥'
+        : msg.includes('إلغاء')?'❌'
+        : msg.includes('توصيل')?'🚚'
+        : '🔔';
+      setNotifications(prev=>[{id:Date.now(), msg, icon, time:Date.now()},...prev].slice(0,40));
+    },[]);
     const addToCart    = useCallback((product)=>{ setCart(prev=>({...prev,[product.id]:(prev[product.id]||0)+1})); showToast(`أُضيف ${product.name} إلى السلة`); },[showToast]);
     const updateCart   = useCallback((id,qty)=>{
       if (qty<=0) {
@@ -3418,19 +3443,21 @@
         </div>
 
         <header style={{ background:'#fff', boxShadow:'0 2px 14px rgba(0,0,0,0.08)', position:'sticky', top:0, zIndex:200 }}>
-          <div style={{ maxWidth:1200, margin:'0 auto', padding:'12px 20px', display:'flex', alignItems:'center', gap:14 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
-              <div style={{ width:46, height:46, borderRadius:13, background:`linear-gradient(135deg,${GREEN},${TEAL})`, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <CartIcon size={24} color="#fff"/>
+          <div style={{ maxWidth:1200, margin:'0 auto', padding:winW<=768?'10px 14px':'12px 20px', display:'flex', alignItems:'center', gap:winW<=768?10:14 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+              <div style={{ width:winW<=768?38:46, height:winW<=768?38:46, borderRadius:13, background:`linear-gradient(135deg,${GREEN},${TEAL})`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <CartIcon size={winW<=768?20:24} color="#fff"/>
               </div>
-              <div style={{ lineHeight:1.2 }}>
-                <div style={{ fontWeight:900, fontSize:16, color:DARK }}>Top Quality</div>
-                {userProfile?.name ? (
-                  <div style={{ fontSize:10, color:TEAL, fontWeight:700 }}>{greeting}، {userProfile.name.split(' ')[0]}</div>
-                ) : (
-                  <div style={{ fontWeight:600, fontSize:11, color:TEAL, letterSpacing:'0.5px' }}>SUPER MARKET</div>
-                )}
-              </div>
+              {winW>768 && (
+                <div style={{ lineHeight:1.2 }}>
+                  <div style={{ fontWeight:900, fontSize:16, color:DARK }}>Top Quality</div>
+                  {userProfile?.name ? (
+                    <div style={{ fontSize:10, color:TEAL, fontWeight:700 }}>{greeting}، {userProfile.name.split(' ')[0]}</div>
+                  ) : (
+                    <div style={{ fontWeight:600, fontSize:11, color:TEAL, letterSpacing:'0.5px' }}>SUPER MARKET</div>
+                  )}
+                </div>
+              )}
             </div>
             <div style={{ flex:1, position:'relative' }}>
               <div style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none', zIndex:1 }}><SearchIcon size={17} color="#bbb"/></div>
@@ -3451,59 +3478,71 @@
                 onClearHistory={()=>setSearchHistory([])}
               />
             </div>
-            <div style={{ display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
-              {installPrompt && (
+            <div style={{ display:'flex', gap:winW<=768?6:8, alignItems:'center', flexShrink:0 }}>
+              {/* ── أزرار سطح المكتب فقط ── */}
+              {winW>768 && installPrompt && (
                 <button onClick={()=>{ installPrompt.prompt(); installPrompt.userChoice.then(()=>setInstallPrompt(null)); }} title="تثبيت التطبيق"
-                  style={{ background:'#e8f5e9', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', color:GREEN, fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700 }}>
+                  style={{ background:'#e8f5e9', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, color:GREEN, fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700 }}>
                   <DownloadIcon size={16} color={GREEN}/> تثبيت
                 </button>
               )}
-              <button onClick={()=>setListView(v=>!v)} title={listView?'عرض شبكة':'عرض قائمة'}
-                style={{ background:listView?GREEN+'18':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}
-                onMouseEnter={e=>e.currentTarget.style.background=GREEN+'28'} onMouseLeave={e=>e.currentTarget.style.background=listView?GREEN+'18':'#f4f6f8'}>
-                {listView ? <GridIcon size={18} color={GREEN}/> : <ListIcon size={18} color="#888"/>}
+              {winW>768 && (
+                <button onClick={()=>setListView(v=>!v)} title={listView?'عرض شبكة':'عرض قائمة'}
+                  style={{ background:listView?GREEN+'18':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}>
+                  {listView ? <GridIcon size={18} color={GREEN}/> : <ListIcon size={18} color="#888"/>}
+                </button>
+              )}
+              {winW>768 && (
+                <button onClick={()=>setShowFilters(!showFilters)} title="فلاتر متقدمة" style={{ background:(showFilters||hasActiveFilters)?GREEN+'22':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', position:'relative' }}>
+                  <SlidersIcon size={18} color={(showFilters||hasActiveFilters)?GREEN:'#888'}/>
+                  {hasActiveFilters && <span style={{ position:'absolute', top:6, right:6, width:7, height:7, borderRadius:'50%', background:GREEN, border:'2px solid #fff' }}/>}
+                </button>
+              )}
+              {winW>768 && (
+                <button onClick={()=>{setShowFavs(!showFavs);setSearch('');setSelectedCat('all');}} style={{ background:showFavs?'#fce4ec':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 13px', cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.18s' }}>
+                  <HeartIcon size={18} color={showFavs?'#e74c3c':'#888'} filled={showFavs}/>
+                  {favorites.size>0 && <span style={{ background:'#e74c3c', color:'#fff', borderRadius:'50%', width:18, height:18, fontSize:10, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center' }}>{favorites.size}</span>}
+                </button>
+              )}
+              {winW>768 && (
+                <button onClick={()=>setShowShoppingList(true)} title="قائمة التسوق" style={{ background:shoppingList.length>0?GREEN+'18':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', position:'relative' }}>
+                  <ListCheckIcon size={18} color={shoppingList.length>0?GREEN:'#888'}/>
+                  {shoppingList.length>0 && <span style={{ background:GREEN, color:'#fff', borderRadius:'50%', width:17, height:17, fontSize:10, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center' }}>{shoppingList.filter(i=>!i.done).length}</span>}
+                </button>
+              )}
+              {winW>768 && (
+                <button onClick={()=>setShowOrders(true)} title="طلباتي" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', position:'relative' }}>
+                  <ClockIcon size={18} color={orders.length>0?TEAL:'#888'}/>
+                  {orders.length>0 && <span style={{ background:TEAL, color:'#fff', borderRadius:'50%', width:17, height:17, fontSize:10, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center' }}>{orders.length}</span>}
+                </button>
+              )}
+              {/* ── جرس الإشعارات (يظهر دائماً) ── */}
+              <button onClick={()=>{ setShowNotifCenter(true); setLastNotifRead(Date.now()); }} title="مركز الإشعارات"
+                style={{ background:unreadNotifCount>0?GREEN+'18':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', transition:'all 0.18s' }}>
+                <BellIcon size={18} color={unreadNotifCount>0?GREEN:'#888'}/>
+                {unreadNotifCount>0 && <span style={{ position:'absolute', top:4, right:4, minWidth:17, height:17, borderRadius:9, background:'#e74c3c', border:'2px solid #fff', fontSize:9, fontWeight:900, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px' }}>{unreadNotifCount>9?'9+':unreadNotifCount}</span>}
               </button>
-              <button onClick={()=>setShowFilters(!showFilters)} title="فلاتر متقدمة" style={{ background:(showFilters||hasActiveFilters)?GREEN+'22':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', position:'relative' }}>
-                <SlidersIcon size={18} color={(showFilters||hasActiveFilters)?GREEN:'#888'}/>
-                {hasActiveFilters && <span style={{ position:'absolute', top:6, right:6, width:7, height:7, borderRadius:'50%', background:GREEN, border:'2px solid #fff' }}/>}
-              </button>
-              <button onClick={()=>{setShowFavs(!showFavs);setSearch('');setSelectedCat('all');}} style={{ background:showFavs?'#fce4ec':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 13px', cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.18s' }}>
-                <HeartIcon size={18} color={showFavs?'#e74c3c':'#888'} filled={showFavs}/>
-                {favorites.size>0 && <span style={{ background:'#e74c3c', color:'#fff', borderRadius:'50%', width:18, height:18, fontSize:10, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center' }}>{favorites.size}</span>}
-              </button>
-              <button onClick={()=>setCartOpen(true)} style={{ background:cartCount>0?GREEN:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 16px', cursor:'pointer', display:'flex', alignItems:'center', gap:8, fontFamily:'Tajawal,sans-serif', fontWeight:800, fontSize:14, color:cartCount>0?'#fff':'#888', transition:'all 0.2s' }}>
+              {/* ── سلة التسوق (تظهر دائماً) ── */}
+              <button onClick={()=>setCartOpen(true)} style={{ background:cartCount>0?GREEN:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 14px', cursor:'pointer', display:'flex', alignItems:'center', gap:7, fontFamily:'Tajawal,sans-serif', fontWeight:800, fontSize:14, color:cartCount>0?'#fff':'#888', transition:'all 0.2s', position:'relative' }}>
                 <CartIcon size={18} color={cartCount>0?'#fff':'#888'}/>
                 {cartCount>0 && <span>{cartCount}</span>}
               </button>
-              <button onClick={()=>setShowShoppingList(true)} title="قائمة التسوق" style={{ background:shoppingList.length>0?GREEN+'18':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', position:'relative' }}
-                onMouseEnter={e=>e.currentTarget.style.background=GREEN+'28'} onMouseLeave={e=>e.currentTarget.style.background=shoppingList.length>0?GREEN+'18':'#f4f6f8'}>
-                <ListCheckIcon size={18} color={shoppingList.length>0?GREEN:'#888'}/>
-                {shoppingList.length>0 && <span style={{ background:GREEN, color:'#fff', borderRadius:'50%', width:17, height:17, fontSize:10, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center' }}>{shoppingList.filter(i=>!i.done).length}</span>}
-              </button>
-              <button onClick={()=>setShowOrders(true)} title="طلباتي" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', position:'relative' }}
-                onMouseEnter={e=>e.currentTarget.style.background='#e3f2fd'} onMouseLeave={e=>e.currentTarget.style.background='#f4f6f8'}>
-                <ClockIcon size={18} color={orders.length>0?TEAL:'#888'}/>
-                {orders.length>0 && <span style={{ background:TEAL, color:'#fff', borderRadius:'50%', width:17, height:17, fontSize:10, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center' }}>{orders.length}</span>}
-              </button>
-              <button onClick={()=>{ setShowNotifCenter(true); setLastNotifRead(Date.now()); }} title="مركز الإشعارات"
-                style={{ background:unreadNotifCount>0?GREEN+'18':'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', transition:'all 0.18s' }}
-                onMouseEnter={e=>e.currentTarget.style.background=GREEN+'28'} onMouseLeave={e=>e.currentTarget.style.background=unreadNotifCount>0?GREEN+'18':'#f4f6f8'}>
-                <BellIcon size={18} color={unreadNotifCount>0?GREEN:'#888'}/>
-                {unreadNotifCount>0 && <span style={{ position:'absolute', top:5, right:5, minWidth:16, height:16, borderRadius:8, background:'#e74c3c', border:'2px solid #fff', fontSize:9, fontWeight:900, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px' }}>{unreadNotifCount>9?'9+':unreadNotifCount}</span>}
-              </button>
-              <button onClick={()=>setDarkMode(d=>!d)} title={darkMode?'وضع فاتح':'وضع مظلم'} style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}
-                onMouseEnter={e=>e.currentTarget.style.background='#e8f5e9'} onMouseLeave={e=>e.currentTarget.style.background='#f4f6f8'}>
-                {darkMode ? <SunIcon size={19} color="#f0c030"/> : <MoonIcon size={19} color="#888"/>}
-              </button>
-              <button onClick={()=>setShowProfile(true)} title="حسابي" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s', position:'relative' }}
-                onMouseEnter={e=>e.currentTarget.style.background='#e8f5e9'} onMouseLeave={e=>e.currentTarget.style.background='#f4f6f8'}>
-                <UserIcon size={18} color={userProfile.name?GREEN:'#888'}/>
-                {loyaltyPoints>0 && <span style={{ background:'#f39c12', color:'#fff', borderRadius:20, padding:'1px 7px', fontSize:10, fontWeight:900 }}>{loyaltyPoints}</span>}
-              </button>
-              <button onClick={()=>setView('admin')} title="لوحة الإدارة" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}
-                onMouseEnter={e=>{e.currentTarget.style.background='#e8f5e9';}} onMouseLeave={e=>{e.currentTarget.style.background='#f4f6f8';}}>
-                <SettingsIcon size={19} color="#888"/>
-              </button>
+              {winW>768 && (
+                <button onClick={()=>setDarkMode(d=>!d)} title={darkMode?'وضع فاتح':'وضع مظلم'} style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}>
+                  {darkMode ? <SunIcon size={19} color="#f0c030"/> : <MoonIcon size={19} color="#888"/>}
+                </button>
+              )}
+              {winW>768 && (
+                <button onClick={()=>setShowProfile(true)} title="حسابي" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s' }}>
+                  <UserIcon size={18} color={userProfile.name?GREEN:'#888'}/>
+                  {loyaltyPoints>0 && <span style={{ background:'#f39c12', color:'#fff', borderRadius:20, padding:'1px 7px', fontSize:10, fontWeight:900 }}>{loyaltyPoints}</span>}
+                </button>
+              )}
+              {winW>768 && (
+                <button onClick={()=>setView('admin')} title="لوحة الإدارة" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}>
+                  <SettingsIcon size={19} color="#888"/>
+                </button>
+              )}
             </div>
           </div>
           {!showFavs && !search && (
@@ -3522,7 +3561,26 @@
           )}
         </header>
 
-        <main style={{ maxWidth:1200, margin:'0 auto', padding:`24px 20px ${winW<=768?'80px':compareList.length>0?'110px':'100px'}` }}>
+        <main style={{ maxWidth:1200, margin:'0 auto', padding:`${winW<=768?'14px 12px':'24px 20px'} ${winW<=768?'80px':compareList.length>0?'110px':'100px'}` }}>
+          {/* شريط أدوات الجوال السريع */}
+          {winW<=768 && (
+            <div style={{ display:'flex', gap:8, marginBottom:12, overflowX:'auto', paddingBottom:4 }}>
+              <button onClick={()=>setShowFilters(v=>!v)} style={{ background:(showFilters||hasActiveFilters)?GREEN+'22':'#fff', color:(showFilters||hasActiveFilters)?GREEN:'#666', border:`1.5px solid ${(showFilters||hasActiveFilters)?GREEN:'#e0e0e0'}`, borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0, whiteSpace:'nowrap' }}>
+                <SlidersIcon size={14} color={(showFilters||hasActiveFilters)?GREEN:'#888'}/>
+                فلتر {hasActiveFilters?'●':''}
+              </button>
+              <button onClick={()=>setListView(v=>!v)} style={{ background:listView?GREEN+'22':'#fff', color:listView?GREEN:'#666', border:`1.5px solid ${listView?GREEN:'#e0e0e0'}`, borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
+                {listView ? <GridIcon size={13} color={GREEN}/> : <ListIcon size={13} color="#888"/>}
+                {listView?'شبكة':'قائمة'}
+              </button>
+              <button onClick={()=>setShowShoppingList(true)} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
+                <ListCheckIcon size={13} color="#888"/> قائمة التسوق
+              </button>
+              <button onClick={()=>setView('admin')} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
+                <SettingsIcon size={13} color="#888"/> الإدارة
+              </button>
+            </div>
+          )}
           {showFilters && !showFavs && <FilterPanel filters={filters} setFilters={setFilters} products={products}/>}
           {!showFavs && !search && selectedCat==='all' && orders.length>0 && (() => {
             const lastOrder = [...orders].sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
@@ -3591,7 +3649,7 @@
               }
             </div>
           ) : (
-            <div style={{ display:'grid', gridTemplateColumns:listView?'1fr':'repeat(auto-fill,minmax(210px,1fr))', gap:listView?10:20 }}>
+            <div style={{ display:'grid', gridTemplateColumns:listView?'1fr':winW<=480?'repeat(2,1fr)':'repeat(auto-fill,minmax(210px,1fr))', gap:listView?10:winW<=480?12:20 }}>
               {filteredProducts.map((product,i)=>(
                 <ProductCard key={product.id} product={product} onAdd={addToCart} onFav={toggleFav} isFav={favorites.has(product.id)} inCart={cart[product.id]||0} onCompare={toggleCompare} inCompare={compareList.includes(product.id)} onSelect={openProduct} animDelay={i*0.04} rating={productRatings[product.id]} isWatched={watchList[product.id]!==undefined} onWatch={toggleWatch} listMode={listView}/>
               ))}
@@ -3599,10 +3657,12 @@
           )}
         </main>
 
-        <button onClick={()=>setShowAI(true)} style={{ position:'fixed', bottom:compareList.length>0?86:28, left:28, zIndex:500, background:`linear-gradient(135deg,${TEAL},#0b7d96)`, color:'#fff', border:'none', borderRadius:26, padding:'14px 22px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:`0 6px 24px rgba(31,159,179,0.45)`, transition:'all 0.25s' }}
-          onMouseEnter={e=>e.currentTarget.style.transform='scale(1.06)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
-          <BotIcon size={20} color="#fff"/> مساعد ذكي
-        </button>
+        {winW > 768 && (
+          <button onClick={()=>setShowAI(true)} style={{ position:'fixed', bottom:compareList.length>0?86:28, left:28, zIndex:500, background:`linear-gradient(135deg,${TEAL},#0b7d96)`, color:'#fff', border:'none', borderRadius:26, padding:'14px 22px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:`0 6px 24px rgba(31,159,179,0.45)`, transition:'all 0.25s' }}
+            onMouseEnter={e=>e.currentTarget.style.transform='scale(1.06)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
+            <BotIcon size={20} color="#fff"/> مساعد ذكي
+          </button>
+        )}
 
         {showScrollTop && (
           <button onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} title="العودة للأعلى"
@@ -3616,9 +3676,9 @@
         {selectedProduct && <ProductDetailModal product={selectedProduct} products={products} cart={cart} onClose={()=>setSelectedProduct(null)} onAdd={addToCart} onFav={toggleFav} isFav={favorites.has(selectedProduct.id)} inCart={cart[selectedProduct.id]||0} onUpdate={updateCart} onSelect={openProduct} rating={productRatings[selectedProduct.id]} myRating={myRatings[selectedProduct.id]} onRate={(s)=>rateProduct(selectedProduct.id,s)} reviews={textReviews[selectedProduct.id]||[]} onAddReview={(r)=>addReview({...r, productId:selectedProduct.id})}/>}
         {waNumber && (
           <a href={`https://wa.me/${waNumber.replace(/\D/g,'')}?text=${encodeURIComponent('مرحباً، أريد الاستفسار عن منتجاتكم')}`} target="_blank" rel="noopener noreferrer"
-            style={{ position:'fixed', bottom:compareList.length>0?86:28, right:28, zIndex:500, background:'#25D366', color:'#fff', borderRadius:26, padding:'14px 20px', textDecoration:'none', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:'0 6px 24px rgba(37,211,102,0.45)', transition:'all 0.25s' }}
+            style={{ position:'fixed', bottom: winW<=768 ? 74 : (compareList.length>0?86:28), right:winW<=768?14:28, zIndex:500, background:'#25D366', color:'#fff', borderRadius:winW<=768?'50%':26, padding:winW<=768?'12px':('14px 20px'), textDecoration:'none', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:'0 6px 24px rgba(37,211,102,0.45)', transition:'all 0.25s', width:winW<=768?50:undefined, height:winW<=768?50:undefined, justifyContent:winW<=768?'center':undefined }}
             onMouseEnter={e=>e.currentTarget.style.transform='scale(1.06)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
-            <WhatsAppIcon size={20}/> واتساب
+            <WhatsAppIcon size={winW<=768?22:20}/>{winW>768 && ' واتساب'}
           </a>
         )}
         {showCompare && <CompareModal compareList={compareList} products={products} onClose={()=>setShowCompare(false)}/>}
@@ -3637,8 +3697,10 @@
             onAI={()=>setShowAI(true)}
             onOrders={()=>setShowOrders(true)}
             onProfile={()=>setShowProfile(true)}
-            shoppingList={shoppingList}
-            onShoppingList={()=>setShowShoppingList(true)}
+            onNotif={()=>{ setShowNotifCenter(true); setLastNotifRead(Date.now()); }}
+            unreadNotif={unreadNotifCount}
+            onFavs={()=>{ setShowFavs(v=>!v); setSearch(''); setSelectedCat('all'); }}
+            showFavs={showFavs}
           />
         )}
       </div>
