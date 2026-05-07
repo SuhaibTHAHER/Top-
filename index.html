@@ -2972,7 +2972,7 @@
 
   const FREE_DELIVERY_MIN = 80;
 
-  function CartDrawer({ cart, products, onClose, onUpdate, storeOpen, smartTip, appliedCoupon, onApplyCoupon, onRemoveCoupon, onCheckout, coupons, userProfile, loyaltyPoints, waNumber, freeGiftConfig }) {
+  function CartDrawer({ cart, products, onClose, onUpdate, storeOpen, smartTip, appliedCoupon, onApplyCoupon, onRemoveCoupon, onCheckout, coupons, userProfile, loyaltyPoints, waNumber, freeGiftConfig, isGuest }) {
     const [showCheckout, setShowCheckout] = useState(false);
     const [cartNotes,    setCartNotes]    = useState({});
     const [openNoteId,   setOpenNoteId]   = useState(null);
@@ -3165,8 +3165,13 @@
                   <WhatsAppIcon size={16} fill="#25D366"/> أرسل طلبك عبر واتساب
                 </a>
               )}
-              <button onClick={storeOpen ? ()=>setShowCheckout(true) : undefined} style={{ width:'100%', padding:'13px', background:storeOpen?GREEN:'#ccc', color:'#fff', border:'none', borderRadius:13, fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, cursor:storeOpen?'pointer':'not-allowed', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
-                {storeOpen ? <><ShoppingBagIcon size={18} color="#fff"/> إتمام الطلب</> : <><LockIcon size={18} color="#fff"/> المتجر مغلق</>}
+              {isGuest && (
+                <div style={{ background:'#fff8e1', border:'1.5px solid #ffd54f', borderRadius:12, padding:'11px 14px', marginBottom:10, fontSize:13, color:'#e65100', fontWeight:700, display:'flex', alignItems:'center', gap:8 }}>
+                  🔐 سجّل دخولك لإتمام الطلب والاستمتاع بنقاط الولاء
+                </div>
+              )}
+              <button onClick={storeOpen && !isGuest ? ()=>setShowCheckout(true) : isGuest ? ()=>onCheckout() : undefined} style={{ width:'100%', padding:'13px', background:isGuest?'#f39c12':storeOpen?GREEN:'#ccc', color:'#fff', border:'none', borderRadius:13, fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, cursor:(storeOpen||isGuest)?'pointer':'not-allowed', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                {isGuest ? <><UserIcon size={18} color="#fff"/> سجّل الدخول للطلب</> : storeOpen ? <><ShoppingBagIcon size={18} color="#fff"/> إتمام الطلب</> : <><LockIcon size={18} color="#fff"/> المتجر مغلق</>}
               </button>
               {showCheckout && <CheckoutModal cart={cart} products={products} appliedCoupon={appliedCoupon} userProfile={userProfile||{}} onConfirm={(data)=>{ onCheckout({...data, loyaltyUsed:loyaltyDiscount, cartNotes}); setShowCheckout(false); setUseLoyalty(false); setCartNotes({}); }} onClose={()=>setShowCheckout(false)}/>}
             </div>
@@ -3321,15 +3326,9 @@
   }
 
   /* ─────────────────────────────────────────────────────────────────────── */
-  function App() {
-    // ── Auth ────────────────────────────────────────────────────────────
-    const [currentUser, setCurrentUser] = useState(() => {
-      const sid = lsGet('tq_session', null);
-      if (!sid) return null;
-      const users = lsGet('tq_users', []);
-      return users.find(u => u.id === sid) || null;
-    });
-    const [darkMode,        setDarkMode]        = useState(()=>lsGet('tq_dark', false));
+  function ShopApp({ currentUser, onLogout, darkMode, setDarkMode }) {
+    const uid = currentUser.id;
+    const uk  = (key) => `${key}_${uid}`;
 
     const [products,    setProducts]    = useState(() => lsGet('tq_products', window.INITIAL_PRODUCTS));
     const [storeOpen,   setStoreOpen]   = useState(() => lsGet('tq_store_open', true));
@@ -3346,24 +3345,24 @@
     const [filters,       setFilters]       = useState({minPrice:0,maxPrice:9999,discountOnly:false,inStockOnly:false,sort:'default',labels:[]});
     const [compareList,   setCompareList]   = useState([]);
     const [showCompare,   setShowCompare]   = useState(false);
-    const [searchHistory, setSearchHistory] = useState(()=>lsGet('tq_search_history', []));
+    const [searchHistory, setSearchHistory] = useState(()=>lsGet(uk('tq_search_history'), []));
     const [showSearchDrop,setShowSearchDrop]= useState(false);
     const [appliedCoupon,   setAppliedCoupon]   = useState(null);
-    const [orders,          setOrders]          = useState(()=>lsGet('tq_orders', []));
+    const [orders,          setOrders]          = useState(()=>lsGet(uk('tq_orders'), []));
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [ratings,   setRatings]   = useState(()=>lsGet('tq_ratings', {}));
-    const [myRatings, setMyRatings] = useState(()=>lsGet('tq_my_ratings', {}));
-    const [notifOn,   setNotifOn]   = useState(()=>lsGet('tq_notif', false));
+    const [myRatings, setMyRatings] = useState(()=>lsGet(uk('tq_my_ratings'), {}));
+    const [notifOn,   setNotifOn]   = useState(()=>lsGet(uk('tq_notif'), false));
     const [waNumber,  setWaNumber]  = useState(()=>lsGet('tq_wa_number', ''));
-    const [shoppingList,     setShoppingList]     = useState(()=>lsGet('tq_shopping_list', []));
+    const [shoppingList,     setShoppingList]     = useState(()=>lsGet(uk('tq_shopping_list'), []));
     const [showShoppingList, setShowShoppingList] = useState(false);
     const [showOrders,       setShowOrders]       = useState(false);
     const [undoSnack,        setUndoSnack]        = useState(null);
-    const [watchList,        setWatchList]        = useState(()=>lsGet('tq_watch_list', {}));
+    const [watchList,        setWatchList]        = useState(()=>lsGet(uk('tq_watch_list'), {}));
     const [coupons,          setCoupons]          = useState(()=>lsGet('tq_coupons', DEFAULT_COUPONS));
-    const [userProfile,      setUserProfile]      = useState(()=>lsGet('tq_user_profile', {name:'',phone:'',address:''}));
-    const [loyaltyPoints,    setLoyaltyPoints]    = useState(()=>lsGet('tq_loyalty', 0));
-    const [recentlyViewed,   setRecentlyViewed]   = useState(()=>lsGet('tq_recently_viewed', []));
+    const [userProfile,      setUserProfile]      = useState(()=>lsGet(uk('tq_user_profile'), {name:'',phone:'',address:''}));
+    const [loyaltyPoints,    setLoyaltyPoints]    = useState(()=>lsGet(uk('tq_loyalty'), 0));
+    const [recentlyViewed,   setRecentlyViewed]   = useState(()=>lsGet(uk('tq_recently_viewed'), []));
     const [showProfile,      setShowProfile]      = useState(false);
     const [listView,         setListView]         = useState(false);
     const [showScrollTop,    setShowScrollTop]    = useState(false);
@@ -3372,35 +3371,26 @@
     const [textReviews,    setTextReviews]    = useState(()=>lsGet('tq_text_reviews', {}));
     const [voiceActive,    setVoiceActive]    = useState(false);
     const [announcement,   setAnnouncement]   = useState(()=>lsGet('tq_announcement', ''));
-    const [notifications,  setNotifications]  = useState(()=>lsGet('tq_notifications',[]));
+    const [notifications,  setNotifications]  = useState(()=>lsGet(uk('tq_notifications'),[]));
     const [showNotifCenter,setShowNotifCenter]= useState(false);
-    const [lastNotifRead,  setLastNotifRead]  = useState(()=>lsGet('tq_notif_read', 0));
+    const [lastNotifRead,  setLastNotifRead]  = useState(()=>lsGet(uk('tq_notif_read'), 0));
     const [showLuckyWheel, setShowLuckyWheel] = useState(false);
     const [freeGiftConfig, setFreeGiftConfig] = useState(()=>lsGet('tq_free_gift',{ productId:null, minOrder:100, enabled:false }));
-    const [lastCheckIn,    setLastCheckIn]    = useState(()=>lsGet('tq_last_checkin',''));
-    const [checkInStreak,  setCheckInStreak]  = useState(()=>lsGet('tq_checkin_streak',0));
+    const [lastCheckIn,    setLastCheckIn]    = useState(()=>lsGet(uk('tq_last_checkin'),''));
+    const [checkInStreak,  setCheckInStreak]  = useState(()=>lsGet(uk('tq_checkin_streak'),0));
     const [winW,           setWinW]           = useState(window.innerWidth);
-
-    // ── Auth helpers ─────────────────────────────────────────────────────
-    const handleLogin  = (user) => { setCurrentUser(user); };
-    const handleLogout = () => {
-      try { localStorage.removeItem('tq_session'); } catch {}
-      setCurrentUser(null);
-      setCart({});
-    };
 
     // ── حفظ تلقائي في localStorage ──────────────────────────────────────
     useEffect(() => { lsSet('tq_products',       products);      }, [products]);
     useEffect(() => { lsSet('tq_store_open',    storeOpen);     }, [storeOpen]);
-    useEffect(() => { lsSet('tq_search_history',searchHistory); }, [searchHistory]);
-    useEffect(() => { lsSet('tq_orders', orders); }, [orders]);
-    useEffect(() => { lsSet('tq_dark',       darkMode);   }, [darkMode]);
+    useEffect(() => { lsSet(uk('tq_search_history'),searchHistory); }, [searchHistory]);
+    useEffect(() => { lsSet(uk('tq_orders'), orders); }, [orders]);
     useEffect(() => { lsSet('tq_ratings',    ratings);    }, [ratings]);
-    useEffect(() => { lsSet('tq_my_ratings', myRatings);  }, [myRatings]);
-    useEffect(() => { lsSet('tq_notif',      notifOn);    }, [notifOn]);
+    useEffect(() => { lsSet(uk('tq_my_ratings'), myRatings);  }, [myRatings]);
+    useEffect(() => { lsSet(uk('tq_notif'),      notifOn);    }, [notifOn]);
     useEffect(() => { lsSet('tq_wa_number',  waNumber);   }, [waNumber]);
-    useEffect(() => { lsSet('tq_shopping_list', shoppingList); }, [shoppingList]);
-    useEffect(() => { lsSet('tq_watch_list',    watchList);    }, [watchList]);
+    useEffect(() => { lsSet(uk('tq_shopping_list'), shoppingList); }, [shoppingList]);
+    useEffect(() => { lsSet(uk('tq_watch_list'),    watchList);    }, [watchList]);
     useEffect(() => {
       const onScroll = () => setShowScrollTop(window.scrollY > 380);
       window.addEventListener('scroll', onScroll, { passive:true });
@@ -3412,16 +3402,26 @@
       return () => window.removeEventListener('beforeinstallprompt', handler);
     }, []);
     useEffect(() => { lsSet('tq_coupons',       coupons);      }, [coupons]);
-    useEffect(() => { lsSet('tq_recently_viewed', recentlyViewed); }, [recentlyViewed]);
-    useEffect(() => { lsSet('tq_user_profile',  userProfile);  }, [userProfile]);
-    useEffect(() => { lsSet('tq_loyalty',       loyaltyPoints);}, [loyaltyPoints]);
+    useEffect(() => { lsSet(uk('tq_recently_viewed'), recentlyViewed); }, [recentlyViewed]);
+    useEffect(() => { lsSet(uk('tq_user_profile'),  userProfile);  }, [userProfile]);
+    // تعبئة الاسم والهاتف من بيانات الحساب إذا كانت فارغة
+    useEffect(() => {
+      if (!currentUser.isGuest && (!userProfile.name || !userProfile.phone)) {
+        setUserProfile(prev => ({
+          ...prev,
+          name: prev.name || currentUser.name || '',
+          phone: prev.phone || currentUser.phone || '',
+        }));
+      }
+    }, []);
+    useEffect(() => { lsSet(uk('tq_loyalty'),       loyaltyPoints);}, [loyaltyPoints]);
     useEffect(() => { lsSet('tq_text_reviews',  textReviews);  }, [textReviews]);
     useEffect(() => { lsSet('tq_announcement',  announcement); }, [announcement]);
     useEffect(() => { lsSet('tq_free_gift',     freeGiftConfig); }, [freeGiftConfig]);
-    useEffect(() => { lsSet('tq_notifications', notifications.slice(0,40)); }, [notifications]);
-    useEffect(() => { lsSet('tq_notif_read',    lastNotifRead); }, [lastNotifRead]);
-    useEffect(() => { lsSet('tq_last_checkin',  lastCheckIn);  }, [lastCheckIn]);
-    useEffect(() => { lsSet('tq_checkin_streak',checkInStreak);}, [checkInStreak]);
+    useEffect(() => { lsSet(uk('tq_notifications'), notifications.slice(0,40)); }, [notifications]);
+    useEffect(() => { lsSet(uk('tq_notif_read'),    lastNotifRead); }, [lastNotifRead]);
+    useEffect(() => { lsSet(uk('tq_last_checkin'),  lastCheckIn);  }, [lastCheckIn]);
+    useEffect(() => { lsSet(uk('tq_checkin_streak'),checkInStreak);}, [checkInStreak]);
     useEffect(() => {
       const handler = () => setWinW(window.innerWidth);
       window.addEventListener('resize', handler);
@@ -3474,6 +3474,7 @@
     const toggleCompare = useCallback((id)=>{ setCompareList(prev=>{ if(prev.includes(id))return prev.filter(x=>x!==id); if(prev.length>=3){showToast('الحد الأقصى 3 منتجات للمقارنة');return prev;} return [...prev,id]; }); },[showToast]);
     const addToHistory  = useCallback((term)=>{ if(!term.trim())return; setSearchHistory(prev=>[term,...prev.filter(h=>h!==term)].slice(0,5)); },[]);
     const rateProduct = useCallback((productId, stars) => {
+      if (currentUser.isGuest) { showToast('سجّل دخولك لتتمكن من تقييم المنتجات'); return; }
       setMyRatings(prev => {
         const oldStar = prev[productId] || 0;
         setRatings(r => {
@@ -3497,6 +3498,7 @@
     , [ratings]);
 
     const checkout = useCallback((data={})=>{
+      if (currentUser.isGuest) { showToast('⚠️ سجّل دخولك أو أنشئ حساباً للإتمام'); return; }
       const items = Object.entries(cart).map(([id,qty])=>{
         const p = products.find(x=>x.id===Number(id));
         if (!p) return null;
@@ -3559,6 +3561,7 @@
     }, [lastCheckIn]);
 
     const doCheckIn = useCallback(() => {
+      if (currentUser.isGuest) { showToast('سجّل دخولك لجمع نقاط الولاء اليومية'); return; }
       if (!canCheckIn) return;
       const yesterday = new Date(Date.now() - 86400000).toDateString();
       const wasYesterday = lastCheckIn && new Date(lastCheckIn).toDateString() === yesterday;
@@ -3579,8 +3582,9 @@
     },[showToast]);
 
     const addReview = useCallback((review) => {
+      if (currentUser.isGuest) { showToast('سجّل دخولك لكتابة مراجعة'); return; }
       const pid = review.productId;
-      setTextReviews(prev => ({ ...prev, [pid]: [...(prev[pid]||[]), { id:Date.now(), author:review.author, text:review.text, stars:review.stars, date:review.date }] }));
+      setTextReviews(prev => ({ ...prev, [pid]: [...(prev[pid]||[]), { id:Date.now(), author:review.author||currentUser.name, text:review.text, stars:review.stars, date:review.date }] }));
       showToast('شكراً! تم نشر مراجعتك ⭐');
     }, [showToast]);
 
@@ -3631,9 +3635,6 @@
       return list;
     },[products,selectedCat,search,showFavs,favorites,filters]);
 
-    // ── Auth gate ──────────────────────────────────────────────────────
-    if (!currentUser) return <LoginScreen onLogin={handleLogin} darkMode={darkMode}/>;
-
     if (view==='admin') return <AdminPanel products={products} setProducts={setProducts} storeOpen={storeOpen} setStoreOpen={setStoreOpen} onExit={()=>setView('customer')} orders={orders} setOrders={setOrders} waNumber={waNumber} setWaNumber={setWaNumber} coupons={coupons} setCoupons={setCoupons} announcement={announcement} setAnnouncement={setAnnouncement} freeGiftConfig={freeGiftConfig} setFreeGiftConfig={setFreeGiftConfig}/>;
 
     return (
@@ -3675,8 +3676,10 @@
               {winW>768 && (
                 <div style={{ lineHeight:1.2 }}>
                   <div style={{ fontWeight:900, fontSize:16, color:DARK }}>Top Quality</div>
-                  {userProfile?.name ? (
-                    <div style={{ fontSize:10, color:TEAL, fontWeight:700 }}>{greeting}، {userProfile.name.split(' ')[0]}</div>
+                  {(userProfile?.name || currentUser?.name) && !currentUser?.isGuest ? (
+                    <div style={{ fontSize:10, color:TEAL, fontWeight:700 }}>{greeting}، {(userProfile.name||currentUser.name).split(' ')[0]}</div>
+                  ) : currentUser?.isGuest ? (
+                    <div style={{ fontSize:10, color:'#f39c12', fontWeight:700 }}>تصفح كضيف</div>
                   ) : (
                     <div style={{ fontWeight:600, fontSize:11, color:TEAL, letterSpacing:'0.5px' }}>SUPER MARKET</div>
                   )}
@@ -3757,10 +3760,16 @@
                 </button>
               )}
               {winW>768 && (
-                <button onClick={()=>setShowProfile(true)} title="حسابي" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s' }}>
-                  <UserIcon size={18} color={userProfile.name?GREEN:'#888'}/>
-                  {loyaltyPoints>0 && <span style={{ background:'#f39c12', color:'#fff', borderRadius:20, padding:'1px 7px', fontSize:10, fontWeight:900 }}>{loyaltyPoints}</span>}
-                </button>
+                currentUser.isGuest ? (
+                  <button onClick={onLogout} title="تسجيل الدخول" style={{ background:`linear-gradient(135deg,${GREEN},${TEAL})`, border:'none', borderRadius:11, padding:'8px 14px', cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.18s', color:'#fff', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700 }}>
+                    <UserIcon size={16} color="#fff"/> دخول / تسجيل
+                  </button>
+                ) : (
+                  <button onClick={()=>setShowProfile(true)} title="حسابي" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, transition:'all 0.18s' }}>
+                    <UserIcon size={18} color={userProfile.name||currentUser.name?GREEN:'#888'}/>
+                    {loyaltyPoints>0 && <span style={{ background:'#f39c12', color:'#fff', borderRadius:20, padding:'1px 7px', fontSize:10, fontWeight:900 }}>{loyaltyPoints}</span>}
+                  </button>
+                )
               )}
               {winW>768 && currentUser?.isAdmin && (
                 <button onClick={()=>setView('admin')} title="لوحة الإدارة" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}>
@@ -3898,7 +3907,7 @@
         )}
         <CompareBar compareList={compareList} products={products} onCompare={()=>setShowCompare(true)} onClear={()=>setCompareList([])} onRemove={id=>setCompareList(prev=>prev.filter(x=>x!==id))}/>
 
-        {cartOpen    && <CartDrawer cart={cart} products={products} onClose={()=>setCartOpen(false)} onUpdate={updateCart} storeOpen={storeOpen} smartTip={smartTip} appliedCoupon={appliedCoupon} onApplyCoupon={setAppliedCoupon} onRemoveCoupon={()=>setAppliedCoupon(null)} onCheckout={checkout} coupons={coupons} userProfile={userProfile} loyaltyPoints={loyaltyPoints} waNumber={waNumber} freeGiftConfig={freeGiftConfig}/>}
+        {cartOpen    && <CartDrawer cart={cart} products={products} onClose={()=>setCartOpen(false)} onUpdate={updateCart} storeOpen={storeOpen} smartTip={smartTip} appliedCoupon={appliedCoupon} onApplyCoupon={setAppliedCoupon} onRemoveCoupon={()=>setAppliedCoupon(null)} onCheckout={checkout} coupons={coupons} userProfile={userProfile} loyaltyPoints={currentUser.isGuest?0:loyaltyPoints} waNumber={waNumber} freeGiftConfig={freeGiftConfig} isGuest={currentUser.isGuest}/>}
         {selectedProduct && <ProductDetailModal product={selectedProduct} products={products} cart={cart} onClose={()=>setSelectedProduct(null)} onAdd={addToCart} onFav={toggleFav} isFav={favorites.has(selectedProduct.id)} inCart={cart[selectedProduct.id]||0} onUpdate={updateCart} onSelect={openProduct} rating={productRatings[selectedProduct.id]} myRating={myRatings[selectedProduct.id]} onRate={(s)=>rateProduct(selectedProduct.id,s)} reviews={textReviews[selectedProduct.id]||[]} onAddReview={(r)=>addReview({...r, productId:selectedProduct.id})}/>}
         {waNumber && (
           <a href={`https://wa.me/${waNumber.replace(/\D/g,'')}?text=${encodeURIComponent('مرحباً، أريد الاستفسار عن منتجاتكم')}`} target="_blank" rel="noopener noreferrer"
@@ -3911,7 +3920,7 @@
         {showAI      && <AIChat products={products} cart={cart} onClose={()=>setShowAI(false)}/>}
         {showShoppingList && <ShoppingListPanel list={shoppingList} onAdd={addShoppingItem} onToggle={toggleShoppingItem} onDelete={deleteShoppingItem} onClearDone={clearDoneItems} onClose={()=>setShowShoppingList(false)}/>}
         {showOrders   && <OrdersPanel orders={orders} products={products} onReorder={reorder} onCancel={cancelOrder} onClose={()=>setShowOrders(false)}/>}
-        {showProfile  && <UserProfilePanel profile={userProfile} onSave={setUserProfile} onClose={()=>setShowProfile(false)} loyaltyPoints={loyaltyPoints} orders={orders} products={products} currentUser={currentUser} onLogout={()=>{ setShowProfile(false); handleLogout(); }}/>}
+        {showProfile  && <UserProfilePanel profile={userProfile} onSave={setUserProfile} onClose={()=>setShowProfile(false)} loyaltyPoints={loyaltyPoints} orders={orders} products={products} currentUser={currentUser} onLogout={()=>{ setShowProfile(false); onLogout(); }}/>}
         {showNotifCenter && <NotifCenterPanel notifications={notifications} notifOn={notifOn} onToggleNotif={()=>{ if(!notifOn){ enableNotif(); } else { setNotifOn(false); showToast('تم إيقاف إشعارات الجهاز'); } }} onClose={()=>setShowNotifCenter(false)} onClear={()=>setNotifications([])}/>}
         {showLuckyWheel && <LuckyWheelModal onClose={()=>setShowLuckyWheel(false)} onClaim={(pts)=>{ if(pts>0){ setLoyaltyPoints(prev=>prev+pts); showToast(`🎰 عجلة الحظ: +${pts} نقطة مكافأة!`); } }}/>}
         {undoSnack   && <UndoSnack snack={undoSnack} onUndo={undoRemove} onDismiss={()=>setUndoSnack(null)}/>}
@@ -3932,6 +3941,26 @@
         )}
       </div>
     );
+  }
+
+  function App() {
+    const [currentUser, setCurrentUser] = useState(() => {
+      const sid = lsGet('tq_session', null);
+      if (!sid) return null;
+      const users = lsGet('tq_users', []);
+      return users.find(u => u.id === sid) || null;
+    });
+    const [darkMode, setDarkMode] = useState(() => lsGet('tq_dark', false));
+    useEffect(() => { lsSet('tq_dark', darkMode); }, [darkMode]);
+
+    const handleLogin  = (user) => { setCurrentUser(user); };
+    const handleLogout = () => {
+      try { localStorage.removeItem('tq_session'); } catch {}
+      setCurrentUser(null);
+    };
+
+    if (!currentUser) return <LoginScreen onLogin={handleLogin} darkMode={darkMode}/>;
+    return <ShopApp key={String(currentUser.id)} currentUser={currentUser} onLogout={handleLogout} darkMode={darkMode} setDarkMode={setDarkMode}/>;
   }
 
   ReactDOM.createRoot(document.getElementById('root')).render(<App />);
