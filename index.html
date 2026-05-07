@@ -1873,28 +1873,52 @@
   }
 
   /* ── MobileBottomNav ────────────────────────────────────────────────── */
-  function MobileBottomNav({ cartCount, orders, onCart, onAI, onOrders, onProfile, onNotif, unreadNotif, onFavs, showFavs }) {
-    const tabs = [
-      { id:'favs',    icon:<HeartIcon size={21} color={showFavs?'#e74c3c':'#888'} filled={showFavs}/>, label:'المفضلة', action:onFavs },
-      { id:'cart',    icon:<CartIcon  size={21} color={cartCount>0?GREEN:'#888'}/>, label:'السلة',    action:onCart,   badge:cartCount||0 },
-      { id:'ai',      icon:<BotIcon   size={21} color="#888"/>, label:'الذكاء',   action:onAI },
-      { id:'orders',  icon:<ClockIcon size={21} color={orders.length>0?TEAL:'#888'}/>, label:'طلباتي', action:onOrders, badge:orders.length||0 },
-      { id:'profile', icon:<UserIcon  size={21} color="#888"/>, label:'حسابي',   action:onProfile },
-    ];
+  function MobileBottomNav({ cartCount, orders, onCart, onAI, onOrders, onProfile, onNotif, unreadNotif, onFavs, showFavs, activePanel }) {
+    // activePanel: 'cart'|'orders'|'profile'|'favs'|'notif'|null
+    const isActive = (id) => activePanel === id || (id==='favs' && showFavs);
+
+    const Tab = ({ id, icon, label, action, badge, activeColor }) => {
+      const active = isActive(id);
+      const col = active ? (activeColor||GREEN) : '#9aa5b1';
+      return (
+        <button onClick={action}
+          style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2, padding:'8px 4px 6px', background:'none', border:'none', cursor:'pointer', fontFamily:'Tajawal,sans-serif', position:'relative', minHeight:58, WebkitTapHighlightColor:'transparent' }}>
+          {/* أيقونة النشاط */}
+          {active && <span style={{ position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:28, height:3, borderRadius:'0 0 3px 3px', background:activeColor||GREEN }}/>}
+          {/* Badge */}
+          {badge > 0 && (
+            <span style={{ position:'absolute', top:8, left:'50%', transform:'translateX(4px)', minWidth:17, height:17, borderRadius:9, background:'#e74c3c', color:'#fff', fontSize:9, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 3px', border:'2px solid #fff', zIndex:2 }}>
+              {badge>9?'9+':badge}
+            </span>
+          )}
+          <span style={{ display:'flex', alignItems:'center', justifyContent:'center', transition:'transform 0.15s', transform:active?'scale(1.12)':'scale(1)' }}>
+            {React.cloneElement(icon, { color: col })}
+          </span>
+          <span style={{ fontSize:10, color:col, fontWeight:active?800:500, transition:'color 0.15s', lineHeight:1 }}>{label}</span>
+        </button>
+      );
+    };
+
     return (
-      <nav style={{ position:'fixed', bottom:0, left:0, right:0, zIndex:800, background:'#fff', borderTop:'1.5px solid #e8ecf0', display:'flex', alignItems:'stretch', boxShadow:'0 -3px 16px rgba(0,0,0,0.09)', paddingBottom:'env(safe-area-inset-bottom,0px)' }}>
-        {tabs.map(t => (
-          <button key={t.id} onClick={t.action||undefined}
-            style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3, padding:'9px 0 7px', background:'none', border:'none', cursor:t.action?'pointer':'default', fontFamily:'Tajawal,sans-serif', position:'relative', minHeight:56 }}>
-            {t.badge > 0 && (
-              <span style={{ position:'absolute', top:6, right:'calc(50% - 18px)', minWidth:17, height:17, borderRadius:9, background:'#e74c3c', color:'#fff', fontSize:9, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 3px', border:'2px solid #fff' }}>
-                {t.badge>9?'9+':t.badge}
-              </span>
-            )}
-            <span style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>{t.icon}</span>
-            <span style={{ fontSize:10, color:'#888', fontWeight:600, marginTop:1 }}>{t.label}</span>
+      <nav style={{ position:'fixed', bottom:0, left:0, right:0, zIndex:800, background:'#fff', borderTop:'1px solid #eef0f3', display:'flex', alignItems:'stretch', boxShadow:'0 -4px 20px rgba(0,0,0,0.08)', paddingBottom:'env(safe-area-inset-bottom,0px)' }}>
+
+        <Tab id="profile" icon={<UserIcon size={23}/>}  label="حسابي"   action={onProfile} activeColor={GREEN}/>
+        <Tab id="orders"  icon={<ClockIcon size={23}/>} label="طلباتي"  action={onOrders}  activeColor={TEAL}  badge={orders.length||0}/>
+
+        {/* زر الذكاء الاصطناعي — المركزي البارز */}
+        <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', padding:'6px 4px 8px', position:'relative' }}>
+          <button onClick={onAI}
+            style={{ width:52, height:52, borderRadius:'50%', background:`linear-gradient(135deg,${TEAL},#0b7d96)`, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:`0 4px 16px rgba(31,159,179,0.5)`, transition:'transform 0.15s,box-shadow 0.15s', marginTop:-14, WebkitTapHighlightColor:'transparent' }}
+            onTouchStart={e=>{ e.currentTarget.style.transform='scale(0.93)'; e.currentTarget.style.boxShadow='0 2px 8px rgba(31,159,179,0.4)'; }}
+            onTouchEnd={e=>{ e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=`0 4px 16px rgba(31,159,179,0.5)`; }}>
+            <BotIcon size={24} color="#fff"/>
           </button>
-        ))}
+          <span style={{ position:'absolute', bottom:8, left:'50%', transform:'translateX(-50%)', fontSize:10, color:'#9aa5b1', fontWeight:500, whiteSpace:'nowrap' }}>مساعد</span>
+        </div>
+
+        <Tab id="cart"    icon={<CartIcon size={23}/>}  label="السلة"   action={onCart}    activeColor={GREEN} badge={cartCount||0}/>
+        <Tab id="favs"    icon={<HeartIcon size={23} filled={showFavs}/>} label="المفضلة" action={onFavs} activeColor="#e74c3c"/>
+
       </nav>
     );
   }
@@ -3701,6 +3725,7 @@
             unreadNotif={unreadNotifCount}
             onFavs={()=>{ setShowFavs(v=>!v); setSearch(''); setSelectedCat('all'); }}
             showFavs={showFavs}
+            activePanel={cartOpen?'cart':showOrders?'orders':showProfile?'profile':showFavs?'favs':null}
           />
         )}
       </div>
