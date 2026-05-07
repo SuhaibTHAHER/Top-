@@ -1873,53 +1873,93 @@
   }
 
   /* ── MobileBottomNav ────────────────────────────────────────────────── */
-  function MobileBottomNav({ cartCount, orders, onCart, onAI, onOrders, onProfile, onNotif, unreadNotif, onFavs, showFavs, activePanel }) {
-    // activePanel: 'cart'|'orders'|'profile'|'favs'|'notif'|null
+  function MobileBottomNav({ cartCount, orders, onCart, onAI, onOrders, onProfile, onFavs, showFavs, activePanel }) {
     const isActive = (id) => activePanel === id || (id==='favs' && showFavs);
 
-    const Tab = ({ id, icon, label, action, badge, activeColor }) => {
+    const NavBtn = ({ id, icon, label, action, badge, color }) => {
       const active = isActive(id);
-      const col = active ? (activeColor||GREEN) : '#9aa5b1';
+      const c = active ? (color||GREEN) : '#a0aab4';
       return (
-        <button onClick={action}
-          style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2, padding:'8px 4px 6px', background:'none', border:'none', cursor:'pointer', fontFamily:'Tajawal,sans-serif', position:'relative', minHeight:58, WebkitTapHighlightColor:'transparent' }}>
-          {/* أيقونة النشاط */}
-          {active && <span style={{ position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:28, height:3, borderRadius:'0 0 3px 3px', background:activeColor||GREEN }}/>}
+        <button onClick={action} style={{
+          flex:1, display:'flex', flexDirection:'column', alignItems:'center',
+          justifyContent:'flex-end', gap:3, paddingBottom:8, paddingTop:6,
+          background:'none', border:'none', cursor:'pointer',
+          fontFamily:'Tajawal,sans-serif', position:'relative',
+          WebkitTapHighlightColor:'transparent', outline:'none'
+        }}>
+          {/* شريط التفعيل العلوي */}
+          {active && (
+            <span style={{
+              position:'absolute', top:0, left:'50%', transform:'translateX(-50%)',
+              width:32, height:3, borderRadius:'0 0 4px 4px',
+              background:color||GREEN
+            }}/>
+          )}
           {/* Badge */}
           {badge > 0 && (
-            <span style={{ position:'absolute', top:8, left:'50%', transform:'translateX(4px)', minWidth:17, height:17, borderRadius:9, background:'#e74c3c', color:'#fff', fontSize:9, fontWeight:900, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 3px', border:'2px solid #fff', zIndex:2 }}>
-              {badge>9?'9+':badge}
+            <span style={{
+              position:'absolute', top:5, left:'calc(50% + 6px)',
+              minWidth:16, height:16, borderRadius:8,
+              background:'#e74c3c', color:'#fff', fontSize:9, fontWeight:900,
+              display:'flex', alignItems:'center', justifyContent:'center',
+              padding:'0 3px', border:'2px solid #fff', lineHeight:1
+            }}>
+              {badge > 9 ? '9+' : badge}
             </span>
           )}
-          <span style={{ display:'flex', alignItems:'center', justifyContent:'center', transition:'transform 0.15s', transform:active?'scale(1.12)':'scale(1)' }}>
-            {React.cloneElement(icon, { color: col })}
+          <span style={{ display:'flex', transform: active ? 'translateY(-2px)' : 'translateY(0)', transition:'transform 0.2s' }}>
+            {React.cloneElement(icon, { color: c, size: active ? 24 : 22 })}
           </span>
-          <span style={{ fontSize:10, color:col, fontWeight:active?800:500, transition:'color 0.15s', lineHeight:1 }}>{label}</span>
+          <span style={{
+            fontSize: 10, lineHeight:1, fontWeight: active ? 700 : 500,
+            color: c, transition:'color 0.2s'
+          }}>{label}</span>
         </button>
       );
     };
 
     return (
-      <nav style={{ position:'fixed', bottom:0, left:0, right:0, zIndex:800, background:'#fff', borderTop:'1px solid #eef0f3', display:'flex', alignItems:'stretch', boxShadow:'0 -4px 20px rgba(0,0,0,0.08)', paddingBottom:'env(safe-area-inset-bottom,0px)' }}>
+      <>
+        {/* شريط شفاف خلف الزر العائم */}
+        <div style={{ position:'fixed', bottom:0, left:0, right:0, height:62, zIndex:799,
+          background:'transparent', pointerEvents:'none' }}/>
+        <nav style={{
+          position:'fixed', bottom:0, left:0, right:0, zIndex:800,
+          background:'#fff', borderTop:'1.5px solid #eef1f5',
+          display:'flex', alignItems:'stretch', height:62,
+          boxShadow:'0 -2px 18px rgba(0,0,0,0.09)',
+          paddingBottom:'env(safe-area-inset-bottom,0px)',
+          overflow:'visible'
+        }}>
+          <NavBtn id="profile" icon={<UserIcon size={22}/>}  label="حسابي"  action={onProfile} color={GREEN}/>
+          <NavBtn id="orders"  icon={<ClockIcon size={22}/>} label="طلباتي" action={onOrders}  color={TEAL} badge={orders.length||0}/>
 
-        <Tab id="profile" icon={<UserIcon size={23}/>}  label="حسابي"   action={onProfile} activeColor={GREEN}/>
-        <Tab id="orders"  icon={<ClockIcon size={23}/>} label="طلباتي"  action={onOrders}  activeColor={TEAL}  badge={orders.length||0}/>
+          {/* ── زر المساعد الذكي المرتفع ── */}
+          <div style={{ flex:1, position:'relative', display:'flex', justifyContent:'center' }}>
+            <button onClick={onAI} style={{
+              position:'absolute', top:-22, left:'50%', transform:'translateX(-50%)',
+              width:56, height:56, borderRadius:'50%',
+              background:`linear-gradient(145deg,${TEAL} 0%,#0a6e84 100%)`,
+              border:'3.5px solid #fff',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              boxShadow:`0 6px 20px rgba(31,159,179,0.50), 0 2px 6px rgba(0,0,0,0.12)`,
+              cursor:'pointer', WebkitTapHighlightColor:'transparent',
+              transition:'transform 0.15s, box-shadow 0.15s'
+            }}
+            onTouchStart={e=>{e.currentTarget.style.transform='translateX(-50%) scale(0.91)';}}
+            onTouchEnd={e=>{e.currentTarget.style.transform='translateX(-50%) scale(1)';}}>
+              <BotIcon size={26} color="#fff"/>
+            </button>
+            <span style={{
+              position:'absolute', bottom:7, left:'50%', transform:'translateX(-50%)',
+              fontSize:10, color: TEAL, fontWeight:700, whiteSpace:'nowrap', lineHeight:1
+            }}>مساعد</span>
+          </div>
 
-        {/* زر الذكاء الاصطناعي — المركزي البارز */}
-        <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', padding:'6px 4px 8px', position:'relative' }}>
-          <button onClick={onAI}
-            style={{ width:52, height:52, borderRadius:'50%', background:`linear-gradient(135deg,${TEAL},#0b7d96)`, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:`0 4px 16px rgba(31,159,179,0.5)`, transition:'transform 0.15s,box-shadow 0.15s', marginTop:-14, WebkitTapHighlightColor:'transparent' }}
-            onTouchStart={e=>{ e.currentTarget.style.transform='scale(0.93)'; e.currentTarget.style.boxShadow='0 2px 8px rgba(31,159,179,0.4)'; }}
-            onTouchEnd={e=>{ e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=`0 4px 16px rgba(31,159,179,0.5)`; }}>
-            <BotIcon size={24} color="#fff"/>
-          </button>
-          <span style={{ position:'absolute', bottom:8, left:'50%', transform:'translateX(-50%)', fontSize:10, color:'#9aa5b1', fontWeight:500, whiteSpace:'nowrap' }}>مساعد</span>
-        </div>
-
-        <Tab id="cart"    icon={<CartIcon size={23}/>}  label="السلة"   action={onCart}    activeColor={GREEN} badge={cartCount||0}/>
-        <Tab id="favs"    icon={<HeartIcon size={23} filled={showFavs}/>} label="المفضلة" action={onFavs} activeColor="#e74c3c"/>
-
-      </nav>
+          <NavBtn id="cart"  icon={<CartIcon  size={22}/>} label="السلة"   action={onCart}  color={GREEN} badge={cartCount||0}/>
+          <NavBtn id="favs"  icon={<HeartIcon size={22} filled={showFavs}/>} label="المفضلة" action={onFavs} color="#e74c3c"/>
+        </nav>
+      </>
     );
   }
 
