@@ -1649,7 +1649,7 @@
   ];
 
   /* ── UserProfilePanel ────────────────────────────────────────────────── */
-  function UserProfilePanel({ profile, onSave, onClose, loyaltyPoints, orders, products }) {
+  function UserProfilePanel({ profile, onSave, onClose, loyaltyPoints, orders, products, currentUser, onLogout }) {
     const [form, setForm] = useState(profile);
     const upd = (k,v) => setForm(prev=>({...prev,[k]:v}));
     const Field = ({ label, k, type='text', ph='' }) => (
@@ -1660,6 +1660,10 @@
           onFocus={e=>e.target.style.borderColor=GREEN} onBlur={e=>e.target.style.borderColor='#eef0f2'}/>
       </div>
     );
+    const isGuest = currentUser?.isGuest;
+    const displayName = currentUser?.name || form.name || 'حسابي';
+    const badgeLabel = currentUser?.isAdmin ? '👑 مدير' : isGuest ? '👤 ضيف' : '⭐ عضو';
+    const badgeBg    = currentUser?.isAdmin ? '#7c3aed' : isGuest ? '#64748b' : 'rgba(255,255,255,0.2)';
     return (
       <div style={{ position:'fixed', inset:0, zIndex:2000, display:'flex', justifyContent:'flex-end', background:'rgba(0,0,0,0.4)' }} onClick={e=>e.target===e.currentTarget&&onClose()}>
         <div style={{ width:360, maxWidth:'95vw', background:'#fff', height:'100%', display:'flex', flexDirection:'column', boxShadow:'-8px 0 32px rgba(0,0,0,0.15)', animation:'drawerIn 0.28s ease' }}>
@@ -1669,8 +1673,11 @@
                 <UserIcon size={28} color="#fff"/>
               </div>
               <div>
-                <div style={{ color:'#fff', fontWeight:800, fontSize:17 }}>{form.name||'حسابي'}</div>
-                <div style={{ color:'rgba(255,255,255,0.75)', fontSize:12 }}>عميل مميز في Top Quality</div>
+                <div style={{ color:'#fff', fontWeight:800, fontSize:17 }}>{displayName}</div>
+                <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:4 }}>
+                  <span style={{ background:badgeBg, color:'#fff', borderRadius:20, padding:'2px 10px', fontSize:11, fontWeight:700 }}>{badgeLabel}</span>
+                  {currentUser?.phone && !isGuest && <span style={{ color:'rgba(255,255,255,0.7)', fontSize:11 }}>{currentUser.phone}</span>}
+                </div>
               </div>
             </div>
             <button onClick={onClose} style={{ background:'rgba(255,255,255,0.18)', border:'none', borderRadius:'50%', width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><XIcon size={17} color="#fff"/></button>
@@ -1741,14 +1748,26 @@
                 </div>
               );
             })()}
-            <Field label="الاسم الكامل" k="name" ph="أدخل اسمك الكامل"/>
-            <Field label="رقم الهاتف" k="phone" type="tel" ph="05X-XXXXXXX"/>
-            <Field label="العنوان" k="address" ph="حي، شارع، رقم المنزل"/>
-            <Field label="البريد الإلكتروني" k="email" type="email" ph="example@email.com"/>
+            {!isGuest && <>
+              <Field label="الاسم الكامل" k="name" ph="أدخل اسمك الكامل"/>
+              <Field label="رقم الهاتف" k="phone" type="tel" ph="05X-XXXXXXX"/>
+              <Field label="العنوان" k="address" ph="حي، شارع، رقم المنزل"/>
+              <Field label="البريد الإلكتروني" k="email" type="email" ph="example@email.com"/>
+            </>}
           </div>
-          <div style={{ padding:'16px 20px', borderTop:'1px solid #f0f0f0' }}>
-            <button onClick={()=>{ onSave(form); onClose(); }} style={{ width:'100%', background:`linear-gradient(135deg,${GREEN},#6fa832)`, color:'#fff', border:'none', borderRadius:13, padding:'14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', gap:8, boxShadow:'0 4px 14px rgba(140,198,63,0.35)' }}>
-              <CheckIcon size={18} color="#fff"/> حفظ البيانات
+          <div style={{ padding:'16px 20px', borderTop:'1px solid #f0f0f0', display:'flex', flexDirection:'column', gap:10 }}>
+            {!isGuest && (
+              <button onClick={()=>{ onSave(form); onClose(); }} style={{ width:'100%', background:`linear-gradient(135deg,${GREEN},#6fa832)`, color:'#fff', border:'none', borderRadius:13, padding:'14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', gap:8, boxShadow:'0 4px 14px rgba(140,198,63,0.35)' }}>
+                <CheckIcon size={18} color="#fff"/> حفظ البيانات
+              </button>
+            )}
+            {isGuest && (
+              <div style={{ background:'#fff8e1', border:'1px solid #ffd54f', borderRadius:12, padding:'12px 14px', fontSize:13, color:'#e65100', textAlign:'center', fontWeight:600 }}>
+                💡 أنت تتصفح كضيف — سجّل حساباً لحفظ بياناتك وطلباتك
+              </div>
+            )}
+            <button onClick={onLogout} style={{ width:'100%', background:'transparent', color:'#e74c3c', border:'1.5px solid #fecaca', borderRadius:13, padding:'12px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+              🚪 {isGuest ? 'إنشاء حساب / تسجيل الدخول' : 'تسجيل الخروج'}
             </button>
           </div>
         </div>
@@ -3180,7 +3199,138 @@
     }
   }
 
+  /* ── LoginScreen ─────────────────────────────────────────────────────── */
+  function LoginScreen({ onLogin, darkMode }) {
+    const [mode, setMode]     = useState('login');
+    const [form, setForm]     = useState({ name:'', phone:'', password:'', confirm:'' });
+    const [error, setError]   = useState('');
+    const [showPass, setShowPass] = useState(false);
+    const upd = (k,v) => setForm(f=>({...f,[k]:v}));
+
+    const getUsers = () => {
+      let users = lsGet('tq_users', []);
+      if (!users.find(u => u.isAdmin)) {
+        const admin = { id:'admin_1', name:'المدير', phone:'admin', email:'admin@topquality.com', password:'admin123', isAdmin:true, createdAt:Date.now() };
+        users = [admin, ...users];
+        lsSet('tq_users', users);
+      }
+      return users;
+    };
+
+    const doLogin = () => {
+      setError('');
+      if (!form.phone.trim() || !form.password) { setError('الرجاء إدخال رقم الهاتف وكلمة المرور'); return; }
+      const users = getUsers();
+      const u = users.find(u => u.phone === form.phone.trim() && u.password === form.password);
+      if (!u) { setError('رقم الهاتف أو كلمة المرور غير صحيحة'); return; }
+      lsSet('tq_session', u.id);
+      onLogin(u);
+    };
+
+    const doRegister = () => {
+      setError('');
+      if (!form.name.trim() || !form.phone.trim() || !form.password) { setError('الرجاء ملء جميع الحقول المطلوبة'); return; }
+      if (form.password.length < 6) { setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل'); return; }
+      if (form.password !== form.confirm) { setError('كلمتا المرور غير متطابقتين'); return; }
+      const users = getUsers();
+      if (users.find(u => u.phone === form.phone.trim())) { setError('رقم الهاتف مسجل مسبقاً، جرب تسجيل الدخول'); return; }
+      const newUser = { id:Date.now(), name:form.name.trim(), phone:form.phone.trim(), email:'', password:form.password, isAdmin:false, createdAt:Date.now() };
+      lsSet('tq_users', [...users, newUser]);
+      lsSet('tq_session', newUser.id);
+      onLogin(newUser);
+    };
+
+    const inp = (extra={}) => ({ width:'100%', padding:'12px 14px', borderRadius:12, border:`1.5px solid ${darkMode?'#2d3e50':'#dee2e6'}`, background:darkMode?'#1a2535':'#f8f9fa', color:darkMode?'#f1f5f9':'#2d3436', fontSize:15, outline:'none', fontFamily:'Tajawal,sans-serif', boxSizing:'border-box', ...extra });
+    const bg = darkMode ? '#1e293b' : '#fff';
+    const clr = darkMode ? '#f1f5f9' : '#2d3436';
+
+    return (
+      <div style={{ minHeight:'100vh', background:darkMode?'#0f172a':'linear-gradient(160deg,#8CC63F 0%,#1F9FB3 100%)', display:'flex', alignItems:'center', justifyContent:'center', padding:20, fontFamily:'Tajawal,sans-serif' }}>
+        <div style={{ background:bg, borderRadius:24, padding:'36px 28px', width:'100%', maxWidth:420, boxShadow:'0 24px 80px rgba(0,0,0,0.22)' }}>
+          {/* Logo */}
+          <div style={{ textAlign:'center', marginBottom:30 }}>
+            <div style={{ width:82, height:82, borderRadius:'50%', background:'linear-gradient(135deg,#8CC63F,#1F9FB3)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px', boxShadow:'0 8px 28px rgba(140,198,63,0.45)' }}>
+              <StoreIcon size={42} color="#fff"/>
+            </div>
+            <h1 style={{ fontSize:24, fontWeight:900, color:clr, margin:0 }}>توب كواليتي</h1>
+            <p style={{ color:darkMode?'#94a3b8':'#78909c', fontSize:13, margin:'5px 0 0' }}>سوبر ماركت الجودة العالية</p>
+          </div>
+
+          {/* Tabs */}
+          <div style={{ display:'flex', background:darkMode?'#0f172a':'#f1f5f9', borderRadius:14, padding:4, marginBottom:26, gap:3 }}>
+            {[['login','تسجيل الدخول'],['register','حساب جديد']].map(([m,label])=>(
+              <button key={m} onClick={()=>{setMode(m);setError('');setForm({name:'',phone:'',password:'',confirm:''}); }}
+                style={{ flex:1, padding:'10px 0', border:'none', borderRadius:11, fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:'Tajawal,sans-serif', background:mode===m?bg:'transparent', color:mode===m?clr:'#94a3b8', boxShadow:mode===m?'0 2px 10px rgba(0,0,0,0.1)':'none', transition:'all 0.2s' }}>{label}</button>
+            ))}
+          </div>
+
+          {/* Fields */}
+          <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            {mode==='register' && (
+              <div>
+                <label style={{ fontSize:13, fontWeight:700, color:darkMode?'#94a3b8':'#546e7a', display:'block', marginBottom:6 }}>الاسم الكامل *</label>
+                <input value={form.name} onChange={e=>upd('name',e.target.value)} placeholder="أدخل اسمك الكامل" style={inp()}/>
+              </div>
+            )}
+            <div>
+              <label style={{ fontSize:13, fontWeight:700, color:darkMode?'#94a3b8':'#546e7a', display:'block', marginBottom:6 }}>رقم الهاتف *</label>
+              <input value={form.phone} onChange={e=>upd('phone',e.target.value)} placeholder="05XXXXXXXX" dir="ltr" style={inp({ textAlign:'right' })} onKeyDown={e=>mode==='login'&&e.key==='Enter'&&doLogin()}/>
+            </div>
+            <div>
+              <label style={{ fontSize:13, fontWeight:700, color:darkMode?'#94a3b8':'#546e7a', display:'block', marginBottom:6 }}>كلمة المرور *</label>
+              <div style={{ position:'relative' }}>
+                <input type={showPass?'text':'password'} value={form.password} onChange={e=>upd('password',e.target.value)} placeholder="••••••••" style={inp({ paddingLeft:44 })} onKeyDown={e=>e.key==='Enter'&&(mode==='login'?doLogin():doRegister())}/>
+                <button onClick={()=>setShowPass(v=>!v)} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', fontSize:16, padding:0, lineHeight:1 }}>{showPass?'🙈':'👁️'}</button>
+              </div>
+            </div>
+            {mode==='register' && (
+              <div>
+                <label style={{ fontSize:13, fontWeight:700, color:darkMode?'#94a3b8':'#546e7a', display:'block', marginBottom:6 }}>تأكيد كلمة المرور *</label>
+                <input type="password" value={form.confirm} onChange={e=>upd('confirm',e.target.value)} placeholder="••••••••" style={inp()} onKeyDown={e=>e.key==='Enter'&&doRegister()}/>
+              </div>
+            )}
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div style={{ background:'#fef2f2', border:'1px solid #fecaca', borderRadius:10, padding:'10px 14px', marginTop:16, color:'#dc2626', fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:8 }}>
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* Submit */}
+          <button onClick={mode==='login'?doLogin:doRegister} style={{ width:'100%', marginTop:22, padding:'14px', borderRadius:14, border:'none', background:'linear-gradient(135deg,#8CC63F,#6ea82d)', color:'#fff', fontSize:16, fontWeight:800, cursor:'pointer', fontFamily:'Tajawal,sans-serif', boxShadow:'0 6px 20px rgba(140,198,63,0.4)', transition:'transform 0.15s' }}
+            onMouseEnter={e=>e.currentTarget.style.transform='scale(1.02)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
+            {mode==='login'?'🔐 تسجيل الدخول':'✅ إنشاء حساب'}
+          </button>
+
+          {/* Guest */}
+          <button onClick={()=>onLogin({ id:'guest', name:'ضيف', phone:'', email:'', isAdmin:false, isGuest:true })} style={{ width:'100%', marginTop:10, padding:'12px', borderRadius:14, border:`1.5px solid ${darkMode?'#334155':'#e2e8f0'}`, background:'transparent', color:darkMode?'#94a3b8':'#64748b', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'Tajawal,sans-serif', transition:'all 0.2s' }}>
+            👤 متابعة كضيف
+          </button>
+
+          {/* Admin hint */}
+          <div style={{ textAlign:'center', marginTop:20, padding:'10px 14px', background:darkMode?'#0f172a':'#f8fafc', borderRadius:10, border:`1px dashed ${darkMode?'#334155':'#cbd5e1'}` }}>
+            <p style={{ fontSize:11, color:darkMode?'#475569':'#94a3b8', margin:0, lineHeight:1.8 }}>
+              🔑 دخول المدير: هاتف <strong style={{color:darkMode?'#60a5fa':'#3b82f6'}}>admin</strong> / كلمة مرور <strong style={{color:darkMode?'#60a5fa':'#3b82f6'}}>admin123</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────── */
   function App() {
+    // ── Auth ────────────────────────────────────────────────────────────
+    const [currentUser, setCurrentUser] = useState(() => {
+      const sid = lsGet('tq_session', null);
+      if (!sid) return null;
+      const users = lsGet('tq_users', []);
+      return users.find(u => u.id === sid) || null;
+    });
+    const [darkMode,        setDarkMode]        = useState(()=>lsGet('tq_dark', false));
+
     const [products,    setProducts]    = useState(() => lsGet('tq_products', window.INITIAL_PRODUCTS));
     const [storeOpen,   setStoreOpen]   = useState(() => lsGet('tq_store_open', true));
     const [cart,        setCart]        = useState({});
@@ -3200,7 +3350,6 @@
     const [showSearchDrop,setShowSearchDrop]= useState(false);
     const [appliedCoupon,   setAppliedCoupon]   = useState(null);
     const [orders,          setOrders]          = useState(()=>lsGet('tq_orders', []));
-    const [darkMode,        setDarkMode]        = useState(()=>lsGet('tq_dark', false));
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [ratings,   setRatings]   = useState(()=>lsGet('tq_ratings', {}));
     const [myRatings, setMyRatings] = useState(()=>lsGet('tq_my_ratings', {}));
@@ -3231,6 +3380,14 @@
     const [lastCheckIn,    setLastCheckIn]    = useState(()=>lsGet('tq_last_checkin',''));
     const [checkInStreak,  setCheckInStreak]  = useState(()=>lsGet('tq_checkin_streak',0));
     const [winW,           setWinW]           = useState(window.innerWidth);
+
+    // ── Auth helpers ─────────────────────────────────────────────────────
+    const handleLogin  = (user) => { setCurrentUser(user); };
+    const handleLogout = () => {
+      try { localStorage.removeItem('tq_session'); } catch {}
+      setCurrentUser(null);
+      setCart({});
+    };
 
     // ── حفظ تلقائي في localStorage ──────────────────────────────────────
     useEffect(() => { lsSet('tq_products',       products);      }, [products]);
@@ -3474,6 +3631,9 @@
       return list;
     },[products,selectedCat,search,showFavs,favorites,filters]);
 
+    // ── Auth gate ──────────────────────────────────────────────────────
+    if (!currentUser) return <LoginScreen onLogin={handleLogin} darkMode={darkMode}/>;
+
     if (view==='admin') return <AdminPanel products={products} setProducts={setProducts} storeOpen={storeOpen} setStoreOpen={setStoreOpen} onExit={()=>setView('customer')} orders={orders} setOrders={setOrders} waNumber={waNumber} setWaNumber={setWaNumber} coupons={coupons} setCoupons={setCoupons} announcement={announcement} setAnnouncement={setAnnouncement} freeGiftConfig={freeGiftConfig} setFreeGiftConfig={setFreeGiftConfig}/>;
 
     return (
@@ -3602,7 +3762,7 @@
                   {loyaltyPoints>0 && <span style={{ background:'#f39c12', color:'#fff', borderRadius:20, padding:'1px 7px', fontSize:10, fontWeight:900 }}>{loyaltyPoints}</span>}
                 </button>
               )}
-              {winW>768 && (
+              {winW>768 && currentUser?.isAdmin && (
                 <button onClick={()=>setView('admin')} title="لوحة الإدارة" style={{ background:'#f4f6f8', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}>
                   <SettingsIcon size={19} color="#888"/>
                 </button>
@@ -3640,9 +3800,11 @@
               <button onClick={()=>setShowShoppingList(true)} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
                 <ListCheckIcon size={13} color="#888"/> قائمة التسوق
               </button>
-              <button onClick={()=>setView('admin')} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
-                <SettingsIcon size={13} color="#888"/> الإدارة
-              </button>
+              {currentUser?.isAdmin && (
+                <button onClick={()=>setView('admin')} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
+                  <SettingsIcon size={13} color="#888"/> الإدارة
+                </button>
+              )}
             </div>
           )}
           {showFilters && !showFavs && <FilterPanel filters={filters} setFilters={setFilters} products={products}/>}
@@ -3749,7 +3911,7 @@
         {showAI      && <AIChat products={products} cart={cart} onClose={()=>setShowAI(false)}/>}
         {showShoppingList && <ShoppingListPanel list={shoppingList} onAdd={addShoppingItem} onToggle={toggleShoppingItem} onDelete={deleteShoppingItem} onClearDone={clearDoneItems} onClose={()=>setShowShoppingList(false)}/>}
         {showOrders   && <OrdersPanel orders={orders} products={products} onReorder={reorder} onCancel={cancelOrder} onClose={()=>setShowOrders(false)}/>}
-        {showProfile  && <UserProfilePanel profile={userProfile} onSave={setUserProfile} onClose={()=>setShowProfile(false)} loyaltyPoints={loyaltyPoints} orders={orders} products={products}/>}
+        {showProfile  && <UserProfilePanel profile={userProfile} onSave={setUserProfile} onClose={()=>setShowProfile(false)} loyaltyPoints={loyaltyPoints} orders={orders} products={products} currentUser={currentUser} onLogout={()=>{ setShowProfile(false); handleLogout(); }}/>}
         {showNotifCenter && <NotifCenterPanel notifications={notifications} notifOn={notifOn} onToggleNotif={()=>{ if(!notifOn){ enableNotif(); } else { setNotifOn(false); showToast('تم إيقاف إشعارات الجهاز'); } }} onClose={()=>setShowNotifCenter(false)} onClear={()=>setNotifications([])}/>}
         {showLuckyWheel && <LuckyWheelModal onClose={()=>setShowLuckyWheel(false)} onClaim={(pts)=>{ if(pts>0){ setLoyaltyPoints(prev=>prev+pts); showToast(`🎰 عجلة الحظ: +${pts} نقطة مكافأة!`); } }}/>}
         {undoSnack   && <UndoSnack snack={undoSnack} onUndo={undoRemove} onDismiss={()=>setUndoSnack(null)}/>}
