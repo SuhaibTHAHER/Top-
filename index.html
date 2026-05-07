@@ -3709,20 +3709,41 @@
     }, []);
 
     // ── Price Drop Alert ────────────────────────────────────────────────
+    // يقارن السعر الفعلي بعد الخصم (لا السعر الخام) حتى تُطلق إشعارات الخصم
+    const effectivePrice = (p) => p.discount > 0 ? p.price * (1 - p.discount / 100) : p.price;
     const prevPricesRef = useRef({});
     useEffect(() => {
       const prev = prevPricesRef.current;
       if (Object.keys(prev).length > 0) {
         products.forEach(p => {
-          if (prev[p.id] !== undefined && p.price < prev[p.id] && watchList[p.id] !== undefined) {
-            showToast(`📉 انخفض سعر ${p.name} إلى ₪${p.price.toFixed(2)}`);
-            if (notifOn && 'Notification' in window && Notification.permission === 'granted') {
-              try { new Notification('Top Quality – تنبيه سعر', { body:`انخفض سعر ${p.name} من ₪${prev[p.id].toFixed(2)} إلى ₪${p.price.toFixed(2)}`, icon:'/icon-192.png' }); } catch {}
-            }
+          const effNow  = effectivePrice(p);
+          const effPrev = prev[p.id];
+          if (effPrev === undefined || effNow >= effPrev) return; // لا انخفاض
+
+          // ينبّه إذا كان المنتج في المراقبة أو السلة أو المفضلة
+          const isRelevant = watchList[p.id] !== undefined
+            || cart[p.id] > 0
+            || favorites.has(p.id);
+          if (!isRelevant) return;
+
+          const msg = `📉 انخفض سعر ${p.name} من ₪${effPrev.toFixed(2)} إلى ₪${effNow.toFixed(2)}`;
+
+          // toast + مركز الإشعارات (showToast يضيف كليهما تلقائياً)
+          showToast(msg);
+
+          // إشعار جهاز (push notification) إذا مفعّل
+          if (notifOn && 'Notification' in window && Notification.permission === 'granted') {
+            try {
+              new Notification('Top Quality – انخفاض سعر 🏷️', {
+                body: `${p.name}: ₪${effPrev.toFixed(2)} ← ₪${effNow.toFixed(2)}`,
+                icon: '/icon-192.png'
+              });
+            } catch {}
           }
         });
       }
-      prevPricesRef.current = Object.fromEntries(products.map(p => [p.id, p.price]));
+      // تخزين الأسعار الفعلية (بعد الخصم) كمرجع للمقارنة القادمة
+      prevPricesRef.current = Object.fromEntries(products.map(p => [p.id, effectivePrice(p)]));
     }, [products]);
 
     const cartCount = useMemo(()=>Object.values(cart).reduce((a,b)=>a+b,0),[cart]);
