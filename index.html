@@ -799,14 +799,42 @@
       if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, [messages, loading]);
 
-    const buildContext = () => {
-      const pList = products.map(p =>
-        `${p.name} (₪${p.price}${p.discount>0?`, خصم ${p.discount}%`:''}${p.stock<5?', كمية محدودة':''})`
-      ).join(' | ');
+    // بناء سياق ذكي — يفلتر المنتجات الأكثر صلة بدل إرسال الكل (مهم مع 600+ منتج)
+    const buildContext = (userMsg = '') => {
+      const MAX = 90; // حد أقصى للمنتجات المرسلة للـ AI
+      const cartIds  = new Set(Object.keys(cart).map(Number));
+      const cartCats = new Set(
+        Object.keys(cart).map(id => products.find(p=>p.id===Number(id))?.category).filter(Boolean)
+      );
+      const msgNorm  = normAI(userMsg);
+      const msgWords = msgNorm.split(/\s+/).filter(w=>w.length>1);
+
+      // تسجيل نقاط الصلة لكل منتج
+      const scored = products.map(p => {
+        let score = 0;
+        if (cartIds.has(p.id))       score += 12; // في السلة
+        if (cartCats.has(p.category))score += 6;  // نفس فئة السلة
+        if (p.featured)              score += 4;
+        if (p.discount > 0)          score += 3;
+        if (p.flashDeal)             score += 3;
+        // تطابق كلمات السؤال مع اسم المنتج
+        const pn = normAI(p.name);
+        msgWords.forEach(w => { if (pn.includes(w)) score += 10; });
+        return { p, score };
+      });
+
+      scored.sort((a,b) => b.score - a.score);
+      const top = scored.slice(0, MAX).map(s => s.p);
+
+      const pList = top.map(p =>
+        `${p.name}(₪${p.price}${p.discount>0?`-${p.discount}%`:''})`
+      ).join('|');
+
       const cartItems = Object.entries(cart||{})
-        .map(([id,qty]) => { const p=products.find(x=>x.id===Number(id)); return p?`${p.name} ×${qty}`:null; })
-        .filter(Boolean).join('، ');
-      return `منتجات المتجر المتاحة:\n${pList}\n\n${cartItems?`سلة العميل الحالية: ${cartItems}`:'سلة العميل فارغة'}`;
+        .map(([id,qty]) => { const p=products.find(x=>x.id===Number(id)); return p?`${p.name}×${qty}`:null; })
+        .filter(Boolean).join('،');
+
+      return `إجمالي منتجات المتجر: ${products.length} منتج\nأبرز المنتجات (${top.length}):\n${pList}\n${cartItems?`سلة العميل: ${cartItems}`:'السلة فارغة'}`;
     };
 
     const send = async (text) => {
@@ -829,7 +857,7 @@
         const history = messages.filter((_,i) => i > 0); // استثناء رسالة الترحيب
         const groqMessages = [
           // system: تعليمات المساعد + بيانات المتجر
-          { role:'system', content: SYSTEM_PROMPT + '\n\n' + buildContext() },
+          { role:'system', content: SYSTEM_PROMPT + '\n\n' + buildContext(msg) },
           // سجل المحادثة السابقة
           ...history.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content })),
           // الرسالة الجديدة
@@ -3528,11 +3556,17 @@
       aiTipKey.current = key;
       setAiTip(null);
       setAiTipLoading(true);
-      const cartDesc = items.map(i=>`${i.product.name} (${i.qty})`).join('، ');
-      const prodList = products.map(p=>`${p.name} ₪${p.price}`).join(' | ');
+      const cartDesc = items.map(i=>`${i.product.name}(${i.qty})`).join('،');
+      // فلترة ذكية: فئات السلة + مميز/مخفض — حد 80 منتج
+      const cartCats = new Set(items.map(i=>i.product.category));
+      const normC = s=>(s||'').replace(/[أإآا]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').trim();
+      const relevant = products
+        .map(p=>({ p, s:(cartCats.has(p.category)?5:0)+(p.featured?3:0)+(p.discount>0?2:0) }))
+        .sort((a,b)=>b.s-a.s).slice(0,80).map(x=>x.p);
+      const prodList = relevant.map(p=>`${p.name}₪${p.price}`).join('|');
       window.callGroq([
         { role:'system', content:'أنت مساعد تسوق. أجب بـ JSON فقط بدون markdown أو شرح.' },
-        { role:'user',   content:`سلة العميل: ${cartDesc}\nمنتجات المتجر المتاحة: ${prodList}\n\nاقترح وصفة واحدة مناسبة لمحتوى السلة مع 2 منتجات ناقصة من قائمة المتجر فقط.\nأجب بـ JSON فقط:\n{"recipe":"اسم الوصفة","missing":["اسم المنتج 1","اسم المنتج 2"]}` }
+        { role:'user',   content:`إجمالي المنتجات: ${products.length}\nسلة العميل: ${cartDesc}\nأبرز المنتجات المتاحة(${relevant.length}): ${prodList}\n\nاقترح وصفة واحدة مناسبة للسلة مع 2 منتجات ناقصة من القائمة فقط.\nJSON فقط:\n{"recipe":"اسم الوصفة","missing":["منتج1","منتج2"]}` }
       ], 120)
       .then(text => {
         const clean = text.replace(/```json?|```/g,'').trim();
