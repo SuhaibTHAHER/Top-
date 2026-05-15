@@ -50,6 +50,8 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
     }
   </script>
+  <!-- Google Identity Services — replace YOUR_GOOGLE_CLIENT_ID بـ Client ID من Google Cloud Console -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <script>
     /* ── إخفاء رسائل المكتبات قبل تحميلها ── */
@@ -535,6 +537,25 @@
       <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
     </SvgIcon>
   );
+  const EyeIcon = ({ size=20, color='currentColor' }) => (
+    <SvgIcon size={size} color={color}>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </SvgIcon>
+  );
+  const EyeOffIcon = ({ size=20, color='currentColor' }) => (
+    <SvgIcon size={size} color={color}>
+      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </SvgIcon>
+  );
+  const SendIcon = ({ size=20, color='currentColor' }) => (
+    <SvgIcon size={size} color={color}>
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2" fill={color} stroke="none"/>
+    </SvgIcon>
+  );
   const UserIcon = ({ size=20, color='currentColor' }) => (
     <SvgIcon size={size} color={color}>
       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
@@ -974,7 +995,7 @@
     );
   }
 
-  function AdminPanel({ products, setProducts, storeOpen, setStoreOpen, onExit, orders, setOrders, waNumber, setWaNumber, coupons, setCoupons, announcement, setAnnouncement, freeGiftConfig, setFreeGiftConfig }) {
+  function AdminPanel({ products, setProducts, storeOpen, setStoreOpen, onExit, orders, setOrders, waNumber, setWaNumber, coupons, setCoupons, announcement, setAnnouncement, freeGiftConfig, setFreeGiftConfig, sendBroadcast }) {
     const [tab, setTab]                   = useStateAdmin('dashboard');
     const [editProduct, setEditProduct]   = useStateAdmin(null);
     const [showAdd, setShowAdd]           = useStateAdmin(false);
@@ -982,6 +1003,7 @@
     const [toast, setToast]               = useStateAdmin(null);
     const [deleteConfirm, setDeleteConfirm] = useStateAdmin(null);
     const [adminW, setAdminW]             = useStateAdmin(window.innerWidth);
+    const [broadcastMsg, setBroadcastMsg] = useStateAdmin('');
     const nextId = useRefAdmin(Math.max(...products.map(p=>p.id))+1);
     const csvImportRef = useRefAdmin();
     useEffect(()=>{
@@ -992,7 +1014,7 @@
     const isMobile = adminW < 640;
 
     const showToast = (msg, color=G) => { setToast({msg,color}); setTimeout(()=>setToast(null),3000); };
-    const handleAddProduct  = (form) => { setProducts(prev=>[...prev,{...form,id:nextId.current++}]); setShowAdd(false); showToast('تم إضافة المنتج بنجاح'); };
+    const handleAddProduct  = (form) => { setProducts(prev=>[...prev,{...form,id:nextId.current++}]); setShowAdd(false); showToast('تم إضافة المنتج بنجاح'); sendBroadcast(`🆕 منتج جديد وصل: ${form.name} — ₪${Number(form.price).toFixed(2)}`); };
     const handleEditProduct = (form) => { setProducts(prev=>prev.map(p=>p.id===editProduct.id?{...p,...form}:p)); setEditProduct(null); showToast('تم تعديل المنتج بنجاح'); };
     const handleDelete      = (id)   => { setProducts(prev=>prev.filter(p=>p.id!==id)); setDeleteConfirm(null); showToast('تم حذف المنتج','#e74c3c'); };
     const exportCSV = () => {
@@ -1188,43 +1210,72 @@
                   onFocus={e=>e.target.style.borderColor=G} onBlur={e=>e.target.style.borderColor='#e0e0e0'}/>
               </div>
               <div style={{ background:'var(--surface)', borderRadius:16, overflow:'hidden', boxShadow:'var(--card-shadow)' }}>
-                <div style={{ display:'grid', gridTemplateColumns:'56px 1fr 110px 80px 70px 80px 110px', padding:'12px 16px', background:'var(--surface2)', fontSize:12, fontWeight:800, color:'var(--text2)', gap:8, borderBottom:'1px solid var(--border)' }}>
-                  <span></span><span>المنتج</span><span>التصنيف</span><span>السعر</span><span>الخصم</span><span>المخزون</span><span>إجراءات</span>
-                </div>
+                {/* رأس الجدول — ديسكتوب فقط */}
+                {!isMobile && (
+                  <div style={{ display:'grid', gridTemplateColumns:'52px 1fr 100px 80px 65px 75px 120px', padding:'12px 16px', background:'var(--surface2)', fontSize:12, fontWeight:800, color:'var(--text2)', gap:8, borderBottom:'1px solid var(--border)' }}>
+                    <span/><span>المنتج</span><span>التصنيف</span><span>السعر</span><span>الخصم</span><span>المخزون</span><span>إجراءات</span>
+                  </div>
+                )}
                 {filteredProds.map((p,idx)=>{
                   const cat    = window.CATEGORIES.find(c=>c.id===p.category);
                   const bg     = CAT_BG_ADMIN[p.category]||'#f5f5f5';
                   const ic     = CAT_IC_COLOR[p.category]||'#bbb';
                   const CatIco = window.CAT_ICONS && window.CAT_ICONS[p.category];
+                  const ActionBtns = () => (
+                    <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
+                      <button onClick={()=>{ const on=!p.featured; setProducts(prev=>prev.map(x=>x.id===p.id?{...x,featured:on}:on?{...x,featured:false}:x)); showToast(on?`🌟 ${p.name} أصبح منتج اليوم`:`تم إلغاء منتج اليوم`); }} title="منتج اليوم" style={{ background:p.featured?'#fff8e1':'var(--surface2)', border:p.featured?'1.5px solid #f39c12':'1.5px solid var(--border)', borderRadius:8, padding:'5px 8px', cursor:'pointer', fontSize:13, lineHeight:1, color:p.featured?'#f39c12':'var(--text3)' }}>🌟</button>
+                      <button onClick={()=>{ const on=!p.flashDeal; setProducts(prev=>prev.map(x=>x.id===p.id?{...x,flashDeal:on,flashEndsAt:on?new Date(Date.now()+6*3600*1000).toISOString():null}:x)); showToast(on?`⚡ فُعّل عرض الفلاش لـ ${p.name}`:`تم إلغاء الفلاش`); if(on) sendBroadcast(`⚡ عرض فلاش! ${p.name} بسعر مخفوض — سارع بالشراء قبل انتهاء العرض!`); }} title="عرض الفلاش" style={{ background:p.flashDeal?'#fff3e0':'var(--surface2)', border:p.flashDeal?'1.5px solid #f39c12':'1.5px solid var(--border)', borderRadius:8, padding:'5px 8px', cursor:'pointer', fontSize:14, lineHeight:1, color:p.flashDeal?'#e74c3c':'var(--text3)' }}>⚡</button>
+                      <button onClick={()=>setEditProduct(p)} style={{ background:T+'18', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}><PencilIcon size={14} color={T}/>{isMobile&&<span style={{fontSize:12,color:T,fontWeight:700}}>تعديل</span>}</button>
+                      <button onClick={()=>setDeleteConfirm(p)} style={{ background:'#fce4ec', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}><TrashIcon size={14} color="#e74c3c"/>{isMobile&&<span style={{fontSize:12,color:'#e74c3c',fontWeight:700}}>حذف</span>}</button>
+                    </div>
+                  );
+                  if (isMobile) return (
+                    <div key={p.id} style={{ padding:'14px 16px', borderBottom:idx<filteredProds.length-1?'1px solid var(--border)':'none' }}>
+                      <div style={{ display:'flex', gap:12, alignItems:'flex-start' }}>
+                        <div style={{ width:48, height:48, borderRadius:10, flexShrink:0, background:bg, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                          {p.image?<img src={p.image} style={{ width:'100%',height:'100%',objectFit:'cover' }}/>:CatIco?<CatIco size={24} color={ic}/>:null}
+                        </div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ fontWeight:700, fontSize:14, color:'var(--text)', display:'flex', flexWrap:'wrap', gap:4, alignItems:'center' }}>
+                            {p.name}
+                            {p.label && (() => { const lbl=PRODUCT_LABELS.find(l=>l.id===p.label); return lbl&&lbl.id?<span style={{ fontSize:10,color:lbl.color,background:lbl.bg,borderRadius:10,padding:'1px 6px' }}>{lbl.emoji} {lbl.label}</span>:null; })()}
+                            {p.flashDeal && <span style={{ fontSize:10,color:'#e74c3c',background:'#fce4ec',borderRadius:10,padding:'1px 6px' }}>⚡ فلاش</span>}
+                          </div>
+                          <div style={{ display:'flex', gap:12, marginTop:6, flexWrap:'wrap' }}>
+                            <span style={{ fontSize:12, fontWeight:800, color:G }}>₪{p.price.toFixed(2)}</span>
+                            {p.discount>0&&<span style={{ fontSize:12,fontWeight:700,color:'#e74c3c' }}>-{p.discount}%</span>}
+                            <span style={{ fontSize:12,color:p.stock<15?'#e74c3c':'#27ae60',fontWeight:700 }}>مخزون: {p.stock}</span>
+                            <span style={{ fontSize:11,color:T,background:T+'12',borderRadius:12,padding:'1px 8px',fontWeight:600 }}>{cat?cat.name:p.category}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ marginTop:10 }}><ActionBtns/></div>
+                    </div>
+                  );
                   return (
-                    <div key={p.id} style={{ display:'grid', gridTemplateColumns:'56px 1fr 110px 80px 70px 80px 110px', padding:'12px 16px', gap:8, alignItems:'center', borderBottom:idx<filteredProds.length-1?'1px solid #f8f9fa':'none', transition:'background 0.15s' }}
-                      onMouseEnter={e=>e.currentTarget.style.background='#f8fffe'} onMouseLeave={e=>e.currentTarget.style.background=''}>
+                    <div key={p.id} style={{ display:'grid', gridTemplateColumns:'52px 1fr 100px 80px 65px 75px 120px', padding:'12px 16px', gap:8, alignItems:'center', borderBottom:idx<filteredProds.length-1?'1px solid var(--border)':'none', transition:'background 0.15s' }}
+                      onMouseEnter={e=>e.currentTarget.style.background='var(--surface2)'} onMouseLeave={e=>e.currentTarget.style.background=''}>
                       <div style={{ width:44, height:44, borderRadius:10, flexShrink:0, background:bg, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                        {p.image ? <img src={p.image} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }}/> : CatIco ? <CatIco size={24} color={ic}/> : null}
+                        {p.image?<img src={p.image} alt={p.name} style={{ width:'100%',height:'100%',objectFit:'cover' }}/>:CatIco?<CatIco size={24} color={ic}/>:null}
                       </div>
                       <div>
-                        <div style={{ fontWeight:700, fontSize:14, color:D, display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
+                        <div style={{ fontWeight:700, fontSize:13, color:'var(--text)', display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
                           {p.name}
-                          {p.label && (() => { const lbl=PRODUCT_LABELS.find(l=>l.id===p.label); return lbl&&lbl.id ? <span style={{ fontSize:10, fontWeight:800, color:lbl.color, background:lbl.bg, borderRadius:10, padding:'1px 7px', flexShrink:0 }}>{lbl.emoji} {lbl.label}</span> : null; })()}
-                          {p.flashDeal && <span style={{ fontSize:10, fontWeight:800, color:'#e74c3c', background:'#fce4ec', borderRadius:10, padding:'1px 7px', flexShrink:0 }}>⚡ فلاش</span>}
+                          {p.label && (() => { const lbl=PRODUCT_LABELS.find(l=>l.id===p.label); return lbl&&lbl.id?<span style={{ fontSize:10,fontWeight:800,color:lbl.color,background:lbl.bg,borderRadius:10,padding:'1px 7px' }}>{lbl.emoji} {lbl.label}</span>:null; })()}
+                          {p.flashDeal&&<span style={{ fontSize:10,fontWeight:800,color:'#e74c3c',background:'#fce4ec',borderRadius:10,padding:'1px 7px' }}>⚡ فلاش</span>}
                         </div>
-                        <div style={{ fontSize:12, color:'#aaa' }}>{p.desc}</div>
+                        <div style={{ fontSize:11, color:'var(--text3)' }}>{p.desc}</div>
                       </div>
-                      <span style={{ fontSize:12, fontWeight:600, color:T, background:T+'12', padding:'3px 8px', borderRadius:20, width:'fit-content' }}>{cat?cat.name:p.category}</span>
-                      <span style={{ fontWeight:800, color:G, fontSize:14 }}>₪{p.price.toFixed(2)}</span>
-                      <span style={{ fontWeight:700, fontSize:13, color:p.discount>0?'#e74c3c':'#ccc' }}>{p.discount>0?`-${p.discount}%`:'—'}</span>
-                      <span style={{ fontWeight:700, fontSize:13, color:p.stock<15?'#e74c3c':'#27ae60' }}>{p.stock}</span>
-                      <div style={{ display:'flex', gap:6 }}>
-                        <button onClick={()=>{ const on=!p.featured; setProducts(prev=>prev.map(x=>x.id===p.id?{...x,featured:on}:on?{...x,featured:false}:x)); showToast(on?`🌟 ${p.name} أصبح منتج اليوم`:`تم إلغاء منتج اليوم لـ ${p.name}`); }} title="منتج اليوم" style={{ background:p.featured?'#fff8e1':'#f5f5f5', border:p.featured?'1.5px solid #f39c12':'1.5px solid #e0e0e0', borderRadius:8, padding:'5px 9px', cursor:'pointer', fontSize:13, lineHeight:1, fontWeight:700, color:p.featured?'#f39c12':'#bbb', transition:'all 0.2s' }}>🌟</button>
-                        <button onClick={()=>{ const on=!p.flashDeal; setProducts(prev=>prev.map(x=>x.id===p.id?{...x,flashDeal:on,flashEndsAt:on?new Date(Date.now()+6*3600*1000).toISOString():null}:x)); showToast(on?`⚡ فُعّل عرض الفلاش لـ ${p.name}`:`تم إلغاء الفلاش لـ ${p.name}`); }} title="عرض الفلاش" style={{ background:p.flashDeal?'#fff3e0':'#f5f5f5', border:p.flashDeal?'1.5px solid #f39c12':'1.5px solid #e0e0e0', borderRadius:8, padding:'5px 9px', cursor:'pointer', fontSize:14, lineHeight:1, fontWeight:700, color:p.flashDeal?'#e74c3c':'#bbb', transition:'all 0.2s' }}>⚡</button>
-                        <button onClick={()=>setEditProduct(p)} style={{ background:T+'18', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><PencilIcon size={15} color={T}/></button>
-                        <button onClick={()=>setDeleteConfirm(p)} style={{ background:'#fce4ec', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><TrashIcon size={15} color="#e74c3c"/></button>
-                      </div>
+                      <span style={{ fontSize:11, fontWeight:600, color:T, background:T+'12', padding:'3px 8px', borderRadius:20, width:'fit-content' }}>{cat?cat.name:p.category}</span>
+                      <span style={{ fontWeight:800, color:G, fontSize:13 }}>₪{p.price.toFixed(2)}</span>
+                      <span style={{ fontWeight:700, fontSize:12, color:p.discount>0?'#e74c3c':'var(--text3)' }}>{p.discount>0?`-${p.discount}%`:'—'}</span>
+                      <span style={{ fontWeight:700, fontSize:12, color:p.stock<15?'#e74c3c':'#27ae60' }}>{p.stock}</span>
+                      <ActionBtns/>
                     </div>
                   );
                 })}
               </div>
-              <div style={{ marginTop:12, fontSize:13, color:'#888', textAlign:'left' }}>{filteredProds.length} من {products.length} منتج</div>
+              <div style={{ marginTop:12, fontSize:13, color:'var(--text2)', textAlign:'left' }}>{filteredProds.length} من {products.length} منتج</div>
             </div>
           )}
 
@@ -1311,6 +1362,35 @@
                     ✅ الهدية المجانية مفعّلة — الحد الأدنى ₪{freeGiftConfig.minOrder}
                   </div>
                 )}
+              </div>
+
+              {/* ── إشعارات جماعية للمستخدمين ── */}
+              <div style={{ background:'var(--surface)', borderRadius:16, padding:28, boxShadow:'0 2px 12px rgba(0,0,0,0.07)', maxWidth:500, marginTop:20 }}>
+                <h2 style={{ fontSize:16, fontWeight:800, color:'var(--text)', marginBottom:8, display:'flex', alignItems:'center', gap:8 }}>
+                  <span style={{ fontSize:20 }}>📣</span> إرسال إشعار للمستخدمين
+                </h2>
+                <div style={{ fontSize:12, color:'var(--text3)', marginBottom:14 }}>اكتب رسالة الإشعار وسيتم إرسالها لجميع المستخدمين المسجلين عند دخولهم للمتجر.</div>
+                <textarea
+                  value={broadcastMsg}
+                  onChange={e=>setBroadcastMsg(e.target.value)}
+                  placeholder="مثال: 🎉 عرض حصري — خصم 30% على جميع المنتجات اليوم فقط!"
+                  rows={3}
+                  style={{ width:'100%', padding:'10px 14px', border:'1.5px solid var(--input-border)', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:14, color:'var(--text)', background:'var(--input-bg)', outline:'none', resize:'vertical', direction:'rtl', boxSizing:'border-box', transition:'border-color 0.2s' }}
+                  onFocus={e=>e.target.style.borderColor=G}
+                  onBlur={e=>e.target.style.borderColor='var(--input-border)'}
+                />
+                <div style={{ display:'flex', gap:10, marginTop:10, alignItems:'center' }}>
+                  <button onClick={()=>{
+                    if (!broadcastMsg.trim()) { showToast('اكتب رسالة الإشعار أولاً','#e74c3c'); return; }
+                    sendBroadcast(broadcastMsg.trim());
+                    setBroadcastMsg('');
+                    showToast('✅ تم إرسال الإشعار لجميع المستخدمين');
+                  }} style={{ background:G, color:'#fff', border:'none', borderRadius:12, padding:'10px 22px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                    <SendIcon size={15} color="#fff"/> إرسال الإشعار
+                  </button>
+                  {broadcastMsg && <button onClick={()=>setBroadcastMsg('')} style={{ background:'#fce4ec', border:'none', borderRadius:12, padding:'10px 16px', cursor:'pointer', color:'#e74c3c', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700 }}>مسح</button>}
+                  <div style={{ fontSize:11, color:'var(--text3)', marginRight:'auto' }}>{broadcastMsg.length}/200 حرف</div>
+                </div>
               </div>
             </div>
           )}
@@ -1676,23 +1756,63 @@
   /* ── CompareModal ─────────────────────────────────────────────────────── */
   function CompareModal({ compareList, products, onClose }) {
     const items = compareList.map(id=>products.find(p=>p.id===id)).filter(Boolean);
+    const isMob = window.innerWidth < 640;
     const rows = [
       { label:'التصنيف',       val: p=>{ const c=window.CATEGORIES.find(x=>x.id===p.category); return c?c.name:p.category; }},
       { label:'السعر الأصلي',  val: p=>fmt(p.price) },
-      { label:'الخصم',         val: p=>p.discount>0?<span style={{background:'#fce4ec',color:'#e74c3c',borderRadius:20,padding:'2px 10px',fontSize:12,fontWeight:800}}>-{p.discount}%</span>:<span style={{color:'#ccc'}}>—</span> },
-      { label:'السعر النهائي', val: p=>{ const f=p.discount>0?p.price*(1-p.discount/100):p.price; return <span style={{color:GREEN,fontWeight:900,fontSize:16}}>{fmt(f)}</span>; }},
-      { label:'المخزون',       val: p=><span style={{background:p.stock<15?'#fce4ec':'#e8f5e9',color:p.stock<15?'#e74c3c':'#2e7d32',borderRadius:20,padding:'2px 10px',fontSize:12,fontWeight:700}}>{p.stock} وحدة</span>},
-      { label:'الوصف',         val: p=><span style={{fontSize:12,color:'var(--text2)'}}>{p.desc||'—'}</span>},
+      { label:'الخصم',         val: p=>p.discount>0?<span style={{background:'#fce4ec',color:'#e74c3c',borderRadius:20,padding:'2px 8px',fontSize:11,fontWeight:800}}>-{p.discount}%</span>:<span style={{color:'var(--text3)'}}>—</span> },
+      { label:'السعر النهائي', val: p=>{ const f=p.discount>0?p.price*(1-p.discount/100):p.price; return <span style={{color:GREEN,fontWeight:900,fontSize:15}}>{fmt(f)}</span>; }},
+      { label:'المخزون',       val: p=><span style={{background:p.stock<15?'#fce4ec':'#e8f5e9',color:p.stock<15?'#e74c3c':'#2e7d32',borderRadius:20,padding:'2px 8px',fontSize:11,fontWeight:700}}>{p.stock} وحدة</span>},
+      { label:'الوصف',         val: p=><span style={{fontSize:11,color:'var(--text2)'}}>{p.desc||'—'}</span>},
     ];
+
+    /* ── نسخة الجوال: بطاقات أفقية قابلة للتمرير ── */
+    if (isMob) return (
+      <div style={{ position:'fixed', inset:0, zIndex:2000, background:'rgba(0,0,0,0.6)', backdropFilter:'blur(4px)', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}
+        onClick={e=>e.target===e.currentTarget&&onClose()}>
+        <div style={{ background:'var(--surface)', borderRadius:'20px 20px 0 0', maxHeight:'92vh', display:'flex', flexDirection:'column', animation:'aiSlideUp 0.28s ease' }}>
+          <div style={{ padding:'16px 18px', borderBottom:'1px solid var(--border)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <span style={{ fontWeight:800, fontSize:15, color:'var(--text)', display:'flex', alignItems:'center', gap:6 }}><ScaleIcon size={17} color={TEAL}/> مقارنة المنتجات</span>
+            <button onClick={onClose} style={{ background:'var(--surface2)', border:'none', borderRadius:'50%', width:30, height:30, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><XIcon size={13} color="var(--text3)"/></button>
+          </div>
+          {/* بطاقات المنتجات أفقياً */}
+          <div style={{ display:'flex', gap:10, padding:'12px 14px', overflowX:'auto' }}>
+            {items.map(p=>{
+              const bg=CAT_BG[p.category]||'#f5f5f5', ic=CAT_IC[p.category]||'#bbb';
+              const CatIco=window.CAT_ICONS&&window.CAT_ICONS[p.category];
+              const fp=p.discount>0?p.price*(1-p.discount/100):p.price;
+              return (
+                <div key={p.id} style={{ flexShrink:0, width:150, background:'var(--surface2)', borderRadius:14, overflow:'hidden', border:'1px solid var(--border)' }}>
+                  <div style={{ height:80, background:bg, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {p.image?<img src={p.image} style={{ width:'100%',height:'100%',objectFit:'cover' }}/>:CatIco&&<CatIco size={32} color={ic}/>}
+                  </div>
+                  <div style={{ padding:'8px 10px' }}>
+                    <div style={{ fontWeight:800, fontSize:12, color:'var(--text)', lineHeight:1.3, marginBottom:6 }}>{p.name}</div>
+                    {rows.map((row,i)=>(
+                      <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'4px 0', borderTop:'1px solid var(--border)' }}>
+                        <span style={{ fontSize:10, color:'var(--text2)', fontWeight:600 }}>{row.label}</span>
+                        <span style={{ fontSize:11, fontWeight:700 }}>{row.val(p)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+
+    /* ── نسخة الديسكتوب: جدول عمودي ── */
     return (
       <div style={{ position:'fixed', inset:0, zIndex:2000, background:'rgba(0,0,0,0.55)', backdropFilter:'blur(4px)', display:'flex', alignItems:'center', justifyContent:'center' }}
         onClick={e=>e.target===e.currentTarget&&onClose()}>
-        <div style={{ background:'var(--surface)', borderRadius:20, width:Math.min(160+items.length*200,760), maxWidth:'95vw', maxHeight:'88vh', overflowY:'auto', boxShadow:'0 24px 64px rgba(0,0,0,0.22)', animation:'aiSlideUp 0.28s ease' }}>
+        <div style={{ background:'var(--surface)', borderRadius:20, width:Math.min(160+items.length*200,780), maxWidth:'96vw', maxHeight:'88vh', overflowY:'auto', overflowX:'auto', boxShadow:'0 24px 64px rgba(0,0,0,0.22)', animation:'aiSlideUp 0.28s ease' }}>
           <div style={{ padding:'18px 24px', borderBottom:'1px solid var(--border)', display:'flex', justifyContent:'space-between', alignItems:'center', position:'sticky', top:0, background:'var(--surface)', zIndex:10 }}>
             <h2 style={{ fontSize:17, fontWeight:800, color:'var(--text)', display:'flex', alignItems:'center', gap:8 }}><ScaleIcon size={19} color={TEAL}/> مقارنة المنتجات</h2>
             <button onClick={onClose} style={{ background:'var(--surface2)', border:'none', borderRadius:'50%', width:33, height:33, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><XIcon size={15} color="var(--text3)"/></button>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:`140px repeat(${items.length},1fr)`, borderBottom:'2px solid var(--border)' }}>
+          <div style={{ display:'grid', gridTemplateColumns:`130px repeat(${items.length},minmax(150px,1fr))`, borderBottom:'2px solid var(--border)', minWidth: 130+items.length*150 }}>
             <div style={{ padding:16, background:'var(--surface2)' }}/>
             {items.map(p=>{
               const bg=CAT_BG[p.category]||'#f5f5f5', ic=CAT_IC[p.category]||'#bbb';
@@ -1702,16 +1822,16 @@
                   <div style={{ height:80, background:bg, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
                     {p.image?<img src={p.image} style={{ width:'100%',height:'100%',objectFit:'cover' }}/>:CatIco&&<CatIco size={36} color={ic}/>}
                   </div>
-                  <div style={{ fontWeight:800, fontSize:14, color:'var(--text)', marginTop:8, lineHeight:1.3 }}>{p.name}</div>
+                  <div style={{ fontWeight:800, fontSize:13, color:'var(--text)', marginTop:8, lineHeight:1.3 }}>{p.name}</div>
                 </div>
               );
             })}
           </div>
           {rows.map((row,i)=>(
-            <div key={i} style={{ display:'grid', gridTemplateColumns:`140px repeat(${items.length},1fr)`, background:i%2===0?'var(--surface)':'var(--surface2)', borderBottom:'1px solid var(--border)' }}>
-              <div style={{ padding:'12px 16px', fontSize:13, fontWeight:700, color:'var(--text2)', display:'flex', alignItems:'center', background:'var(--surface2)', borderLeft:'1px solid var(--border)' }}>{row.label}</div>
+            <div key={i} style={{ display:'grid', gridTemplateColumns:`130px repeat(${items.length},minmax(150px,1fr))`, background:i%2===0?'var(--surface)':'var(--surface2)', borderBottom:'1px solid var(--border)', minWidth: 130+items.length*150 }}>
+              <div style={{ padding:'12px 14px', fontSize:12, fontWeight:700, color:'var(--text2)', display:'flex', alignItems:'center', background:'var(--surface2)', borderLeft:'1px solid var(--border)' }}>{row.label}</div>
               {items.map(p=>(
-                <div key={p.id} style={{ padding:'12px 16px', textAlign:'center', display:'flex', alignItems:'center', justifyContent:'center', borderLeft:'1px solid var(--border)' }}>{row.val(p)}</div>
+                <div key={p.id} style={{ padding:'12px 14px', textAlign:'center', display:'flex', alignItems:'center', justifyContent:'center', borderLeft:'1px solid var(--border)' }}>{row.val(p)}</div>
               ))}
             </div>
           ))}
@@ -3083,23 +3203,20 @@
             آخر {product.stock}!
           </div>
         ) : null}
-        <div style={{ position:'absolute', top:8, right:8, zIndex:2, display:'flex', flexDirection:'column', gap:5 }}>
-          <button onClick={e=>{e.stopPropagation();onFav(product.id);}} style={{ background:'rgba(255,255,255,0.92)', border:'none', borderRadius:'50%', width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 6px rgba(0,0,0,0.12)', transition:'transform 0.15s' }}
-            onMouseEnter={e=>e.currentTarget.style.transform='scale(1.25)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
-            <HeartIcon size={17} color={isFav?'#e74c3c':'#ccc'} filled={isFav}/>
-          </button>
-          <button onClick={e=>{e.stopPropagation();onCompare(product.id);}} title="قارن المنتج" style={{ background:inCompare?TEAL:'rgba(255,255,255,0.92)', border:'none', borderRadius:'50%', width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 6px rgba(0,0,0,0.12)', transition:'all 0.15s' }}
-            onMouseEnter={e=>e.currentTarget.style.transform='scale(1.25)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
-            <ScaleIcon size={16} color={inCompare?'#fff':'#bbb'}/>
-          </button>
-          {onWatch && <button onClick={e=>{e.stopPropagation();onWatch(product);}} title={isWatched?'إلغاء تنبيه السعر':'تنبيه عند تخفيض السعر'} style={{ background:isWatched?'#fff8e1':'rgba(255,255,255,0.92)', border:'none', borderRadius:'50%', width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 6px rgba(0,0,0,0.12)', transition:'all 0.15s' }}
-            onMouseEnter={e=>e.currentTarget.style.transform='scale(1.25)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
-            <BellIcon size={16} color={isWatched?'#f39c12':'#bbb'}/>
-          </button>}
-          <button onClick={handleCardShare} title="مشاركة المنتج" style={{ background:copied?'#e8f5e9':'rgba(255,255,255,0.92)', border:'none', borderRadius:'50%', width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 6px rgba(0,0,0,0.12)', transition:'all 0.15s' }}
-            onMouseEnter={e=>e.currentTarget.style.transform='scale(1.25)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
-            {copied ? <CheckIcon size={15} color={GREEN}/> : <ShareIcon size={15} color="#bbb"/>}
-          </button>
+        {/* أيقونات المنتج — شبكة 2×2 لتوفير المساحة على الصورة */}
+        <div style={{ position:'absolute', top:7, right:7, zIndex:2, display:'grid', gridTemplateColumns:'1fr 1fr', gap:4 }}>
+          {[
+            { key:'fav',     bg:isFav?'#fce4ec':'rgba(255,255,255,0.92)',     icon:<HeartIcon size={15} color={isFav?'#e74c3c':'#bbb'} filled={isFav}/>,      title:'مفضلة',          onClick:e=>{e.stopPropagation();onFav(product.id);} },
+            { key:'cmp',     bg:inCompare?TEAL:'rgba(255,255,255,0.92)',       icon:<ScaleIcon size={14} color={inCompare?'#fff':'#bbb'}/>,                    title:'مقارنة',         onClick:e=>{e.stopPropagation();onCompare(product.id);} },
+            { key:'watch',   bg:isWatched?'#fff8e1':'rgba(255,255,255,0.92)', icon:<BellIcon size={14} color={isWatched?'#f39c12':'#bbb'}/>,                  title:isWatched?'إلغاء تنبيه':'تنبيه السعر', onClick:e=>{e.stopPropagation();onWatch&&onWatch(product);}, hide:!onWatch },
+            { key:'share',   bg:copied?'#e8f5e9':'rgba(255,255,255,0.92)',     icon:copied?<CheckIcon size={14} color={GREEN}/>:<ShareIcon size={13} color="#bbb"/>, title:'مشاركة',    onClick:handleCardShare },
+          ].filter(b=>!b.hide).map(b=>(
+            <button key={b.key} onClick={b.onClick} title={b.title}
+              style={{ background:b.bg, border:'none', borderRadius:'50%', width:30, height:30, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 5px rgba(0,0,0,0.15)', transition:'transform 0.15s, background 0.15s' }}
+              onMouseEnter={e=>e.currentTarget.style.transform='scale(1.18)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
+              {b.icon}
+            </button>
+          ))}
         </div>
         <div style={{ position:'relative' }}>
           <ProductThumb product={product} height={130} iconSize={56}/>
@@ -3458,7 +3575,9 @@
     const [form, setForm]     = useState({ name:'', phone:'', password:'', confirm:'' });
     const [error, setError]   = useState('');
     const [showPass, setShowPass] = useState(false);
+    const [loading, setLoading]  = useState(false);
     const upd = (k,v) => setForm(f=>({...f,[k]:v}));
+    const switchMode = (m) => { setMode(m); setError(''); setShowPass(false); setForm({name:'',phone:'',password:'',confirm:''}); };
 
     /* ── Password helpers ───────────────────────────────────────────────── */
     const hashPwd = async (pw) => {
@@ -3479,35 +3598,68 @@
       return users;
     };
 
+    /* ── Google Sign-In ─────────────────────────────────────────────────── */
+    const handleGoogleLogin = () => {
+      if (!window.google?.accounts?.id) { setError('خدمة جوجل غير متوفرة حالياً، جرب لاحقاً'); return; }
+      // ⚠️ استبدل القيمة أدناه بـ Client ID من Google Cloud Console
+      const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: ({ credential }) => {
+          try {
+            const payload = JSON.parse(atob(credential.split('.')[1]));
+            const users   = getUsers();
+            let user = users.find(u => u.googleId === payload.sub || (u.email && u.email === payload.email));
+            if (!user) {
+              user = { id: Date.now(), name: payload.name, phone: '', email: payload.email||'', googleId: payload.sub, isAdmin:false, createdAt: Date.now() };
+              lsSet('tq_users', [...users, user]);
+            }
+            lsSet('tq_session', user.id);
+            onLogin(user);
+          } catch { setError('فشل تسجيل الدخول بجوجل، حاول مرة أخرى'); }
+        },
+      });
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // Fallback: open popup
+          window.google.accounts.oauth2?.initCodeClient?.({})?.requestCode?.();
+        }
+      });
+    };
+
     const doLogin = async () => {
-      setError('');
+      setError(''); setLoading(true);
       const phone = form.phone.trim().replace(/\s/g, '');
-      if (!phone || !form.password) { setError('الرجاء إدخال رقم الهاتف وكلمة المرور'); return; }
+      if (!phone || !form.password) { setError('الرجاء إدخال رقم الهاتف وكلمة المرور'); setLoading(false); return; }
       const users = getUsers();
       const h = await hashPwd(form.password);
       // Supports both hashed (new) and plaintext (legacy) passwords — migrates on-the-fly
       const u = users.find(u => u.phone === phone && (
         isHashed(u.password) ? u.password === h : u.password === form.password
       ));
-      if (!u) { setError('رقم الهاتف أو كلمة المرور غير صحيحة'); return; }
+      if (!u) { setError('رقم الهاتف أو كلمة المرور غير صحيحة'); setLoading(false); return; }
       // Migrate plaintext → hash silently
       if (!isHashed(u.password)) {
         lsSet('tq_users', users.map(x => x.id === u.id ? { ...x, password: h } : x));
         u.password = h;
       }
       lsSet('tq_session', u.id);
+      setLoading(false);
       onLogin(u);
     };
 
+    // تحقق موسّع من صيغة الهاتف (يقبل +، مسافات، شرطات، أقواس)
+    const validPhone = (p) => /^[+\d][\d\s\-()]{5,18}$/.test(p) && p.replace(/\D/g,'').length >= 7;
+
     const doRegister = async () => {
-      setError('');
+      setError(''); setLoading(true);
       const name  = sanitize(form.name);
-      const phone = form.phone.trim().replace(/\s/g, '');
-      if (!name || !phone || !form.password) { setError('الرجاء ملء جميع الحقول المطلوبة'); return; }
-      if (name.length < 2) { setError('الاسم قصير جداً'); return; }
-      if (!/^[\d+\-]{7,15}$/.test(phone)) { setError('رقم الهاتف غير صحيح — يجب أن يحتوي على أرقام فقط (7–15 رقم)'); return; }
-      if (form.password.length < 6) { setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل'); return; }
-      if (form.password !== form.confirm) { setError('كلمتا المرور غير متطابقتين'); return; }
+      const phone = form.phone.trim();
+      if (!name || !phone || !form.password) { setError('الرجاء ملء جميع الحقول المطلوبة'); setLoading(false); return; }
+      if (name.length < 2) { setError('الاسم قصير جداً'); setLoading(false); return; }
+      if (!validPhone(phone)) { setError('رقم الهاتف غير صحيح (مثال: 0599123456 أو +966599123456)'); setLoading(false); return; }
+      if (form.password.length < 6) { setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل'); setLoading(false); return; }
+      if (form.password !== form.confirm) { setError('كلمتا المرور غير متطابقتين'); setLoading(false); return; }
       const users = getUsers();
       if (users.find(u => u.phone === phone)) { setError('رقم الهاتف مسجل مسبقاً، جرب تسجيل الدخول'); return; }
       const h = await hashPwd(form.password);
@@ -3536,7 +3688,7 @@
           {/* Tabs */}
           <div style={{ display:'flex', background:darkMode?'#0f172a':'#f1f5f9', borderRadius:14, padding:4, marginBottom:26, gap:3 }}>
             {[['login','تسجيل الدخول'],['register','حساب جديد']].map(([m,label])=>(
-              <button key={m} onClick={()=>{setMode(m);setError('');setForm({name:'',phone:'',password:'',confirm:''}); }}
+              <button key={m} onClick={()=>switchMode(m)}
                 style={{ flex:1, padding:'10px 0', border:'none', borderRadius:11, fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:'Tajawal,sans-serif', background:mode===m?bg:'transparent', color:mode===m?clr:'#94a3b8', boxShadow:mode===m?'0 2px 10px rgba(0,0,0,0.1)':'none', transition:'all 0.2s' }}>{label}</button>
             ))}
           </div>
@@ -3551,19 +3703,25 @@
             )}
             <div>
               <label style={{ fontSize:13, fontWeight:700, color:darkMode?'#94a3b8':'#546e7a', display:'block', marginBottom:6 }}>رقم الهاتف *</label>
-              <input value={form.phone} onChange={e=>upd('phone',e.target.value)} placeholder="05XXXXXXXX" dir="ltr" style={inp({ textAlign:'right' })} onKeyDown={e=>mode==='login'&&e.key==='Enter'&&doLogin()}/>
+              <input value={form.phone} onChange={e=>upd('phone',e.target.value)} placeholder="0599123456 أو +966599123456" dir="ltr" style={inp({ textAlign:'right' })} onKeyDown={e=>mode==='login'&&e.key==='Enter'&&doLogin()}/>
             </div>
             <div>
               <label style={{ fontSize:13, fontWeight:700, color:darkMode?'#94a3b8':'#546e7a', display:'block', marginBottom:6 }}>كلمة المرور *</label>
               <div style={{ position:'relative' }}>
                 <input type={showPass?'text':'password'} value={form.password} onChange={e=>upd('password',e.target.value)} placeholder="••••••••" style={inp({ paddingLeft:44 })} onKeyDown={e=>e.key==='Enter'&&(mode==='login'?doLogin():doRegister())}/>
-                <button onClick={()=>setShowPass(v=>!v)} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', fontSize:16, padding:0, lineHeight:1 }}>{showPass?'🙈':'👁️'}</button>
+                <button onClick={()=>setShowPass(v=>!v)} aria-label={showPass?'إخفاء كلمة المرور':'إظهار كلمة المرور'}
+                  style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', fontSize:16, padding:0, lineHeight:1 }}>
+                  {showPass ? <EyeOffIcon size={18} color={darkMode?'#94a3b8':'#aaa'}/> : <EyeIcon size={18} color={darkMode?'#94a3b8':'#aaa'}/>}
+                </button>
               </div>
             </div>
             {mode==='register' && (
               <div>
                 <label style={{ fontSize:13, fontWeight:700, color:darkMode?'#94a3b8':'#546e7a', display:'block', marginBottom:6 }}>تأكيد كلمة المرور *</label>
                 <input type="password" value={form.confirm} onChange={e=>upd('confirm',e.target.value)} placeholder="••••••••" style={inp()} onKeyDown={e=>e.key==='Enter'&&doRegister()}/>
+                {form.confirm && form.confirm !== form.password && (
+                  <div style={{ fontSize:11, color:'#e74c3c', marginTop:4 }}>⚠ كلمتا المرور غير متطابقتين</div>
+                )}
               </div>
             )}
           </div>
@@ -3576,9 +3734,25 @@
           )}
 
           {/* Submit */}
-          <button onClick={mode==='login'?doLogin:doRegister} style={{ width:'100%', marginTop:22, padding:'14px', borderRadius:14, border:'none', background:'linear-gradient(135deg,#8CC63F,#6ea82d)', color:'#fff', fontSize:16, fontWeight:800, cursor:'pointer', fontFamily:'Tajawal,sans-serif', boxShadow:'0 6px 20px rgba(140,198,63,0.4)', transition:'transform 0.15s' }}
-            onMouseEnter={e=>e.currentTarget.style.transform='scale(1.02)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
-            {mode==='login'?'🔐 تسجيل الدخول':'✅ إنشاء حساب'}
+          <button onClick={mode==='login'?doLogin:doRegister} disabled={loading}
+            style={{ width:'100%', marginTop:22, padding:'14px', borderRadius:14, border:'none', background:'linear-gradient(135deg,#8CC63F,#6ea82d)', color:'#fff', fontSize:16, fontWeight:800, cursor:loading?'not-allowed':'pointer', fontFamily:'Tajawal,sans-serif', boxShadow:'0 6px 20px rgba(140,198,63,0.4)', transition:'transform 0.15s', opacity:loading?0.75:1 }}
+            onMouseEnter={e=>!loading&&(e.currentTarget.style.transform='scale(1.02)')} onMouseLeave={e=>e.currentTarget.style.transform=''}>
+            {loading ? '⏳ جاري التحقق...' : mode==='login'?'🔐 تسجيل الدخول':'✅ إنشاء حساب'}
+          </button>
+
+          {/* Divider */}
+          <div style={{ display:'flex', alignItems:'center', gap:12, margin:'18px 0 14px' }}>
+            <div style={{ flex:1, height:1, background:darkMode?'#2d3e50':'#e2e8f0' }}/>
+            <span style={{ fontSize:12, color:darkMode?'#475569':'#94a3b8', whiteSpace:'nowrap' }}>أو</span>
+            <div style={{ flex:1, height:1, background:darkMode?'#2d3e50':'#e2e8f0' }}/>
+          </div>
+
+          {/* Google Sign-In */}
+          <button onClick={handleGoogleLogin}
+            style={{ width:'100%', padding:'12px', borderRadius:14, border:`1.5px solid ${darkMode?'#334155':'#e2e8f0'}`, background:darkMode?'#1e293b':'#fff', color:clr, fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'Tajawal,sans-serif', display:'flex', alignItems:'center', justifyContent:'center', gap:10, transition:'all 0.2s' }}
+            onMouseEnter={e=>e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'} onMouseLeave={e=>e.currentTarget.style.boxShadow=''}>
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            تسجيل الدخول بـ Google
           </button>
 
           {/* Guest */}
@@ -3656,6 +3830,7 @@
     const [checkInStreak,  setCheckInStreak]  = useState(()=>lsGet(uk('tq_checkin_streak'),0));
     const [winW,           setWinW]           = useState(window.innerWidth);
     const [dismissedAnn,   setDismissedAnn]   = useState(''); // إغلاق شريط الإعلان (مؤقت)
+    const [lastBroadcastSeen, setLastBroadcastSeen] = useState(() => lsGet(uk('tq_last_broadcast'), 0));
 
     // ── حفظ تلقائي في localStorage ─────────────────────────────────────────
     // delay=500ms for heavy/image data; immediate for critical transactional data
@@ -3702,6 +3877,7 @@
     useLsWrite(uk('tq_notif_read'),       lastNotifRead);
     useLsWrite(uk('tq_last_checkin'),     lastCheckIn);
     useLsWrite(uk('tq_checkin_streak'),   checkInStreak);
+    useLsWrite(uk('tq_last_broadcast'),   lastBroadcastSeen);
     useEffect(() => {
       const handler = () => setWinW(window.innerWidth);
       window.addEventListener('resize', handler);
@@ -3765,6 +3941,42 @@
         : '🔔';
       setNotifications(prev=>[{id:Date.now(), msg, icon, time:Date.now()},...prev].slice(0,40));
     },[]);
+
+    // ── إرسال إشعار جماعي من الأدمن ────────────────────────────────────────
+    const sendBroadcast = useCallback((msg) => {
+      const bs = lsGet('tq_broadcasts', []);
+      const entry = { id: Date.now(), msg, time: Date.now() };
+      lsSet('tq_broadcasts', [...bs, entry].slice(-50));
+      window.dispatchEvent(new CustomEvent('tq_broadcast'));
+    }, []);
+
+    // ── استقبال إشعارات الأدمن للمستخدمين المسجلين ──────────────────────────
+    useEffect(() => {
+      if (currentUser.isGuest || currentUser.isAdmin) return;
+      const checkBroadcasts = () => {
+        const bs  = lsGet('tq_broadcasts', []);
+        const last = lsGet(uk('tq_last_broadcast'), 0);
+        const cutoff = Date.now() - 24 * 3600 * 1000; // فقط إشعارات الـ 24 ساعة الأخيرة
+        const newBs = bs.filter(b => b.time > last && b.time > cutoff);
+        if (newBs.length === 0) return;
+        newBs.sort((a, b) => a.time - b.time).forEach(b => showToast(b.msg));
+        const newLast = Math.max(...newBs.map(b => b.time));
+        lsSet(uk('tq_last_broadcast'), newLast);
+        setLastBroadcastSeen(newLast);
+      };
+      checkBroadcasts();
+      const onBroadcast = () => checkBroadcasts();
+      const onStorage   = (e) => { if (!e.key || e.key === 'tq_broadcasts') checkBroadcasts(); };
+      window.addEventListener('tq_broadcast', onBroadcast);
+      window.addEventListener('storage',      onStorage);
+      const timer = setInterval(checkBroadcasts, 15000); // فحص كل 15 ثانية
+      return () => {
+        window.removeEventListener('tq_broadcast', onBroadcast);
+        window.removeEventListener('storage',      onStorage);
+        clearInterval(timer);
+      };
+    }, [showToast, currentUser.isGuest, currentUser.isAdmin]);
+
     const addToCart    = useCallback((product)=>{ setCart(prev=>({...prev,[product.id]:(prev[product.id]||0)+1})); showToast(`أُضيف ${product.name} إلى السلة`); },[showToast]);
     const updateCart   = useCallback((id,qty)=>{
       if (qty<=0) {
@@ -3936,7 +4148,7 @@
       return list;
     },[products,selectedCat,search,showFavs,favorites,filters]);
 
-    if (view==='admin') return <AdminPanel products={products} setProducts={setProducts} storeOpen={storeOpen} setStoreOpen={setStoreOpen} onExit={()=>setView('customer')} orders={orders} setOrders={setOrders} waNumber={waNumber} setWaNumber={setWaNumber} coupons={coupons} setCoupons={setCoupons} announcement={announcement} setAnnouncement={setAnnouncement} freeGiftConfig={freeGiftConfig} setFreeGiftConfig={setFreeGiftConfig}/>;
+    if (view==='admin') return <AdminPanel products={products} setProducts={setProducts} storeOpen={storeOpen} setStoreOpen={setStoreOpen} onExit={()=>setView('customer')} orders={orders} setOrders={setOrders} waNumber={waNumber} setWaNumber={setWaNumber} coupons={coupons} setCoupons={setCoupons} announcement={announcement} setAnnouncement={setAnnouncement} freeGiftConfig={freeGiftConfig} setFreeGiftConfig={setFreeGiftConfig} sendBroadcast={sendBroadcast}/>;
 
     return (
       <div data-theme={darkMode?'dark':''} style={{ minHeight:'100vh', background:'var(--bg)', fontFamily:'Tajawal,sans-serif', color:'var(--text)' }}>
