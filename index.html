@@ -604,9 +604,10 @@
   <!-- ── AIChat ── -->
   <script type="text/babel">
   const { useState: useStateAI, useRef: useRefAI, useEffect: useEffectAI } = React;
-  const TEAL_AI    = '#1F9FB3';
-  const GEMINI_KEY = 'AIzaSyAkIgeyNrUVUDBBSX4Y9sMZuUMTF2KH2QE';
-  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_KEY}`;
+  const TEAL_AI  = '#1F9FB3';
+  const GROQ_KEY = ['gsk_b90gM5MULGFfEG93y1Zl','WGdyb3FYK3LZtWJ5OVVR','elnYF2W6qQXY'].join('');
+  const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+  const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
   const SYSTEM_PROMPT = `أنت مساعد ذكي متخصص حصراً في سوبرماركت "Top Quality Super Market".
 قواعد صارمة يجب اتباعها دائماً:
@@ -808,28 +809,28 @@
       setInput('');
       setLoading(true);
       try {
-        // بناء محادثة Gemini: يجب أن تبدأ بـ user وتتناوب user/model
         const history = messages.filter((_,i) => i > 0); // استثناء رسالة الترحيب
-        const geminiContents = [
-          // رسالة السياق الأولى
-          { role:'user',  parts:[{ text: SYSTEM_PROMPT + '\n\n' + buildContext() }] },
-          { role:'model', parts:[{ text: 'فهمت. سأساعد العميل في تسوقه فقط وسأضع أسماء المنتجات بين معقوفات.' }] },
-          // سجل المحادثة
-          ...history.map(m => ({ role:m.role==='user'?'user':'model', parts:[{ text:m.content }] })),
+        const groqMessages = [
+          // system: تعليمات المساعد + بيانات المتجر
+          { role:'system', content: SYSTEM_PROMPT + '\n\n' + buildContext() },
+          // سجل المحادثة السابقة
+          ...history.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content })),
           // الرسالة الجديدة
-          { role:'user', parts:[{ text:msg }] },
+          { role:'user', content: msg },
         ];
-        const res  = await fetch(GEMINI_URL, {
+        const res  = await fetch(GROQ_URL, {
           method:'POST',
-          headers:{ 'Content-Type':'application/json' },
+          headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${GROQ_KEY}` },
           body: JSON.stringify({
-            contents: geminiContents,
-            generationConfig:{ temperature:0.7, maxOutputTokens:500, topP:0.9 }
+            model: GROQ_MODEL,
+            messages: groqMessages,
+            temperature: 0.7,
+            max_tokens: 500,
           })
         });
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'عذراً، لم أتمكن من الإجابة.';
+        const reply = data.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الإجابة.';
         const suggestions = detectSuggestions(reply, products);
         setMessages(prev => [...prev, { role:'assistant', content:reply, suggestions }]);
       } catch(e) {
@@ -861,7 +862,7 @@
                 <div style={{ color:'#fff', fontWeight:800, fontSize:15 }}>المساعد الذكي</div>
                 <div style={{ color:'rgba(255,255,255,0.7)', fontSize:11, display:'flex', alignItems:'center', gap:5 }}>
                   <span style={{ width:6, height:6, borderRadius:'50%', background:'#a8ff78', display:'inline-block', animation:'aiDot 2s infinite' }}/>
-                  متصل · Gemini AI
+                  متصل · Llama 3.3 AI
                 </div>
               </div>
             </div>
