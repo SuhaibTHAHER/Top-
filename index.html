@@ -50,7 +50,7 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
     }
   </script>
-  <!-- Google Identity Services — replace YOUR_GOOGLE_CLIENT_ID بـ Client ID من Google Cloud Console -->
+  <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <script>
@@ -3602,7 +3602,7 @@
     const handleGoogleLogin = () => {
       if (!window.google?.accounts?.id) { setError('خدمة جوجل غير متوفرة حالياً، جرب لاحقاً'); return; }
       // ⚠️ استبدل القيمة أدناه بـ Client ID من Google Cloud Console
-      const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+      const GOOGLE_CLIENT_ID = '999776973189-00ttff0o1jmhabhdkg08m0crbq6sm8f4.apps.googleusercontent.com';
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: ({ credential }) => {
