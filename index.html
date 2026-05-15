@@ -604,148 +604,310 @@
   <!-- ── AIChat ── -->
   <script type="text/babel">
   const { useState: useStateAI, useRef: useRefAI, useEffect: useEffectAI } = React;
-  const TEAL_AI = '#1F9FB3';
+  const TEAL_AI    = '#1F9FB3';
+  const GEMINI_KEY = 'AIzaSyAkIgeyNrUVUDBBSX4Y9sMZuUMTF2KH2QE';
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+
+  const SYSTEM_PROMPT = `أنت مساعد ذكي متخصص حصراً في سوبرماركت "Top Quality Super Market".
+قواعد صارمة يجب اتباعها دائماً:
+1. أجب فقط على أسئلة تتعلق بالتسوق، الطعام، الوصفات، التغذية، المنتجات، الأسعار، الميزانية.
+2. إذا سألك أحد عن أي موضوع آخر (سياسة، تقنية، أخبار، رياضة، إلخ)، ارفض بلطف: "أنا مساعد تسوق متخصص، لا أستطيع المساعدة في هذا الموضوع 😊 لكن يسعدني مساعدتك في تسوقك!"
+3. عند اقتراح أي منتج متوفر في المتجر، ضع اسمه بالضبط بين معقوفتين هكذا: [اسم المنتج]
+4. أجب بالعربية بأسلوب ودود ومختصر، لا تتجاوز 200 كلمة.
+5. اذكر سعر المنتج عند اقتراحه.`;
+
   const QUICK_ACTIONS = [
-    { label:'وصفة من السلة',    prompt:'ما الوصفات التي أستطيع تحضيرها من المنتجات في سلتي الحالية؟' },
-    { label:'ميزانية 50 شيكل', prompt:'معي 50 شيكل فقط، اقترح لي أفضل مشتريات لوجبات متكاملة ومغذية' },
-    { label:'خيارات صحية',     prompt:'ما هي أفضل المنتجات الصحية المتوفرة وكيف أدمجها في وجبات يومية؟' },
-    { label:'سناك للأمسية',    prompt:'أريد مسليات وسناكات مميزة للجلوس ومشاهدة فيلم الليلة' },
-    { label:'سلة ذكية',        prompt:'بناءً على ما في سلتي، ماذا ينقصني لتكتمل وجبة لذيذة؟' },
+    { label:'🍳 وصفة من السلة',    prompt:'ما الوصفات التي أستطيع تحضيرها من المنتجات في سلتي الحالية؟' },
+    { label:'💰 ميزانية 50 ₪',     prompt:'معي 50 شيكل فقط، اقترح لي أفضل مشتريات لوجبات متكاملة' },
+    { label:'🥗 خيارات صحية',      prompt:'ما أفضل المنتجات الصحية المتوفرة لأسبوع غذائي متوازن؟' },
+    { label:'🍿 سناك للأمسية',     prompt:'أريد مسليات وسناكات للجلوس ومشاهدة فيلم الليلة' },
+    { label:'🛒 سلة ذكية',         prompt:'بناءً على ما في سلتي، ماذا ينقصني لتكتمل وجبة لذيذة؟' },
   ];
+
+  // تطبيع النص العربي للمقارنة
+  const normAI = (s) => (s||'').replace(/[ً-ٟ]/g,'').replace(/[أإآا]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').toLowerCase().trim();
+
+  // كشف المنتجات المذكورة بين [معقوفات] في نص الـ AI
+  function detectSuggestions(text, products) {
+    const found = [], seen = new Set();
+    const re = /\[([^\]]{2,50})\]/g;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const raw = m[1].trim();
+      const nr  = normAI(raw);
+      const prod = products.find(p => {
+        const np = normAI(p.name);
+        return np === nr || np.includes(nr) || nr.includes(np);
+      });
+      if (prod && !seen.has(prod.id)) { seen.add(prod.id); found.push(prod); }
+    }
+    return found;
+  }
+
   function TypingDots() {
     return (
       <div style={{ display:'flex', gap:5, padding:'4px 0' }}>
         {[0,1,2].map(i => (
-          <div key={i} style={{
-            width:8, height:8, borderRadius:'50%', background:'rgba(255,255,255,0.8)',
-            animation:`aiDot 1.2s ${i*0.2}s ease-in-out infinite`,
-          }}/>
+          <div key={i} style={{ width:8, height:8, borderRadius:'50%', background:'rgba(255,255,255,0.85)',
+            animation:`aiDot 1.2s ${i*0.2}s ease-in-out infinite` }}/>
         ))}
       </div>
     );
   }
-  function AIChatMessage({ msg }) {
+
+  function AIChatMessage({ msg, products, onAddToCart, onToggleFav, favorites }) {
     const isUser = msg.role === 'user';
+    const [editMode,  setEditMode]  = useStateAI(false);
+    const [selected,  setSelected]  = useStateAI(() => new Set((msg.suggestions||[]).map(p => p.id)));
+    const suggs = msg.suggestions || [];
+
+    // إزالة المعقوفات من نص العرض
+    const displayText = (msg.content||'').replace(/\[([^\]]+)\]/g, '$1');
+
+    const toggleSel = (id) => setSelected(prev => { const n=new Set(prev); n.has(id)?n.delete(id):n.add(id); return n; });
+    const addSelected = () => suggs.filter(p => selected.has(p.id)).forEach(p => onAddToCart(p));
+
     return (
-      <div style={{ display:'flex', justifyContent:isUser?'flex-start':'flex-end', marginBottom:10 }}>
-        {!isUser && (
-          <div style={{
-            width:30, height:30, borderRadius:'50%',
-            background:'linear-gradient(135deg, #1F9FB3, #0e7fa0)',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            flexShrink:0, alignSelf:'flex-end', marginLeft:8,
-          }}>
-            <BotIcon size={16} color="#fff"/>
+      <div style={{ display:'flex', flexDirection:'column', alignItems:isUser?'flex-start':'flex-end', marginBottom:14 }}>
+        {/* فقاعة الرسالة */}
+        <div style={{ display:'flex', justifyContent:isUser?'flex-start':'flex-end', width:'100%', alignItems:'flex-end', gap:8 }}>
+          {!isUser && (
+            <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,#1F9FB3,#0e7fa0)',
+              display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <BotIcon size={15} color="#fff"/>
+            </div>
+          )}
+          <div style={{ maxWidth:'80%', background:isUser?'var(--surface2)':'linear-gradient(135deg,#1F9FB3,#0b7d96)',
+            color:isUser?'var(--text)':'#fff', borderRadius:isUser?'4px 16px 16px 16px':'16px 4px 16px 16px',
+            padding:'10px 14px', fontSize:14, lineHeight:1.7, whiteSpace:'pre-wrap',
+            boxShadow:isUser?'none':'0 2px 8px rgba(31,159,179,0.25)',
+            border:isUser?'1px solid var(--border)':'none' }}>
+            {displayText}
+          </div>
+        </div>
+
+        {/* بطاقات المنتجات المقترحة */}
+        {!isUser && suggs.length > 0 && (
+          <div style={{ marginTop:8, marginRight:38, width:'calc(100% - 38px)', maxWidth:360 }}>
+            {/* شريط الإجراءات */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
+              <span style={{ fontSize:12, fontWeight:700, color:TEAL_AI }}>🛍️ منتجات مقترحة ({suggs.length})</span>
+              <div style={{ display:'flex', gap:5 }}>
+                {suggs.length > 1 && (
+                  <button onClick={() => setEditMode(p => !p)}
+                    style={{ fontSize:11, background:'transparent', border:`1.5px solid ${TEAL_AI}`, color:TEAL_AI, borderRadius:20, padding:'3px 10px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontWeight:700 }}>
+                    {editMode ? '✕ إلغاء' : '✏️ تعديل'}
+                  </button>
+                )}
+                {editMode ? (
+                  <button onClick={addSelected} disabled={selected.size===0}
+                    style={{ fontSize:11, background:selected.size>0?TEAL_AI:'#ccc', color:'#fff', border:'none', borderRadius:20, padding:'3px 10px', cursor:selected.size>0?'pointer':'not-allowed', fontFamily:'Tajawal,sans-serif', fontWeight:700 }}>
+                    أضف المحدد ({selected.size}) 🛒
+                  </button>
+                ) : suggs.length > 1 && (
+                  <button onClick={() => suggs.forEach(p => onAddToCart(p))}
+                    style={{ fontSize:11, background:TEAL_AI, color:'#fff', border:'none', borderRadius:20, padding:'3px 10px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontWeight:700 }}>
+                    أضف الكل 🛒
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* صفوف المنتجات */}
+            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+              {suggs.map(p => {
+                const eff    = p.discount>0 ? p.price*(1-p.discount/100) : p.price;
+                const isFav  = favorites?.has(p.id);
+                const isChk  = selected.has(p.id);
+                return (
+                  <div key={p.id} onClick={editMode ? () => toggleSel(p.id) : undefined}
+                    style={{ display:'flex', alignItems:'center', gap:8, background:'var(--surface)',
+                      border:`1.5px solid ${editMode&&isChk?TEAL_AI:'var(--border)'}`,
+                      borderRadius:12, padding:'8px 10px', cursor:editMode?'pointer':'default',
+                      opacity:editMode&&!isChk?0.45:1, transition:'all 0.18s',
+                      boxShadow:editMode&&isChk?`0 0 0 2px ${TEAL_AI}33`:'none' }}>
+                    {editMode && (
+                      <div style={{ width:18, height:18, borderRadius:5, border:`2px solid ${isChk?TEAL_AI:'#ccc'}`,
+                        background:isChk?TEAL_AI:'transparent', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                        {isChk && <span style={{ color:'#fff', fontSize:11, lineHeight:1 }}>✓</span>}
+                      </div>
+                    )}
+                    {p.image
+                      ? <img src={p.image} style={{ width:38, height:38, borderRadius:8, objectFit:'cover', flexShrink:0 }}/>
+                      : <div style={{ width:38, height:38, borderRadius:8, background:TEAL_AI+'22', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:18 }}>🛒</div>
+                    }
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontSize:13, fontWeight:700, color:'var(--text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
+                      <div style={{ fontSize:12, color:TEAL_AI, fontWeight:800 }}>
+                        ₪{eff.toFixed(2)}
+                        {p.discount>0 && <span style={{ fontSize:10, color:'#e74c3c', marginRight:5 }}>خصم {p.discount}%</span>}
+                      </div>
+                    </div>
+                    {!editMode && (
+                      <>
+                        <button onClick={() => onToggleFav(p.id)}
+                          style={{ background:isFav?'#fce4ec':'var(--surface2)', border:'none', borderRadius:8, width:32, height:32, cursor:'pointer', fontSize:15, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                          {isFav?'❤️':'🤍'}
+                        </button>
+                        <button onClick={() => onAddToCart(p)}
+                          style={{ background:TEAL_AI, color:'#fff', border:'none', borderRadius:8, padding:'6px 11px', cursor:'pointer', fontSize:12, fontWeight:800, fontFamily:'Tajawal,sans-serif', whiteSpace:'nowrap', flexShrink:0 }}>
+                          + سلة
+                        </button>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
-        <div style={{
-          maxWidth:'78%',
-          background: isUser ? 'var(--surface2)' : 'linear-gradient(135deg, #1F9FB3, #0b7d96)',
-          color: isUser ? 'var(--text)' : '#fff',
-          borderRadius: isUser ? '4px 16px 16px 16px' : '16px 4px 16px 16px',
-          padding:'10px 14px', fontSize:14, lineHeight:1.65, whiteSpace:'pre-wrap',
-          boxShadow: isUser ? 'none' : '0 2px 8px rgba(31,159,179,0.25)',
-          border: isUser ? '1px solid var(--border)' : 'none',
-        }}>{msg.content}</div>
       </div>
     );
   }
-  function AIChat({ products, cart, onClose }) {
-    const [messages, setMessages] = useStateAI([{
-      role:'assistant',
-      content:'أهلاً وسهلاً! أنا مساعدك الذكي في Top Quality Super Market.\n\nأقدر أساعدك بـ:\n- وصفات من المنتجات المتاحة\n- تخطيط الميزانية\n- اقتراحات ذكية للسلة\n- اختيارات صحية\n\nكيف أقدر أخدمك اليوم؟',
+
+  function AIChat({ products, cart, favorites, onAddToCart, onToggleFav, onClose }) {
+    const [messages,  setMessages]  = useStateAI([{
+      role:'assistant', suggestions:[],
+      content:'أهلاً! أنا مساعدك الذكي في Top Quality 🛒\n\nأقدر أساعدك بـ:\n• وصفات من منتجات المتجر\n• تخطيط ميزانية التسوق\n• اقتراح منتجات للسلة والمفضلة\n• نصائح غذائية وصحية\n\nاختر من الاقتراحات أو اكتب سؤالك 👇',
     }]);
-    const [input,   setInput]   = useStateAI('');
-    const [loading, setLoading] = useStateAI(false);
+    const [input,    setInput]    = useStateAI('');
+    const [loading,  setLoading]  = useStateAI(false);
     const scrollRef  = useRefAI(null);
     const inputRef   = useRefAI(null);
     const lastSendTs = useRefAI(0);
     const MSG_LIMIT  = 20;
+
     useEffectAI(() => {
       if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, [messages, loading]);
+
     const buildContext = () => {
-      const pList = products.map(p => `${p.name} (${p.price}₪${p.discount>0?', خصم '+p.discount+'%':''})`).join(' | ');
-      const cartItems = Object.entries(cart||{}).map(([id,qty]) => {
-        const p = products.find(x => x.id === Number(id));
-        return p ? `${p.name} x${qty}` : null;
-      }).filter(Boolean).join('، ');
-      return `أنت مساعد ذكي لسوبرماركت "Top Quality Super Market".\nالمنتجات المتاحة: ${pList}.\n${cartItems?`السلة الحالية للعميل: ${cartItems}.`:'السلة فارغة حالياً.'}\nمهمتك: مساعدة العميل بوصفات، تخطيط ميزانية، اقتراحات ذكية للسلة، اختيارات صحية.\nأجب بالعربية بأسلوب ودود ومختصر. إذا ذكرت منتجات، اذكر سعرها.`;
+      const pList = products.map(p =>
+        `${p.name} (₪${p.price}${p.discount>0?`, خصم ${p.discount}%`:''}${p.stock<5?', كمية محدودة':''})`
+      ).join(' | ');
+      const cartItems = Object.entries(cart||{})
+        .map(([id,qty]) => { const p=products.find(x=>x.id===Number(id)); return p?`${p.name} ×${qty}`:null; })
+        .filter(Boolean).join('، ');
+      return `منتجات المتجر المتاحة:\n${pList}\n\n${cartItems?`سلة العميل الحالية: ${cartItems}`:'سلة العميل فارغة'}`;
     };
+
     const send = async (text) => {
       const msg = (text !== undefined ? text : input).trim();
       if (!msg || loading) return;
-      // Rate-limit: 2 s between sends
       const now = Date.now();
-      if (now - lastSendTs.current < 2000) {
-        setMessages(prev => [...prev, { role:'assistant', content:'⏱️ انتظر لحظة قبل إرسال رسالة أخرى.' }]);
+      if (now - lastSendTs.current < 1500) {
+        setMessages(prev => [...prev, { role:'assistant', content:'⏱️ انتظر لحظة قبل إرسال رسالة أخرى.', suggestions:[] }]);
         return;
       }
-      // Session cap: 20 user messages max
-      const userCount = messages.filter(m => m.role === 'user').length;
-      if (userCount >= MSG_LIMIT) {
-        setMessages(prev => [...prev, { role:'assistant', content:'⚠️ وصلت لحد الرسائل في هذه الجلسة (20 رسالة). أغلق النافذة وافتحها من جديد.' }]);
+      if (messages.filter(m=>m.role==='user').length >= MSG_LIMIT) {
+        setMessages(prev => [...prev, { role:'assistant', content:'⚠️ وصلت لحد الجلسة (20 رسالة). أغلق وافتح المساعد من جديد.', suggestions:[] }]);
         return;
       }
       lastSendTs.current = now;
-      setMessages(prev => [...prev, { role:'user', content:msg }]);
+      setMessages(prev => [...prev, { role:'user', content:msg, suggestions:[] }]);
       setInput('');
       setLoading(true);
       try {
-        const resp = await window.claude.complete({ messages:[{ role:'user', content:buildContext()+'\n\nسؤال العميل: '+msg }] });
-        setMessages(prev => [...prev, { role:'assistant', content:resp }]);
-      } catch {
-        setMessages(prev => [...prev, { role:'assistant', content:'عذراً، حدث خطأ في الاتصال. حاول مرة أخرى.' }]);
+        // بناء محادثة Gemini: يجب أن تبدأ بـ user وتتناوب user/model
+        const history = messages.filter((_,i) => i > 0); // استثناء رسالة الترحيب
+        const geminiContents = [
+          // رسالة السياق الأولى
+          { role:'user',  parts:[{ text: SYSTEM_PROMPT + '\n\n' + buildContext() }] },
+          { role:'model', parts:[{ text: 'فهمت. سأساعد العميل في تسوقه فقط وسأضع أسماء المنتجات بين معقوفات.' }] },
+          // سجل المحادثة
+          ...history.map(m => ({ role:m.role==='user'?'user':'model', parts:[{ text:m.content }] })),
+          // الرسالة الجديدة
+          { role:'user', parts:[{ text:msg }] },
+        ];
+        const res  = await fetch(GEMINI_URL, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            contents: geminiContents,
+            generationConfig:{ temperature:0.7, maxOutputTokens:500, topP:0.9 }
+          })
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'عذراً، لم أتمكن من الإجابة.';
+        const suggestions = detectSuggestions(reply, products);
+        setMessages(prev => [...prev, { role:'assistant', content:reply, suggestions }]);
+      } catch(e) {
+        setMessages(prev => [...prev, { role:'assistant', content:`عذراً، حدث خطأ في الاتصال 😕\n${e.message||'حاول مرة أخرى.'}`, suggestions:[] }]);
       }
       setLoading(false);
-      setTimeout(() => inputRef.current && inputRef.current.focus(), 100);
+      setTimeout(() => inputRef.current?.focus(), 100);
     };
+
     return (
-      <div style={{ position:'fixed', inset:0, zIndex:3000, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.55)', backdropFilter:'blur(4px)' }}
-        onClick={e => e.target === e.currentTarget && onClose()}>
-        <style>{`@keyframes aiDot{0%,60%,100%{transform:translateY(0);opacity:.6}30%{transform:translateY(-7px);opacity:1}}@keyframes aiSlideUp{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}`}</style>
-        <div style={{ background:'var(--surface)', borderRadius:22, width:430, maxWidth:'95vw', maxHeight:'88vh', display:'flex', flexDirection:'column', boxShadow:'0 24px 64px rgba(0,0,0,0.22)', overflow:'hidden', animation:'aiSlideUp 0.28s ease' }}>
-          <div style={{ background:'linear-gradient(135deg,#1F9FB3 0%,#0b7d96 100%)', padding:'18px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <div style={{ width:44, height:44, borderRadius:14, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <BotIcon size={24} color="#fff"/>
+      <div style={{ position:'fixed', inset:0, zIndex:3000, display:'flex', alignItems:'flex-end', justifyContent:'center', background:'rgba(0,0,0,0.5)', backdropFilter:'blur(4px)' }}
+        onClick={e => e.target===e.currentTarget && onClose()}>
+        <style>{`
+          @keyframes aiDot{0%,60%,100%{transform:translateY(0);opacity:.6}30%{transform:translateY(-7px);opacity:1}}
+          @keyframes aiSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+          @media(min-width:520px){ .ai-wrap{ border-radius:22px !important; margin-bottom:24px !important; max-height:88vh !important; } }
+        `}</style>
+        <div className="ai-wrap" style={{ background:'var(--surface)', borderRadius:'22px 22px 0 0', width:'100%', maxWidth:460,
+          maxHeight:'92dvh', display:'flex', flexDirection:'column', boxShadow:'0 -8px 40px rgba(0,0,0,0.22)',
+          overflow:'hidden', animation:'aiSlideUp 0.25s ease' }}>
+
+          {/* هيدر */}
+          <div style={{ background:'linear-gradient(135deg,#1F9FB3,#0b7d96)', padding:'16px 18px', display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:11 }}>
+              <div style={{ width:42, height:42, borderRadius:13, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <BotIcon size={22} color="#fff"/>
               </div>
               <div>
-                <div style={{ color:'#fff', fontWeight:800, fontSize:16 }}>المساعد الذكي</div>
-                <div style={{ color:'rgba(255,255,255,0.65)', fontSize:12, display:'flex', alignItems:'center', gap:5 }}>
-                  <span style={{ width:6, height:6, borderRadius:'50%', background:'#a8ff78', display:'inline-block' }}/>
-                  Top Quality AI · يعمل الآن
+                <div style={{ color:'#fff', fontWeight:800, fontSize:15 }}>المساعد الذكي</div>
+                <div style={{ color:'rgba(255,255,255,0.7)', fontSize:11, display:'flex', alignItems:'center', gap:5 }}>
+                  <span style={{ width:6, height:6, borderRadius:'50%', background:'#a8ff78', display:'inline-block', animation:'aiDot 2s infinite' }}/>
+                  متصل · Gemini AI
                 </div>
               </div>
             </div>
-            <button onClick={onClose} style={{ background:'rgba(255,255,255,0.18)', border:'none', borderRadius:'50%', width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <XIcon size={17} color="#fff"/>
+            <button onClick={onClose} style={{ background:'rgba(255,255,255,0.18)', border:'none', borderRadius:'50%', width:32, height:32, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <XIcon size={16} color="#fff"/>
             </button>
           </div>
-          <div style={{ display:'flex', gap:7, padding:'10px 14px', overflowX:'auto', background:'var(--surface2)', borderBottom:'1px solid var(--border)', flexShrink:0 }}>
+
+          {/* أزرار الاقتراحات السريعة */}
+          <div style={{ display:'flex', gap:6, padding:'9px 12px', overflowX:'auto', background:'var(--surface2)', borderBottom:'1px solid var(--border)', flexShrink:0, scrollbarWidth:'none' }}>
             {QUICK_ACTIONS.map((q,i) => (
-              <button key={i} onClick={() => send(q.prompt)} disabled={loading} style={{ background:'var(--surface)', border:'1.5px solid var(--border)', borderRadius:20, padding:'6px 13px', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:600, cursor:loading?'not-allowed':'pointer', whiteSpace:'nowrap', color:'var(--text2)', transition:'all 0.18s', flexShrink:0 }}
-                onMouseEnter={e=>{if(!loading){e.currentTarget.style.background=TEAL_AI;e.currentTarget.style.color='#fff';e.currentTarget.style.borderColor=TEAL_AI;}}}
-                onMouseLeave={e=>{e.currentTarget.style.background='var(--surface)';e.currentTarget.style.color='var(--text2)';e.currentTarget.style.borderColor='var(--border)';}}
-              >{q.label}</button>
+              <button key={i} onClick={() => send(q.prompt)} disabled={loading}
+                style={{ background:'var(--surface)', border:'1.5px solid var(--border)', borderRadius:20, padding:'5px 12px', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:600, cursor:loading?'not-allowed':'pointer', whiteSpace:'nowrap', color:'var(--text2)', transition:'all 0.15s', flexShrink:0 }}
+                onMouseEnter={e=>{ if(!loading){e.currentTarget.style.background=TEAL_AI;e.currentTarget.style.color='#fff';e.currentTarget.style.borderColor=TEAL_AI;} }}
+                onMouseLeave={e=>{ e.currentTarget.style.background='var(--surface)';e.currentTarget.style.color='var(--text2)';e.currentTarget.style.borderColor='var(--border)'; }}>
+                {q.label}
+              </button>
             ))}
           </div>
-          <div ref={scrollRef} style={{ flex:1, overflowY:'auto', padding:'16px 16px 8px' }}>
-            {messages.map((m,i) => <AIChatMessage key={i} msg={m}/>)}
+
+          {/* منطقة الرسائل */}
+          <div ref={scrollRef} style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px' }}>
+            {messages.map((m,i) => (
+              <AIChatMessage key={i} msg={m} products={products}
+                onAddToCart={onAddToCart} onToggleFav={onToggleFav} favorites={favorites}/>
+            ))}
             {loading && (
-              <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:10 }}>
+              <div style={{ display:'flex', alignItems:'flex-end', gap:8, marginBottom:10, justifyContent:'flex-end' }}>
+                <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,#1F9FB3,#0e7fa0)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <BotIcon size={15} color="#fff"/>
+                </div>
                 <div style={{ background:'linear-gradient(135deg,#1F9FB3,#0b7d96)', borderRadius:'16px 4px 16px 16px', padding:'10px 16px' }}>
                   <TypingDots/>
                 </div>
               </div>
             )}
           </div>
-          <div style={{ padding:'12px 14px 14px', borderTop:'1px solid var(--border)', display:'flex', gap:8, flexShrink:0, background:'var(--surface)' }}>
+
+          {/* حقل الإدخال */}
+          <div style={{ padding:'10px 12px 14px', borderTop:'1px solid var(--border)', display:'flex', gap:8, flexShrink:0, background:'var(--surface)' }}>
             <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
-              onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
-              placeholder="اكتب سؤالك هنا..." disabled={loading}
-              style={{ flex:1, padding:'10px 14px', border:'2px solid var(--border)', borderRadius:12, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none', transition:'border-color 0.2s', color:'var(--text)', background:'var(--input-bg)' }}
-              onFocus={e=>e.target.style.borderColor=TEAL_AI} onBlur={e=>e.target.style.borderColor='var(--border)'}/>
+              onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }}
+              placeholder="اسألني عن وصفة، ميزانية، أو منتج..." disabled={loading}
+              style={{ flex:1, padding:'10px 14px', border:'2px solid var(--border)', borderRadius:12, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none', color:'var(--text)', background:'var(--input-bg)', transition:'border-color 0.2s' }}
+              onFocus={e=>e.target.style.borderColor=TEAL_AI}
+              onBlur={e=>e.target.style.borderColor='var(--border)'}/>
             <button onClick={()=>send()} disabled={loading||!input.trim()}
               style={{ background:(!loading&&input.trim())?TEAL_AI:'#d0d0d0', color:'#fff', border:'none', borderRadius:12, width:44, height:44, flexShrink:0, cursor:(!loading&&input.trim())?'pointer':'not-allowed', display:'flex', alignItems:'center', justifyContent:'center', transition:'background 0.2s' }}>
               <ArrowUpIcon size={18} color="#fff"/>
@@ -4438,7 +4600,7 @@
           </a>
         )}
         {showCompare && <CompareModal compareList={compareList} products={products} onClose={()=>setShowCompare(false)}/>}
-        {showAI      && <AIChat products={products} cart={cart} onClose={()=>setShowAI(false)}/>}
+        {showAI      && <AIChat products={products} cart={cart} favorites={favorites} onAddToCart={addToCart} onToggleFav={toggleFav} onClose={()=>setShowAI(false)}/>}
         {showShoppingList && <ShoppingListPanel list={shoppingList} onAdd={addShoppingItem} onToggle={toggleShoppingItem} onDelete={deleteShoppingItem} onClearDone={clearDoneItems} onClose={()=>setShowShoppingList(false)}/>}
         {showOrders   && <OrdersPanel orders={orders} products={products} onReorder={reorder} onCancel={cancelOrder} onClose={()=>setShowOrders(false)}/>}
         {showProfile  && <UserProfilePanel profile={userProfile} onSave={setUserProfile} onClose={()=>setShowProfile(false)} loyaltyPoints={loyaltyPoints} orders={orders} products={products} currentUser={currentUser} onLogout={()=>{ setShowProfile(false); onLogout(); }}/>}
