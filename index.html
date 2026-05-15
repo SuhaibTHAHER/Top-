@@ -3590,11 +3590,15 @@
 
     const getUsers = () => {
       let users = lsGet('tq_users', []);
-      if (!users.find(u => u.isAdmin)) {
-        const admin = { id:'admin_1', name:'المدير', phone:'admin', email:'admin@topquality.com', password:ADMIN_HASH, isAdmin:true, createdAt:Date.now() };
-        users = [admin, ...users];
-        lsSet('tq_users', users);
+      const adminIdx = users.findIndex(u => u.isAdmin);
+      const adminBase = { id:'admin_1', name:'المدير', phone:'admin', email:'admin@topquality.com', password:ADMIN_HASH, isAdmin:true };
+      if (adminIdx === -1) {
+        users = [{ ...adminBase, createdAt:Date.now() }, ...users];
+      } else {
+        // تحديث الأدمن الموجود لضمان phone وكلمة المرور الصحيحة
+        users[adminIdx] = { ...users[adminIdx], phone:'admin', password:ADMIN_HASH };
       }
+      lsSet('tq_users', users);
       return users;
     };
 
