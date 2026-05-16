@@ -355,6 +355,20 @@
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+  <script>
+    // ── Supabase client ────────────────────────────────────────────
+    window._sb = window.supabase.createClient(
+      'https://guelevqaivugywaabiys.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1ZWxldnFhaXZ1Z3l3YWFiaXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDYxMDIsImV4cCI6MjA5NDUyMjEwMn0.4V51BNOKnyqMvoHqrRg3Bejhii2l3BdsDu_sO6VHHkY'
+    );
+    // phone → fake email for Supabase auth (no SMS needed)
+    window._toEmail = (phone) => {
+      if (!phone) return '';
+      if (phone === 'admin') return 'admin@topquality.app';
+      return phone.trim().replace(/\s+/g,'') + '@topq.app';
+    };
+  </script>
 
   <style>
     /* ── CSS Design Tokens ─────────────────────────────────────────────── */
@@ -1916,7 +1930,7 @@
                             <span style={{ fontWeight:800, color:D, fontSize:15 }}>طلب #{String(order.id).slice(-4)}</span>
                             <span style={{ fontSize:12, color:'#aaa', marginRight:10 }}>{new Date(order.date).toLocaleString('ar-SA')}</span>
                           </div>
-                          <select value={order.status} onChange={e=>setOrders(prev=>prev.map(o=>o.id===order.id?{...o,status:e.target.value}:o))}
+                          <select value={order.status} onChange={async e=>{ const s=e.target.value; await window._sb.from('orders').update({status:s}).eq('id',order.id); setOrders(prev=>prev.map(o=>o.id===order.id?{...o,status:s}:o)); }}
                             style={{ border:`1.5px solid ${sc}`, borderRadius:20, padding:'4px 12px', color:sc, fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', outline:'none', background:'#fff' }}>
                             <option value="pending">قيد الانتظار</option>
                             <option value="preparing">جار التحضير</option>
@@ -4212,21 +4226,25 @@
       setError(''); setLoading(true);
       const phone = form.phone.trim().replace(/\s/g, '');
       if (!phone || !form.password) { setError('الرجاء إدخال رقم الهاتف وكلمة المرور'); setLoading(false); return; }
-      const users = getUsers();
-      const h = await hashPwd(form.password);
-      // Supports both hashed (new) and plaintext (legacy) passwords — migrates on-the-fly
-      const u = users.find(u => u.phone === phone && (
-        isHashed(u.password) ? u.password === h : u.password === form.password
-      ));
-      if (!u) { setError('رقم الهاتف أو كلمة المرور غير صحيحة'); setLoading(false); return; }
-      // Migrate plaintext → hash silently
-      if (!isHashed(u.password)) {
-        lsSet('tq_users', users.map(x => x.id === u.id ? { ...x, password: h } : x));
-        u.password = h;
+      try {
+        const { data, error } = await window._sb.auth.signInWithPassword({
+          email: window._toEmail(phone),
+          password: form.password,
+        });
+        if (error) throw error;
+        const { data: profile } = await window._sb.from('profiles').select('*').eq('id', data.user.id).single();
+        onLogin({
+          id: data.user.id,
+          name: profile?.name || 'مستخدم',
+          phone: profile?.phone || phone,
+          email: data.user.email,
+          isAdmin: profile?.is_admin || false,
+          isGuest: false,
+        });
+      } catch (err) {
+        setError('رقم الهاتف أو كلمة المرور غير صحيحة');
       }
-      lsSet('tq_session', u.id);
       setLoading(false);
-      onLogin(u);
     };
 
     // تحقق موسّع من صيغة الهاتف (يقبل +، مسافات، شرطات، أقواس)
@@ -4241,13 +4259,32 @@
       if (!validPhone(phone)) { setError('رقم الهاتف غير صحيح (مثال: 0599123456 أو +966599123456)'); setLoading(false); return; }
       if (form.password.length < 6) { setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل'); setLoading(false); return; }
       if (form.password !== form.confirm) { setError('كلمتا المرور غير متطابقتين'); setLoading(false); return; }
-      const users = getUsers();
-      if (users.find(u => u.phone === phone)) { setError('رقم الهاتف مسجل مسبقاً، جرب تسجيل الدخول'); return; }
-      const h = await hashPwd(form.password);
-      const newUser = { id:Date.now(), name, phone, email:'', password:h, isAdmin:false, createdAt:Date.now() };
-      lsSet('tq_users', [...users, newUser]);
-      lsSet('tq_session', newUser.id);
-      onLogin(newUser);
+      try {
+        const { data, error } = await window._sb.auth.signUp({
+          email: window._toEmail(phone),
+          password: form.password,
+          options: { data: { name, phone } },
+        });
+        if (error) throw error;
+        // wait for trigger to create profile
+        await new Promise(r => setTimeout(r, 600));
+        const { data: profile } = await window._sb.from('profiles').select('*').eq('id', data.user.id).single();
+        onLogin({
+          id: data.user.id,
+          name: profile?.name || name,
+          phone: profile?.phone || phone,
+          email: data.user.email,
+          isAdmin: profile?.is_admin || false,
+          isGuest: false,
+        });
+      } catch (err) {
+        if (err.message?.includes('already registered') || err.message?.includes('already been registered')) {
+          setError('رقم الهاتف مسجل مسبقاً، سجّل دخولك');
+        } else {
+          setError(err.message || 'حدث خطأ، حاول مرة أخرى');
+        }
+      }
+      setLoading(false);
     };
 
     const inp = (extra={}) => ({ width:'100%', padding:'13px 16px', borderRadius:12, border:`1.5px solid ${darkMode?'#2d3e50':'#d1d5db'}`, background:darkMode?'#1a2535':'#fff', color:darkMode?'#f1f5f9':'#1a1a1a', fontSize:15, outline:'none', fontFamily:'Almarai,sans-serif', boxSizing:'border-box', transition:'border-color 0.2s, box-shadow 0.2s', ...extra });
@@ -4487,6 +4524,16 @@
     const dmSurf = darkMode ? '#1e293b' : '#fff';   // card/panel surface
 
     const [products,    setProducts]    = useState(() => lsGet('tq_products', window.INITIAL_PRODUCTS));
+    // Load products from Supabase (shared across all users)
+    useEffect(() => {
+      window._sb.from('products').select('*').order('id').then(({ data, error }) => {
+        if (!error && data && data.length > 0) {
+          const mapped = data.map(p => ({ id:p.id, name:p.name, category:p.category, price:parseFloat(p.price), discount:p.discount||0, desc:p.description||'', stock:p.stock||0, image:p.image_url||null }));
+          setProducts(mapped);
+          lsSet('tq_products', mapped);
+        }
+      });
+    }, []);
     const [storeOpen,   setStoreOpen]   = useState(() => lsGet('tq_store_open', true));
     const [cart,        setCart]        = useState(() => lsGet(uk('tq_cart'), {}));
     const [favorites,   setFavorites]   = useState(() => new Set(lsGet(uk('tq_favs'), [])));
@@ -4504,7 +4551,17 @@
     const [searchHistory, setSearchHistory] = useState(()=>lsGet(uk('tq_search_history'), []));
     const [showSearchDrop,setShowSearchDrop]= useState(false);
     const [appliedCoupon,   setAppliedCoupon]   = useState(null);
-    const [orders,          setOrders]          = useState(()=>lsGet(uk('tq_orders'), []));
+    const [orders,          setOrders]          = useState([]);
+    // Load orders from Supabase
+    useEffect(() => {
+      if (currentUser.isGuest) return;
+      const q = currentUser.isAdmin
+        ? window._sb.from('orders').select('*').order('created_at', { ascending: false })
+        : window._sb.from('orders').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+      q.then(({ data, error }) => {
+        if (!error && data) setOrders(data.map(o => ({ ...o, date: o.created_at })));
+      });
+    }, [currentUser.id]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [ratings,   setRatings]   = useState(()=>lsGet('tq_ratings', {}));
     const [myRatings, setMyRatings] = useState(()=>lsGet(uk('tq_my_ratings'), {}));
@@ -4716,7 +4773,7 @@
       Object.fromEntries(Object.entries(ratings).map(([id,r])=>[id,{ avg:r.count?r.sum/r.count:0, count:r.count }]))
     , [ratings]);
 
-    const checkout = useCallback((data={})=>{
+    const checkout = useCallback(async (data={})=>{
       if (currentUser.isGuest) { showToast('⚠️ سجّل دخولك أو أنشئ حساباً للإتمام'); return; }
       const items = Object.entries(cart).map(([id,qty])=>{
         const p = products.find(x=>x.id===Number(id));
@@ -4725,21 +4782,35 @@
         return { id:p.id, name:p.name, qty, price };
       }).filter(Boolean);
       if (!items.length) return;
-      const total = items.reduce((s,i)=>s+i.price*i.qty, 0);
-      setOrders(prev=>[{
-        id:Date.now(), date:new Date().toISOString(), items, total, status:'pending',
-        address: data.address||'', phone: data.phone||'',
-        notes: data.notes||'', slot: data.slot||'asap', payment: data.payment||'cash',
-      },...prev]);
+      const subtotal = items.reduce((s,i)=>s+i.price*i.qty, 0);
+      const discountAmount = appliedCoupon ? (appliedCoupon.isPercent ? subtotal*appliedCoupon.value/100 : appliedCoupon.value) : 0;
+      const loyaltyUsed = data.loyaltyUsed || 0;
+      const total = Math.max(0, subtotal - discountAmount - loyaltyUsed);
+
+      // Save order to Supabase
+      const { data: newOrder, error } = await window._sb.from('orders').insert({
+        user_id: currentUser.id,
+        user_name: currentUser.name,
+        user_phone: currentUser.phone,
+        items, subtotal,
+        discount_amount: discountAmount + loyaltyUsed,
+        total,
+        coupon_code: appliedCoupon?.code || null,
+        status: 'pending',
+        notes: data.notes || '',
+      }).select().single();
+
+      if (!error && newOrder) {
+        setOrders(prev => [{ ...newOrder, date: newOrder.created_at }, ...prev]);
+      }
       const earned = Math.floor(total);
-      const used   = data.loyaltyUsed || 0;
-      setLoyaltyPoints(prev => Math.max(0, prev - used) + earned);
+      setLoyaltyPoints(prev => Math.max(0, prev - loyaltyUsed) + earned);
       setCart({});
       setCartOpen(false);
       setAppliedCoupon(null);
       showToast(`تم استلام طلبك! ربحت ${earned} نقطة ولاء 🎉`);
       setTimeout(() => setShowLuckyWheel(true), 700);
-    },[cart, products, showToast]);
+    },[cart, products, showToast, currentUser, appliedCoupon]);
 
     const undoRemove = useCallback(()=>{
       if (!undoSnack) return;
@@ -4764,7 +4835,8 @@
       showToast('تم إضافة المنتجات من الطلب السابق إلى سلتك');
     },[products, showToast]);
 
-    const cancelOrder = useCallback((id) => {
+    const cancelOrder = useCallback(async (id) => {
+      await window._sb.from('orders').update({ status:'cancelled' }).eq('id', id);
       setOrders(prev => prev.map(o => o.id===id ? {...o, status:'cancelled'} : o));
       showToast('تم إلغاء الطلب');
     }, [showToast]);
@@ -5192,30 +5264,43 @@
   }
 
   function App() {
-    const [currentUser, setCurrentUser] = useState(() => {
-      const sid = lsGet('tq_session', null);
-      if (!sid) return null;
-      const users = lsGet('tq_users', []);
-      return users.find(u => u.id === sid) || null;
-    });
+    const [currentUser, setCurrentUser] = useState(null);
+    const [authLoading, setAuthLoading]  = useState(true);
     const [darkMode, setDarkMode] = useState(() => lsGet('tq_dark', false));
     useEffect(() => { lsSet('tq_dark', darkMode); }, [darkMode]);
 
-    // Hide splash screen on first render
+    // Restore session from Supabase on load
     useEffect(() => {
-      const loader = document.getElementById('app-loader');
-      if (loader) {
-        loader.style.opacity = '0';
-        setTimeout(() => { if (loader) loader.style.display = 'none'; }, 420);
-      }
+      window._sb.auth.getSession().then(async ({ data: { session } }) => {
+        if (session?.user) {
+          const { data: profile } = await window._sb.from('profiles').select('*').eq('id', session.user.id).single();
+          if (profile) {
+            setCurrentUser({ id: session.user.id, name: profile.name, phone: profile.phone, email: session.user.email, isAdmin: profile.is_admin, isGuest: false });
+          }
+        }
+        setAuthLoading(false);
+      });
+      const { data: { subscription } } = window._sb.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') setCurrentUser(null);
+      });
+      return () => subscription.unsubscribe();
     }, []);
 
-    const handleLogin  = (user) => { setCurrentUser(user); };
-    const handleLogout = () => {
-      try { localStorage.removeItem('tq_session'); } catch {}
+    // Hide splash when auth check is done
+    useEffect(() => {
+      if (!authLoading) {
+        const loader = document.getElementById('app-loader');
+        if (loader) { loader.style.opacity = '0'; setTimeout(() => { if (loader) loader.style.display = 'none'; }, 420); }
+      }
+    }, [authLoading]);
+
+    const handleLogin  = (user) => setCurrentUser(user);
+    const handleLogout = async () => {
+      if (currentUser && !currentUser.isGuest) await window._sb.auth.signOut();
       setCurrentUser(null);
     };
 
+    if (authLoading) return null;
     if (!currentUser) return <LoginScreen onLogin={handleLogin} darkMode={darkMode}/>;
     return <ShopApp key={String(currentUser.id)} currentUser={currentUser} onLogout={handleLogout} darkMode={darkMode} setDarkMode={setDarkMode}/>;
   }
