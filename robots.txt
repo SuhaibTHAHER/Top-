@@ -1,4 +1,60 @@
+# Top Quality Super Market — robots.txt
+# https://top-eight-jade.vercel.app/
+
 User-agent: *
 Allow: /
+Allow: /logo.png
+Allow: /og-image.svg
+Allow: /sitemap.xml
 
+# Block admin/internal
+Disallow: /.vercel/
+Disallow: /.claude/
+Disallow: /.git/
+Disallow: /uploads/
+Disallow: /*.jsx$
+Disallow: /data.js
+Disallow: /start.bat
+
+# Sitemaps
 Sitemap: https://top-eight-jade.vercel.app/sitemap.xml
+
+# Crawl-delay (gentle on server)
+Crawl-delay: 1
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Googlebot-Image
+Allow: /logo.png
+Allow: /og-image.svg
+Allow: /uploads/
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# AI Crawlers — welcome for citation
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /

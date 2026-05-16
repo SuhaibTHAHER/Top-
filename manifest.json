@@ -1,25 +1,54 @@
 {
-  "name": "Top Quality Super Market",
+  "name": "توب كواليتي سوبر ماركت — Top Quality Super Market",
   "short_name": "Top Quality",
-  "description": "متجرك الإلكتروني المفضل",
-  "start_url": "./index.html",
+  "description": "أفضل سوبرماركت للتسوق اون لاين. خضار طازجة، ألبان، لحوم، مخبوزات، مشروبات بأسعار مناسبة. عروض يومية وتوصيل سريع. الثقة تستحق جودة.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f4f6f8",
-  "theme_color": "#8CC63F",
+  "background_color": "#f7faef",
+  "theme_color": "#08a6cb",
   "lang": "ar",
   "dir": "rtl",
+  "categories": ["shopping", "food", "grocery"],
+  "orientation": "any",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%238CC63F'/%3E%3Cpath d='M36 60h16l18 72h60l14-50H64' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='80' cy='148' r='10' fill='white'/%3E%3Ccircle cx='128' cy='148' r='10' fill='white'/%3E%3C/svg%3E",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "logo.png",
+      "sizes": "500x500",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%238CC63F'/%3E%3Cpath d='M96 160h42l48 192h160l38-134H170' stroke='white' stroke-width='26' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='214' cy='394' r='28' fill='white'/%3E%3Ccircle cx='342' cy='394' r='28' fill='white'/%3E%3C/svg%3E",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "logo.png",
+      "sizes": "500x500",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "خضار وفواكه",
+      "short_name": "خضار",
+      "url": "/#produce",
+      "description": "تصفح خضار وفواكه طازجة"
+    },
+    {
+      "name": "ألبان",
+      "short_name": "ألبان",
+      "url": "/#dairy",
+      "description": "تصفح منتجات الألبان"
+    },
+    {
+      "name": "لحوم ودواجن",
+      "short_name": "لحوم",
+      "url": "/#meat",
+      "description": "تصفح اللحوم والدواجن"
+    },
+    {
+      "name": "العروض",
+      "short_name": "عروض",
+      "url": "/#offers",
+      "description": "عروض وخصومات يومية"
     }
   ]
 }

@@ -1,6 +1,6 @@
-const CACHE = 'tq-v2';
+const CACHE = 'tq-v4';
 const STATIC = [
-  'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap',
+  'https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Almarai:wght@300;400;700&display=swap',
 ];
 
 self.addEventListener('install', e => {
