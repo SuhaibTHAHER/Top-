@@ -16,11 +16,16 @@
   <meta property="og:title"       content="توب كواليتي سوبر ماركت"/>
   <meta property="og:description" content="تسوّق أفضل المنتجات الطازجة والغذائية بأسعار مناسبة. خضار وفواكه، ألبان، لحوم، مشروبات وأكثر."/>
   <meta property="og:url"         content="https://top-eight-jade.vercel.app/"/>
+  <meta property="og:image"        content="https://top-eight-jade.vercel.app/og-image.svg"/>
+  <meta property="og:image:width"  content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:image:alt"    content="توب كواليتي سوبر ماركت — جودة عالية بأسعار منافسة"/>
 
   <!-- Twitter Card -->
-  <meta name="twitter:card"        content="summary"/>
+  <meta name="twitter:card"        content="summary_large_image"/>
   <meta name="twitter:title"       content="توب كواليتي سوبر ماركت"/>
   <meta name="twitter:description" content="تسوّق أفضل المنتجات الطازجة والغذائية بأسعار مناسبة."/>
+  <meta name="twitter:image"       content="https://top-eight-jade.vercel.app/og-image.svg"/>
 
   <!-- JSON-LD structured data -->
   <script type="application/ld+json">
@@ -3365,7 +3370,8 @@
     const finalPrice  = product.discount>0 ? product.price*(1-product.discount/100) : product.price;
     const outOfStock  = product.stock === 0;
     const handleAdd   = (e) => { e.stopPropagation(); if (outOfStock) return; onAdd(product); setAdded(true); setTimeout(()=>setAdded(false),1300); };
-    const lowStock    = product.stock > 0 && product.stock < 10;
+    const lowStock    = product.stock > 0 && product.stock <= 5;
+    const veryLow     = product.stock > 0 && product.stock <= 2;
     const isNew       = product.id > 31;
     const handleCardShare = async (e) => {
       e.stopPropagation();
@@ -3387,7 +3393,7 @@
             <div style={{ fontSize:12, color:'#bbb', marginTop:2 }}>{product.desc}</div>
             {!outOfStock && rating&&rating.count>0 && <StarRating avg={rating.avg} count={rating.count} small/>}
             {outOfStock && <span style={{ fontSize:11, color:'#999', fontWeight:700 }}>نفذت الكمية</span>}
-            {!outOfStock && lowStock && <span style={{ fontSize:11, color:'#e74c3c', fontWeight:700 }}>آخر {product.stock} وحدات!</span>}
+            {!outOfStock && lowStock && <span style={{ fontSize:11, color: veryLow ? '#c0392b' : '#ff8f00', fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none' }}>🔥 آخر {product.stock} قطع!</span>}
             {!outOfStock && !lowStock && !product.label && isNew && <span style={{ fontSize:11, color:TEAL, fontWeight:700 }}>✦ جديد</span>}
             {!outOfStock && product.label && window.PRODUCT_LABELS && (() => { const lbl=window.PRODUCT_LABELS.find(l=>l.id===product.label); return lbl&&lbl.id ? <span style={{ fontSize:11, fontWeight:800, color:lbl.color }}>{lbl.emoji} {lbl.label}</span> : null; })()}
           </div>
@@ -3418,10 +3424,15 @@
             <TagIcon size={11} color="#fff"/>-{product.discount}%
           </div>
         ) : lowStock ? (
-          <div style={{ position:'absolute', top:10, left:10, zIndex:2, background:'#ff8f00', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:800 }}>
-            آخر {product.stock}!
+          <div style={{ position:'absolute', top:10, left:10, zIndex:2, background: veryLow ? '#c0392b' : '#ff8f00', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none', display:'flex', alignItems:'center', gap:3 }}>
+            🔥 آخر {product.stock} قطع!
           </div>
         ) : null}
+        {!outOfStock && product.discount>0 && lowStock && (
+          <div style={{ position:'absolute', bottom:7, left:7, zIndex:2, background: veryLow ? '#c0392b' : '#ff8f00', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none', display:'flex', alignItems:'center', gap:3 }}>
+            🔥 آخر {product.stock} قطع!
+          </div>
+        )}
         {/* أيقونات المنتج — شبكة 2×2 لتوفير المساحة على الصورة */}
         <div style={{ position:'absolute', top:7, right:7, zIndex:2, display:'grid', gridTemplateColumns:'1fr 1fr', gap:4 }}>
           {[
@@ -4068,6 +4079,119 @@
   }
 
   /* ─────────────────────────────────────────────────────────────────────── */
+  /* ── SiteFooter ─────────────────────────────────────────────────────── */
+  function SiteFooter({ waNumber, storeOpen }) {
+    const year = new Date().getFullYear();
+    return (
+      <footer style={{ background:'linear-gradient(135deg,#1a2535 0%,#0f1923 100%)', color:'#fff', marginTop:60, fontFamily:'Tajawal,sans-serif', direction:'rtl' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto', padding:'48px 24px 0' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:40, paddingBottom:40 }}>
+
+            {/* عمود 1: عن المتجر */}
+            <div>
+              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18 }}>
+                <div style={{ width:48, height:48, borderRadius:14, background:`linear-gradient(135deg,${GREEN},${TEAL})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <CartIcon size={24} color="#fff"/>
+                </div>
+                <div>
+                  <div style={{ fontWeight:900, fontSize:18, color:'#fff', lineHeight:1.2 }}>توب كواليتي</div>
+                  <div style={{ fontSize:11, color:'#64748b', letterSpacing:'0.5px' }}>TOP QUALITY SUPER MARKET</div>
+                </div>
+              </div>
+              <p style={{ fontSize:14, color:'#94a3b8', lineHeight:1.9, marginBottom:20 }}>
+                جودة عالية بأسعار منافسة. نوفّر أفضل المنتجات الطازجة والغذائية مع توصيل سريع لباب بيتك.
+              </p>
+              {waNumber && (
+                <a href={`https://wa.me/${waNumber.replace(/\D/g,'')}?text=${encodeURIComponent('مرحباً، أريد الاستفسار عن منتجاتكم')}`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#25D366', color:'#fff', borderRadius:12, padding:'10px 18px', textDecoration:'none', fontSize:14, fontWeight:700, transition:'opacity 0.2s' }}
+                  onMouseEnter={e=>e.currentTarget.style.opacity='0.85'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
+                  <span style={{ fontSize:18 }}>💬</span> تواصل عبر واتساب
+                </a>
+              )}
+            </div>
+
+            {/* عمود 2: روابط سريعة */}
+            <div>
+              <h4 style={{ fontWeight:800, fontSize:15, color:'#e2e8f0', marginBottom:18, paddingBottom:10, borderBottom:'1px solid #1e3048' }}>
+                🔗 روابط سريعة
+              </h4>
+              {[
+                { label:'جميع المنتجات',        emoji:'🛍️' },
+                { label:'العروض والتخفيضات',    emoji:'🏷️' },
+                { label:'المنتجات المميزة',      emoji:'⭐' },
+                { label:'طلباتي السابقة',        emoji:'📦' },
+                { label:'برنامج نقاط الولاء',   emoji:'🎁' },
+              ].map(({ label, emoji }) => (
+                <div key={label} style={{ marginBottom:13, fontSize:14, color:'#94a3b8', cursor:'default', display:'flex', alignItems:'center', gap:9 }}>
+                  <span style={{ fontSize:16 }}>{emoji}</span> {label}
+                </div>
+              ))}
+            </div>
+
+            {/* عمود 3: الأقسام */}
+            <div>
+              <h4 style={{ fontWeight:800, fontSize:15, color:'#e2e8f0', marginBottom:18, paddingBottom:10, borderBottom:'1px solid #1e3048' }}>
+                📦 الأقسام
+              </h4>
+              {[
+                { label:'خضار وفواكه',     emoji:'🥦' },
+                { label:'ألبان ومنتجاتها', emoji:'🥛' },
+                { label:'لحوم ودواجن',     emoji:'🥩' },
+                { label:'مشروبات',         emoji:'🥤' },
+                { label:'مخبوزات',         emoji:'🍞' },
+                { label:'حبوب وبقوليات',  emoji:'🌾' },
+                { label:'مسليات',          emoji:'🍫' },
+              ].map(({ label, emoji }) => (
+                <div key={label} style={{ marginBottom:13, fontSize:14, color:'#94a3b8', cursor:'default', display:'flex', alignItems:'center', gap:9 }}>
+                  <span style={{ fontSize:16 }}>{emoji}</span> {label}
+                </div>
+              ))}
+            </div>
+
+            {/* عمود 4: ساعات العمل */}
+            <div>
+              <h4 style={{ fontWeight:800, fontSize:15, color:'#e2e8f0', marginBottom:18, paddingBottom:10, borderBottom:'1px solid #1e3048' }}>
+                🕐 ساعات العمل
+              </h4>
+              {[
+                { day:'السبت — الخميس', hours:'8:00 ص — 10:00 م' },
+                { day:'الجمعة',          hours:'9:00 ص — 11:00 م' },
+              ].map(({ day, hours }) => (
+                <div key={day} style={{ marginBottom:18 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#cbd5e1', marginBottom:4 }}>{day}</div>
+                  <div style={{ fontSize:14, color:GREEN, fontWeight:700 }}>{hours}</div>
+                </div>
+              ))}
+              <div style={{ marginTop:12, padding:'14px 16px', background:'rgba(140,198,63,0.09)', borderRadius:14, border:'1px solid rgba(140,198,63,0.2)' }}>
+                <div style={{ fontSize:13, fontWeight:800, color:GREEN, marginBottom:5, display:'flex', alignItems:'center', gap:6 }}>
+                  <span style={{ width:8, height:8, borderRadius:'50%', background: storeOpen ? GREEN : '#e74c3c', display:'inline-block', animation: storeOpen ? 'pulseDot 2s infinite' : 'none' }}/>
+                  {storeOpen ? 'المتجر مفتوح الآن' : 'المتجر مغلق حالياً'}
+                </div>
+                <div style={{ fontSize:13, fontWeight:800, color:'#94a3b8', marginTop:8, display:'flex', alignItems:'center', gap:6 }}>
+                  🚚 توصيل خلال 2–4 ساعات
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* شريط أسفل الفوتر */}
+        <div style={{ borderTop:'1px solid #1e3048', padding:'16px 24px', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10, maxWidth:1200, margin:'0 auto' }}>
+          <div style={{ fontSize:13, color:'#475569' }}>
+            © {year} Top Quality Super Market — جميع الحقوق محفوظة
+          </div>
+          <div style={{ display:'flex', gap:18, alignItems:'center' }}>
+            <span style={{ fontSize:12, color:'#475569' }}>صُنع بـ ❤️ في فلسطين</span>
+            <span style={{ fontSize:12, color:'#334155' }}>|</span>
+            <span style={{ fontSize:12, color:'#475569' }}>مدعوم بالذكاء الاصطناعي 🤖</span>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   function ShopApp({ currentUser, onLogout, darkMode, setDarkMode }) {
     const uid = currentUser.id;
     const uk  = (key) => `${key}_${uid}`;
@@ -4457,6 +4581,7 @@
           @keyframes aiSlideUp{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
           @keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
           @keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+          @keyframes stockPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.75;transform:scale(1.08)}}
           *{box-sizing:border-box}
           ::-webkit-scrollbar{width:5px;height:5px}
           ::-webkit-scrollbar-thumb{background:${GREEN};border-radius:4px}
@@ -4704,6 +4829,8 @@
             </div>
           )}
         </main>
+
+        <SiteFooter waNumber={waNumber} storeOpen={storeOpen}/>
 
         {winW > 768 && (
           <button onClick={()=>setShowAI(true)} style={{ position:'fixed', bottom:compareList.length>0?86:28, left:28, zIndex:500, background:`linear-gradient(135deg,${TEAL},#0b7d96)`, color:'#fff', border:'none', borderRadius:26, padding:'14px 22px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:`0 6px 24px rgba(31,159,179,0.45)`, transition:'all 0.25s' }}
