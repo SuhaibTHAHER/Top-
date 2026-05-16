@@ -44,9 +44,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Almarai:wght@300;400;700&display=swap" rel="stylesheet" />
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#8CC63F"/>
+  <meta name="theme-color" content="#96cb3f"/>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
@@ -90,7 +90,7 @@
   <style>
     /* ── CSS Design Tokens ─────────────────────────────────────────────── */
     :root {
-      --bg:          #f4f6f8;
+      --bg:          #f7faef;
       --surface:     #ffffff;
       --surface2:    #f8f9fa;
       --border:      #e8ecf0;
@@ -118,24 +118,25 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      font-family: 'Tajawal', sans-serif;
+      font-family: 'Almarai', sans-serif;
       background: var(--bg);
       color: var(--text);
       transition: background 0.25s, color 0.25s;
     }
-    input, button, select, textarea { font-family: 'Tajawal', sans-serif; }
+    input, button, select, textarea { font-family: 'Almarai', sans-serif; }
+    h1, h2, h3, h4 { font-family: 'Cairo', sans-serif; }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
-    ::-webkit-scrollbar-thumb { background: #8CC63F; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #96cb3f; border-radius: 4px; }
   </style>
 </head>
 <body>
   <!-- ── Splash loader (shown during Babel compile) ── -->
   <div id="app-loader" style="
     position:fixed;inset:0;z-index:9999;
-    background:linear-gradient(160deg,#8CC63F 0%,#1F9FB3 100%);
+    background:linear-gradient(160deg,#96cb3f 0%,#08a6cb 100%);
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    font-family:Tajawal,sans-serif;gap:0;
+    font-family:Almarai,sans-serif;gap:0;
     transition:opacity 0.4s ease;
   ">
     <div style="width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.2);
@@ -147,8 +148,8 @@
         <polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
     </div>
-    <h1 style="color:#fff;font-size:24px;font-weight:900;margin:0 0 6px;">توب كواليتي</h1>
-    <p style="color:rgba(255,255,255,0.75);font-size:14px;margin:0 0 28px;">سوبر ماركت الجودة العالية</p>
+    <h1 style="color:#fff;font-size:24px;font-weight:900;margin:0 0 6px;font-family:'Cairo',sans-serif;">توب كواليتي</h1>
+    <p style="color:rgba(255,255,255,0.75);font-size:14px;margin:0 0 28px;font-family:'Cairo',sans-serif;">الثقة تستحق جودة</p>
     <div style="display:flex;gap:8px;">
       <span style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.9);
         animation:splashDot 1.2s ease-in-out infinite;"></span>
@@ -609,7 +610,7 @@
   <!-- ── AIChat ── -->
   <script type="text/babel">
   const { useState: useStateAI, useRef: useRefAI, useEffect: useEffectAI } = React;
-  const TEAL_AI  = '#1F9FB3';
+  const TEAL_AI  = '#08a6cb';
   const GROQ_KEY = ['gsk_b90gM5MULGFfEG93y1Zl','WGdyb3FYK3LZtWJ5OVVR','elnYF2W6qQXY'].join('');
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
   const GROQ_MODEL = 'llama-3.3-70b-versatile';
@@ -695,12 +696,12 @@
         {/* فقاعة الرسالة */}
         <div style={{ display:'flex', justifyContent:isUser?'flex-start':'flex-end', width:'100%', alignItems:'flex-end', gap:8 }}>
           {!isUser && (
-            <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,#1F9FB3,#0e7fa0)',
+            <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,#08a6cb,#0e7fa0)',
               display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
               <BotIcon size={15} color="#fff"/>
             </div>
           )}
-          <div style={{ maxWidth:'80%', background:isUser?'var(--surface2)':'linear-gradient(135deg,#1F9FB3,#0b7d96)',
+          <div style={{ maxWidth:'80%', background:isUser?'var(--surface2)':'linear-gradient(135deg,#08a6cb,#0b7d96)',
             color:isUser?'var(--text)':'#fff', borderRadius:isUser?'4px 16px 16px 16px':'16px 4px 16px 16px',
             padding:'10px 14px', fontSize:14, lineHeight:1.7, whiteSpace:'pre-wrap',
             boxShadow:isUser?'none':'0 2px 8px rgba(31,159,179,0.25)',
@@ -718,18 +719,18 @@
               <div style={{ display:'flex', gap:5 }}>
                 {suggs.length > 1 && (
                   <button onClick={() => setEditMode(p => !p)}
-                    style={{ fontSize:11, background:'transparent', border:`1.5px solid ${TEAL_AI}`, color:TEAL_AI, borderRadius:20, padding:'3px 10px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontWeight:700 }}>
+                    style={{ fontSize:11, background:'transparent', border:`1.5px solid ${TEAL_AI}`, color:TEAL_AI, borderRadius:20, padding:'3px 10px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontWeight:700 }}>
                     {editMode ? '✕ إلغاء' : '✏️ تعديل'}
                   </button>
                 )}
                 {editMode ? (
                   <button onClick={addSelected} disabled={selected.size===0}
-                    style={{ fontSize:11, background:selected.size>0?TEAL_AI:'#ccc', color:'#fff', border:'none', borderRadius:20, padding:'3px 10px', cursor:selected.size>0?'pointer':'not-allowed', fontFamily:'Tajawal,sans-serif', fontWeight:700 }}>
+                    style={{ fontSize:11, background:selected.size>0?TEAL_AI:'#ccc', color:'#fff', border:'none', borderRadius:20, padding:'3px 10px', cursor:selected.size>0?'pointer':'not-allowed', fontFamily:'Almarai,sans-serif', fontWeight:700 }}>
                     أضف المحدد ({selected.size}) 🛒
                   </button>
                 ) : suggs.length > 1 && (
                   <button onClick={() => suggs.forEach(p => onAddToCart(p))}
-                    style={{ fontSize:11, background:TEAL_AI, color:'#fff', border:'none', borderRadius:20, padding:'3px 10px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontWeight:700 }}>
+                    style={{ fontSize:11, background:TEAL_AI, color:'#fff', border:'none', borderRadius:20, padding:'3px 10px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontWeight:700 }}>
                     أضف الكل 🛒
                   </button>
                 )}
@@ -773,7 +774,7 @@
                           {isFav?'❤️':'🤍'}
                         </button>
                         <button onClick={() => onAddToCart(p)}
-                          style={{ background:TEAL_AI, color:'#fff', border:'none', borderRadius:8, padding:'6px 11px', cursor:'pointer', fontSize:12, fontWeight:800, fontFamily:'Tajawal,sans-serif', whiteSpace:'nowrap', flexShrink:0 }}>
+                          style={{ background:TEAL_AI, color:'#fff', border:'none', borderRadius:8, padding:'6px 11px', cursor:'pointer', fontSize:12, fontWeight:800, fontFamily:'Almarai,sans-serif', whiteSpace:'nowrap', flexShrink:0 }}>
                           + سلة
                         </button>
                       </>
@@ -903,7 +904,7 @@
           overflow:'hidden', animation:'aiSlideUp 0.25s ease' }}>
 
           {/* هيدر */}
-          <div style={{ background:'linear-gradient(135deg,#1F9FB3,#0b7d96)', padding:'16px 18px', display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
+          <div style={{ background:'linear-gradient(135deg,#08a6cb,#0b7d96)', padding:'16px 18px', display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', gap:11 }}>
               <div style={{ width:42, height:42, borderRadius:13, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                 <BotIcon size={22} color="#fff"/>
@@ -925,7 +926,7 @@
           <div style={{ display:'flex', gap:6, padding:'9px 12px', overflowX:'auto', background:'var(--surface2)', borderBottom:'1px solid var(--border)', flexShrink:0, scrollbarWidth:'none' }}>
             {QUICK_ACTIONS.map((q,i) => (
               <button key={i} onClick={() => send(q.prompt)} disabled={loading}
-                style={{ background:'var(--surface)', border:'1.5px solid var(--border)', borderRadius:20, padding:'5px 12px', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:600, cursor:loading?'not-allowed':'pointer', whiteSpace:'nowrap', color:'var(--text2)', transition:'all 0.15s', flexShrink:0 }}
+                style={{ background:'var(--surface)', border:'1.5px solid var(--border)', borderRadius:20, padding:'5px 12px', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:600, cursor:loading?'not-allowed':'pointer', whiteSpace:'nowrap', color:'var(--text2)', transition:'all 0.15s', flexShrink:0 }}
                 onMouseEnter={e=>{ if(!loading){e.currentTarget.style.background=TEAL_AI;e.currentTarget.style.color='#fff';e.currentTarget.style.borderColor=TEAL_AI;} }}
                 onMouseLeave={e=>{ e.currentTarget.style.background='var(--surface)';e.currentTarget.style.color='var(--text2)';e.currentTarget.style.borderColor='var(--border)'; }}>
                 {q.label}
@@ -941,10 +942,10 @@
             ))}
             {loading && (
               <div style={{ display:'flex', alignItems:'flex-end', gap:8, marginBottom:10, justifyContent:'flex-end' }}>
-                <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,#1F9FB3,#0e7fa0)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,#08a6cb,#0e7fa0)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                   <BotIcon size={15} color="#fff"/>
                 </div>
-                <div style={{ background:'linear-gradient(135deg,#1F9FB3,#0b7d96)', borderRadius:'16px 4px 16px 16px', padding:'10px 16px' }}>
+                <div style={{ background:'linear-gradient(135deg,#08a6cb,#0b7d96)', borderRadius:'16px 4px 16px 16px', padding:'10px 16px' }}>
                   <TypingDots/>
                 </div>
               </div>
@@ -956,7 +957,7 @@
             <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
               onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }}
               placeholder="اسألني عن وصفة، ميزانية، أو منتج..." disabled={loading}
-              style={{ flex:1, padding:'10px 14px', border:'2px solid var(--border)', borderRadius:12, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none', color:'var(--text)', background:'var(--input-bg)', transition:'border-color 0.2s' }}
+              style={{ flex:1, padding:'10px 14px', border:'2px solid var(--border)', borderRadius:12, fontFamily:'Almarai,sans-serif', fontSize:14, outline:'none', color:'var(--text)', background:'var(--input-bg)', transition:'border-color 0.2s' }}
               onFocus={e=>e.target.style.borderColor=TEAL_AI}
               onBlur={e=>e.target.style.borderColor='var(--border)'}/>
             <button onClick={()=>send()} disabled={loading||!input.trim()}
@@ -985,14 +986,14 @@
   <!-- ── AdminPanel ── -->
   <script type="text/babel">
   const { useState: useStateAdmin, useRef: useRefAdmin } = React;
-  const G = '#8CC63F', T = '#1F9FB3', D = '#2d3436';
+  const G = '#96cb3f', T = '#08a6cb', D = '#1a1a1a';
   const EMPTY_FORM = { name:'', category:'dairy', price:'', discount:'0', desc:'', stock:'', image:null, label:'' };
   const PRODUCT_LABELS = [
     { id:'',        label:'بدون',    color:'#999',    bg:'#f5f5f5', emoji:''   },
     { id:'hot',     label:'رائج',    color:'#e74c3c', bg:'#fce4ec', emoji:'🔥' },
-    { id:'new',     label:'جديد',    color:'#1F9FB3', bg:'#e0f7fa', emoji:'✨' },
+    { id:'new',     label:'جديد',    color:'#08a6cb', bg:'#e0f7fa', emoji:'✨' },
     { id:'organic', label:'عضوي',    color:'#27ae60', bg:'#e8f5e9', emoji:'🌿' },
-    { id:'fresh',   label:'طازج',    color:'#8CC63F', bg:'#f1f8e9', emoji:'🥬' },
+    { id:'fresh',   label:'طازج',    color:'#96cb3f', bg:'#f1f8e9', emoji:'🥬' },
     { id:'special', label:'مميز',    color:'#f39c12', bg:'#fff8e1', emoji:'⭐' },
     { id:'limited', label:'محدود',   color:'#9c27b0', bg:'#f3e5f5', emoji:'💎' },
   ];
@@ -1058,7 +1059,7 @@
       : EMPTY_FORM
     );
     const set = (k,v) => setForm(f=>({...f,[k]:v}));
-    const inputStyle = { width:'100%', padding:'9px 13px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:14, color:D, outline:'none', transition:'border-color 0.2s', background:'#fff' };
+    const inputStyle = { width:'100%', padding:'9px 13px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:14, color:D, outline:'none', transition:'border-color 0.2s', background:'#fff' };
     const labelStyle = { fontSize:13, fontWeight:700, color:'#555', marginBottom:5, display:'block' };
     const handleSave = () => {
       if (!form.name||!form.price||!form.stock) return;
@@ -1113,15 +1114,15 @@
               <label style={labelStyle}>🏷️ شارة المنتج</label>
               <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
                 {PRODUCT_LABELS.map(lbl => (
-                  <button key={lbl.id} type="button" onClick={() => set('label', lbl.id)} style={{ border:`1.5px solid ${form.label===lbl.id ? lbl.id?lbl.color:'#aaa' : '#e0e0e0'}`, borderRadius:20, padding:'4px 12px', cursor:'pointer', background:form.label===lbl.id ? (lbl.id?lbl.bg:'#f0f0f0') : '#fff', color:form.label===lbl.id ? (lbl.id?lbl.color:'#555') : '#999', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:form.label===lbl.id ? 800 : 500, transition:'all 0.15s', whiteSpace:'nowrap' }}>
+                  <button key={lbl.id} type="button" onClick={() => set('label', lbl.id)} style={{ border:`1.5px solid ${form.label===lbl.id ? lbl.id?lbl.color:'#aaa' : '#e0e0e0'}`, borderRadius:20, padding:'4px 12px', cursor:'pointer', background:form.label===lbl.id ? (lbl.id?lbl.bg:'#f0f0f0') : '#fff', color:form.label===lbl.id ? (lbl.id?lbl.color:'#555') : '#999', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:form.label===lbl.id ? 800 : 500, transition:'all 0.15s', whiteSpace:'nowrap' }}>
                     {lbl.emoji}{lbl.emoji?' ':''}{lbl.label}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ display:'flex', gap:10, marginTop:4 }}>
-              <button onClick={onCancel} style={{ flex:1, padding:'11px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, cursor:'pointer', color:'var(--text2)' }}>إلغاء</button>
-              <button onClick={handleSave} disabled={!valid} style={{ flex:2, padding:'11px', background:valid?G:'#ccc', border:'none', borderRadius:12, fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, cursor:valid?'pointer':'not-allowed', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+              <button onClick={onCancel} style={{ flex:1, padding:'11px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, cursor:'pointer', color:'var(--text2)' }}>إلغاء</button>
+              <button onClick={handleSave} disabled={!valid} style={{ flex:2, padding:'11px', background:valid?G:'#ccc', border:'none', borderRadius:12, fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, cursor:valid?'pointer':'not-allowed', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
                 {initial ? <><CheckIcon size={16} color="#fff"/> حفظ التعديلات</> : <><PlusIcon size={16} color="#fff"/> إضافة المنتج</>}
               </button>
             </div>
@@ -1174,7 +1175,7 @@
     };
     const inp = (v, s, ph, extra={}) => (
       <input value={v} onChange={e=>s(e.target.value)} placeholder={ph}
-        style={{ padding:'10px 13px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:13, color:D, outline:'none', ...extra }}
+        style={{ padding:'10px 13px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:13, color:D, outline:'none', ...extra }}
         onFocus={e=>e.target.style.borderColor=G} onBlur={e=>e.target.style.borderColor='#e0e0e0'}/>
     );
     return (
@@ -1184,13 +1185,13 @@
           <h2 style={{ fontSize:15, fontWeight:800, color:D, marginBottom:16 }}>إضافة كوبون جديد</h2>
           <div style={{ display:'flex', gap:10, flexWrap:'wrap', alignItems:'flex-end' }}>
             {inp(code, setCode, 'كود الخصم (مثال: SAVE10)', { width:160, textTransform:'uppercase' })}
-            <select value={type} onChange={e=>setType(e.target.value)} style={{ padding:'10px 12px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:13, color:D, outline:'none', cursor:'pointer' }}>
+            <select value={type} onChange={e=>setType(e.target.value)} style={{ padding:'10px 12px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:13, color:D, outline:'none', cursor:'pointer' }}>
               <option value="percent">نسبة مئوية %</option>
               <option value="fixed">قيمة ثابتة ₪</option>
             </select>
             {inp(val, setVal, type==='percent'?'النسبة (1-100)':'القيمة بالشيكل', { width:140 })}
             {inp(lbl, setLbl, 'وصف الكوبون (اختياري)', { flex:1, minWidth:180 })}
-            <button onClick={add} style={{ background:G, color:'#fff', border:'none', borderRadius:10, padding:'10px 22px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, display:'flex', alignItems:'center', gap:6, whiteSpace:'nowrap' }}>
+            <button onClick={add} style={{ background:G, color:'#fff', border:'none', borderRadius:10, padding:'10px 22px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, display:'flex', alignItems:'center', gap:6, whiteSpace:'nowrap' }}>
               <PlusIcon size={15} color="#fff"/> إضافة
             </button>
           </div>
@@ -1208,7 +1209,7 @@
                     <div style={{ fontSize:12, color:'#aaa' }}>{cp.type==='percent'?`${cp.value}% خصم`:`₪${cp.value} خصم ثابت`}</div>
                   </div>
                 </div>
-                <button onClick={()=>{ setCoupons(prev=>{const n={...prev};delete n[c];return n;}); showToast('تم حذف الكوبون','#e74c3c'); }} style={{ background:'#fce4ec', border:'none', borderRadius:8, padding:'7px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color:'#e74c3c', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700 }}>
+                <button onClick={()=>{ setCoupons(prev=>{const n={...prev};delete n[c];return n;}); showToast('تم حذف الكوبون','#e74c3c'); }} style={{ background:'#fce4ec', border:'none', borderRadius:8, padding:'7px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color:'#e74c3c', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700 }}>
                   <TrashIcon size={14} color="#e74c3c"/> حذف
                 </button>
               </div>
@@ -1290,7 +1291,7 @@
     ];
 
     return (
-      <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:isMobile?'column':'row', fontFamily:'Tajawal,sans-serif' }}>
+      <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:isMobile?'column':'row', fontFamily:'Almarai,sans-serif' }}>
         {toast && <div style={{ position:'fixed', bottom:24, left:'50%', transform:'translateX(-50%)', background:toast.color, color:'#fff', padding:'12px 28px', borderRadius:30, fontSize:14, fontWeight:700, boxShadow:'0 4px 20px rgba(0,0,0,0.2)', zIndex:9999 }}>{toast.msg}</div>}
 
         {/* ── Sidebar (desktop) / Top nav (mobile) ─── */}
@@ -1303,14 +1304,14 @@
                 </div>
                 <span style={{ fontWeight:900, fontSize:13, color:D }}>لوحة الإدارة</span>
               </div>
-              <button onClick={onExit} style={{ background:'#fff3e0', border:'none', borderRadius:8, padding:'6px 12px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, color:'#e67e22', display:'flex', alignItems:'center', gap:6 }}>
+              <button onClick={onExit} style={{ background:'#fff3e0', border:'none', borderRadius:8, padding:'6px 12px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, color:'#e67e22', display:'flex', alignItems:'center', gap:6 }}>
                 <StoreIcon size={14} color="#e67e22"/> المتجر
               </button>
             </div>
             <nav style={{ display:'flex', overflowX:'auto', padding:'6px 8px', gap:4 }}>
               {sideItems.map(s=>(
                 <button key={s.id} onClick={()=>setTab(s.id)}
-                  style={{ flexShrink:0, padding:'7px 12px', background:tab===s.id?G:'transparent', border:tab===s.id?'none':'1px solid var(--border)', borderRadius:20, display:'flex', alignItems:'center', gap:6, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, color:tab===s.id?'#fff':'var(--text2)', transition:'all 0.18s', whiteSpace:'nowrap' }}>
+                  style={{ flexShrink:0, padding:'7px 12px', background:tab===s.id?G:'transparent', border:tab===s.id?'none':'1px solid var(--border)', borderRadius:20, display:'flex', alignItems:'center', gap:6, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, color:tab===s.id?'#fff':'var(--text2)', transition:'all 0.18s', whiteSpace:'nowrap' }}>
                   <span style={{ color:tab===s.id?'#fff':'var(--text3)' }}>{s.icon}</span>{s.label}
                 </button>
               ))}
@@ -1329,13 +1330,13 @@
             </div>
             <nav style={{ padding:'12px 10px', flex:1 }}>
               {sideItems.map(s=>(
-                <button key={s.id} onClick={()=>setTab(s.id)} style={{ width:'100%', padding:'11px 14px', background:tab===s.id?G+'18':'transparent', border:'none', borderRadius:10, display:'flex', alignItems:'center', gap:10, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:tab===s.id?700:500, color:tab===s.id?G:'var(--text2)', marginBottom:4, transition:'all 0.18s', textAlign:'right' }}>
+                <button key={s.id} onClick={()=>setTab(s.id)} style={{ width:'100%', padding:'11px 14px', background:tab===s.id?G+'18':'transparent', border:'none', borderRadius:10, display:'flex', alignItems:'center', gap:10, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:tab===s.id?700:500, color:tab===s.id?G:'var(--text2)', marginBottom:4, transition:'all 0.18s', textAlign:'right' }}>
                   <span style={{ color:tab===s.id?G:'var(--text3)' }}>{s.icon}</span>{s.label}
                 </button>
               ))}
             </nav>
             <div style={{ padding:'12px 10px', borderTop:'1px solid var(--border)' }}>
-              <button onClick={onExit} style={{ width:'100%', padding:'10px 14px', background:'#fff3e0', border:'none', borderRadius:10, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, color:'#e67e22', display:'flex', alignItems:'center', gap:8 }}>
+              <button onClick={onExit} style={{ width:'100%', padding:'10px 14px', background:'#fff3e0', border:'none', borderRadius:10, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, color:'#e67e22', display:'flex', alignItems:'center', gap:8 }}>
                 <StoreIcon size={16} color="#e67e22"/> العودة للمتجر
               </button>
             </div>
@@ -1416,13 +1417,13 @@
                 <h1 style={{ fontSize:22, fontWeight:900, color:D, display:'flex', alignItems:'center', gap:10 }}><PackageIcon size={22} color={D}/> إدارة المنتجات</h1>
                 <div style={{ display:'flex', gap:8 }}>
                   <input ref={csvImportRef} type="file" accept=".csv" style={{ display:'none' }} onChange={importCSV}/>
-                  <button onClick={exportCSV} style={{ background:'#fff', color:'#555', border:'1.5px solid #e0e0e0', borderRadius:12, padding:'10px 16px', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
+                  <button onClick={exportCSV} style={{ background:'#fff', color:'#555', border:'1.5px solid #e0e0e0', borderRadius:12, padding:'10px 16px', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
                     <DownloadIcon size={15} color="#555"/> تصدير CSV
                   </button>
-                  <button onClick={()=>csvImportRef.current.click()} style={{ background:'#fff', color:'#555', border:'1.5px solid #e0e0e0', borderRadius:12, padding:'10px 16px', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
+                  <button onClick={()=>csvImportRef.current.click()} style={{ background:'#fff', color:'#555', border:'1.5px solid #e0e0e0', borderRadius:12, padding:'10px 16px', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
                     <UploadIcon size={15} color="#555"/> استيراد CSV
                   </button>
-                  <button onClick={()=>setShowAdd(true)} style={{ background:G, color:'#fff', border:'none', borderRadius:12, padding:'10px 20px', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:8 }}>
+                  <button onClick={()=>setShowAdd(true)} style={{ background:G, color:'#fff', border:'none', borderRadius:12, padding:'10px 20px', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:8 }}>
                     <PlusIcon size={16} color="#fff"/> إضافة منتج
                   </button>
                 </div>
@@ -1430,7 +1431,7 @@
               <div style={{ position:'relative', marginBottom:16 }}>
                 <div style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)' }}><SearchIcon size={16} color="#bbb"/></div>
                 <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="ابحث عن منتج..."
-                  style={{ width:'100%', padding:'10px 16px 10px 16px', paddingRight:38, border:'2px solid #e0e0e0', borderRadius:12, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none', color:D, transition:'border-color 0.2s' }}
+                  style={{ width:'100%', padding:'10px 16px 10px 16px', paddingRight:38, border:'2px solid #e0e0e0', borderRadius:12, fontFamily:'Almarai,sans-serif', fontSize:14, outline:'none', color:D, transition:'border-color 0.2s' }}
                   onFocus={e=>e.target.style.borderColor=G} onBlur={e=>e.target.style.borderColor='#e0e0e0'}/>
               </div>
               <div style={{ background:'var(--surface)', borderRadius:16, overflow:'hidden', boxShadow:'var(--card-shadow)' }}>
@@ -1518,7 +1519,7 @@
                     </div>
                     <div style={{ fontSize:13, color:'#888', marginTop:3 }}>{storeOpen?'العملاء يستطيعون إتمام الطلبات':'لن يتمكن العملاء من الشراء'}</div>
                   </div>
-                  <button onClick={()=>{setStoreOpen(!storeOpen);showToast(storeOpen?'تم إغلاق المتجر':'تم فتح المتجر',storeOpen?'#e74c3c':G);}} style={{ background:storeOpen?'#e74c3c':G, color:'#fff', border:'none', borderRadius:12, padding:'10px 20px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700 }}>
+                  <button onClick={()=>{setStoreOpen(!storeOpen);showToast(storeOpen?'تم إغلاق المتجر':'تم فتح المتجر',storeOpen?'#e74c3c':G);}} style={{ background:storeOpen?'#e74c3c':G, color:'#fff', border:'none', borderRadius:12, padding:'10px 20px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700 }}>
                     {storeOpen?'إغلاق المتجر':'فتح المتجر'}
                   </button>
                 </div>
@@ -1531,9 +1532,9 @@
                 <div style={{ display:'flex', gap:10 }}>
                   <input value={waNumber||''} onChange={e=>setWaNumber(e.target.value)}
                     placeholder="مثال: 972501234567"
-                    style={{ flex:1, padding:'10px 14px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:14, color:D, outline:'none', direction:'ltr', textAlign:'left' }}
+                    style={{ flex:1, padding:'10px 14px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:14, color:D, outline:'none', direction:'ltr', textAlign:'left' }}
                     onFocus={e=>e.target.style.borderColor=G} onBlur={e=>e.target.style.borderColor='#e0e0e0'}/>
-                  {waNumber && <button onClick={()=>setWaNumber('')} style={{ background:'#fce4ec', border:'none', borderRadius:10, padding:'10px 16px', cursor:'pointer', color:'#e74c3c', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700 }}>حذف</button>}
+                  {waNumber && <button onClick={()=>setWaNumber('')} style={{ background:'#fce4ec', border:'none', borderRadius:10, padding:'10px 16px', cursor:'pointer', color:'#e74c3c', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700 }}>حذف</button>}
                 </div>
                 <div style={{ color:'#aaa', fontSize:12, marginTop:8 }}>أدخل الرقم بدون + وبدون مسافات. سيظهر زر واتساب عائم في المتجر.</div>
               </div>
@@ -1543,12 +1544,12 @@
                 </h2>
                 <input value={announcement||''} onChange={e=>setAnnouncement(e.target.value)}
                   placeholder="مثال: 🎉 عرض اليوم — خصم 20% على منتجات الألبان!"
-                  style={{ width:'100%', padding:'10px 14px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:14, color:D, outline:'none', transition:'border-color 0.2s', direction:'rtl' }}
+                  style={{ width:'100%', padding:'10px 14px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:14, color:D, outline:'none', transition:'border-color 0.2s', direction:'rtl' }}
                   onFocus={e=>e.target.style.borderColor=G} onBlur={e=>e.target.style.borderColor='#e0e0e0'}/>
                 {announcement && (
                   <div style={{ marginTop:8, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <div style={{ fontSize:12, color:'#aaa' }}>سيظهر الإعلان كشريط متحرك ذهبي في أعلى الصفحة.</div>
-                    <button onClick={()=>setAnnouncement('')} style={{ background:'#fce4ec', border:'none', borderRadius:8, padding:'6px 12px', cursor:'pointer', color:'#e74c3c', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, flexShrink:0 }}>حذف</button>
+                    <button onClick={()=>setAnnouncement('')} style={{ background:'#fce4ec', border:'none', borderRadius:8, padding:'6px 12px', cursor:'pointer', color:'#e74c3c', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, flexShrink:0 }}>حذف</button>
                   </div>
                 )}
                 {!announcement && <div style={{ color:'#aaa', fontSize:12, marginTop:8 }}>اتركه فارغاً لإخفاء الشريط.</div>}
@@ -1569,14 +1570,14 @@
                   <label style={{ fontSize:13, fontWeight:700, color:D, display:'block', marginBottom:6 }}>الحد الأدنى للطلب (₪)</label>
                   <input type="number" min="1" value={freeGiftConfig?.minOrder||100}
                     onChange={e=>setFreeGiftConfig(f=>({...f,minOrder:Number(e.target.value)||100}))}
-                    style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none' }}
+                    style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e0e0e0', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:14, outline:'none' }}
                     onFocus={e=>e.target.style.borderColor=G} onBlur={e=>e.target.style.borderColor='#e0e0e0'}/>
                 </div>
                 <div>
                   <label style={{ fontSize:13, fontWeight:700, color:D, display:'block', marginBottom:6 }}>المنتج الهدية</label>
                   <select value={freeGiftConfig?.productId||''}
                     onChange={e=>setFreeGiftConfig(f=>({...f,productId:e.target.value?Number(e.target.value):null}))}
-                    style={{ width:'100%', padding:'9px 12px', border:'1.5px solid var(--input-border)', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:13, outline:'none', background:'var(--input-bg)', color:'var(--text)' }}>
+                    style={{ width:'100%', padding:'9px 12px', border:'1.5px solid var(--input-border)', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:13, outline:'none', background:'var(--input-bg)', color:'var(--text)' }}>
                     <option value="">— اختر منتجاً —</option>
                     {products.map(p=><option key={p.id} value={p.id}>{p.name} · ₪{p.price}</option>)}
                   </select>
@@ -1599,7 +1600,7 @@
                   onChange={e=>setBroadcastMsg(e.target.value)}
                   placeholder="مثال: 🎉 عرض حصري — خصم 30% على جميع المنتجات اليوم فقط!"
                   rows={3}
-                  style={{ width:'100%', padding:'10px 14px', border:'1.5px solid var(--input-border)', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:14, color:'var(--text)', background:'var(--input-bg)', outline:'none', resize:'vertical', direction:'rtl', boxSizing:'border-box', transition:'border-color 0.2s' }}
+                  style={{ width:'100%', padding:'10px 14px', border:'1.5px solid var(--input-border)', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:14, color:'var(--text)', background:'var(--input-bg)', outline:'none', resize:'vertical', direction:'rtl', boxSizing:'border-box', transition:'border-color 0.2s' }}
                   onFocus={e=>e.target.style.borderColor=G}
                   onBlur={e=>e.target.style.borderColor='var(--input-border)'}
                 />
@@ -1609,10 +1610,10 @@
                     sendBroadcast(broadcastMsg.trim());
                     setBroadcastMsg('');
                     showToast('✅ تم إرسال الإشعار لجميع المستخدمين');
-                  }} style={{ background:G, color:'#fff', border:'none', borderRadius:12, padding:'10px 22px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                  }} style={{ background:G, color:'#fff', border:'none', borderRadius:12, padding:'10px 22px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
                     <SendIcon size={15} color="#fff"/> إرسال الإشعار
                   </button>
-                  {broadcastMsg && <button onClick={()=>setBroadcastMsg('')} style={{ background:'#fce4ec', border:'none', borderRadius:12, padding:'10px 16px', cursor:'pointer', color:'#e74c3c', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700 }}>مسح</button>}
+                  {broadcastMsg && <button onClick={()=>setBroadcastMsg('')} style={{ background:'#fce4ec', border:'none', borderRadius:12, padding:'10px 16px', cursor:'pointer', color:'#e74c3c', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700 }}>مسح</button>}
                   <div style={{ fontSize:11, color:'var(--text3)', marginRight:'auto' }}>{broadcastMsg.length}/200 حرف</div>
                 </div>
               </div>
@@ -1643,7 +1644,7 @@
                             <span style={{ fontSize:12, color:'#aaa', marginRight:10 }}>{new Date(order.date).toLocaleString('ar-SA')}</span>
                           </div>
                           <select value={order.status} onChange={e=>setOrders(prev=>prev.map(o=>o.id===order.id?{...o,status:e.target.value}:o))}
-                            style={{ border:`1.5px solid ${sc}`, borderRadius:20, padding:'4px 12px', color:sc, fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', outline:'none', background:'#fff' }}>
+                            style={{ border:`1.5px solid ${sc}`, borderRadius:20, padding:'4px 12px', color:sc, fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', outline:'none', background:'#fff' }}>
                             <option value="pending">قيد الانتظار</option>
                             <option value="preparing">جار التحضير</option>
                             <option value="shipping">في الطريق</option>
@@ -1674,8 +1675,8 @@
               <h3 style={{ fontSize:17, fontWeight:800, color:D, marginBottom:8 }}>حذف المنتج</h3>
               <p style={{ color:'#666', fontSize:14, marginBottom:24, lineHeight:1.6 }}>هل أنت متأكد من حذف <strong>"{deleteConfirm.name}"</strong>؟<br/>لا يمكن التراجع عن هذا الإجراء.</p>
               <div style={{ display:'flex', gap:10 }}>
-                <button onClick={()=>setDeleteConfirm(null)} style={{ flex:1, padding:'11px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, color:'var(--text2)' }}>إلغاء</button>
-                <button onClick={()=>handleDelete(deleteConfirm.id)} style={{ flex:1, padding:'11px', background:'#e74c3c', border:'none', borderRadius:12, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, color:'#fff' }}>حذف</button>
+                <button onClick={()=>setDeleteConfirm(null)} style={{ flex:1, padding:'11px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, color:'var(--text2)' }}>إلغاء</button>
+                <button onClick={()=>handleDelete(deleteConfirm.id)} style={{ flex:1, padding:'11px', background:'#e74c3c', border:'none', borderRadius:12, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, color:'#fff' }}>حذف</button>
               </div>
             </div>
           </div>
@@ -1689,7 +1690,7 @@
   <!-- ── App ── -->
   <script type="text/babel">
   const { useState, useEffect, useMemo, useCallback, useRef } = React;
-  const GREEN = '#8CC63F', TEAL = '#1F9FB3', DARK = '#2d3436';
+  const GREEN = '#96cb3f', TEAL = '#08a6cb', DEEP_TEAL = '#158fa6', DARK = '#1a1a1a';
   const fmt = (n) => `₪${Number(n).toFixed(2)}`;
   // تطبيع النص العربي للبحث: إزالة التشكيل وتوحيد الألف
   const normalizeAr = (s) => {
@@ -1722,24 +1723,24 @@
             <input type="number" min="0" placeholder="0"
               value={filters.minPrice||''}
               onChange={e=>setFilters(f=>({...f,minPrice:e.target.value?Number(e.target.value):0}))}
-              style={{ width:60, padding:'6px 8px', border:'1.5px solid var(--border)', borderRadius:8, fontFamily:'Tajawal,sans-serif', fontSize:13, outline:'none', background:'var(--input-bg)', color:'var(--text)' }}/>
+              style={{ width:60, padding:'6px 8px', border:'1.5px solid var(--border)', borderRadius:8, fontFamily:'Almarai,sans-serif', fontSize:13, outline:'none', background:'var(--input-bg)', color:'var(--text)' }}/>
             <span style={{ color:'#ccc' }}>—</span>
             <input type="number" min="0" placeholder="أقصى"
               value={filters.maxPrice<9999?filters.maxPrice:''}
               onChange={e=>setFilters(f=>({...f,maxPrice:e.target.value?Number(e.target.value):9999}))}
-              style={{ width:72, padding:'6px 8px', border:'1.5px solid var(--border)', borderRadius:8, fontFamily:'Tajawal,sans-serif', fontSize:13, outline:'none', background:'var(--input-bg)', color:'var(--text)' }}/>
+              style={{ width:72, padding:'6px 8px', border:'1.5px solid var(--border)', borderRadius:8, fontFamily:'Almarai,sans-serif', fontSize:13, outline:'none', background:'var(--input-bg)', color:'var(--text)' }}/>
             <span style={{ fontSize:12, color:'#aaa' }}>₪</span>
           </div>
           <button onClick={()=>setFilters(f=>({...f,discountOnly:!f.discountOnly}))}
-            style={{ background:filters.discountOnly?'#fce4ec':'var(--bg)', color:filters.discountOnly?'#e74c3c':'var(--text2)', border:filters.discountOnly?'1.5px solid #f48fb1':'1.5px solid transparent', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, transition:'all 0.18s', display:'flex', alignItems:'center', gap:6 }}>
+            style={{ background:filters.discountOnly?'#fce4ec':'var(--bg)', color:filters.discountOnly?'#e74c3c':'var(--text2)', border:filters.discountOnly?'1.5px solid #f48fb1':'1.5px solid transparent', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, transition:'all 0.18s', display:'flex', alignItems:'center', gap:6 }}>
             <PercentIcon size={13} color={filters.discountOnly?'#e74c3c':'#888'}/> عروض فقط
           </button>
           <button onClick={()=>setFilters(f=>({...f,inStockOnly:!f.inStockOnly}))}
-            style={{ background:filters.inStockOnly?'#e8f5e9':'var(--bg)', color:filters.inStockOnly?'#2e7d32':'var(--text2)', border:filters.inStockOnly?`1.5px solid ${GREEN}`:'1.5px solid transparent', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, transition:'all 0.18s', display:'flex', alignItems:'center', gap:6 }}>
+            style={{ background:filters.inStockOnly?'#e8f5e9':'var(--bg)', color:filters.inStockOnly?'#2e7d32':'var(--text2)', border:filters.inStockOnly?`1.5px solid ${GREEN}`:'1.5px solid transparent', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, transition:'all 0.18s', display:'flex', alignItems:'center', gap:6 }}>
             <PackageIcon size={13} color={filters.inStockOnly?GREEN:'#888'}/> متوفر فقط
           </button>
           <select value={filters.sort} onChange={e=>setFilters(f=>({...f,sort:e.target.value}))}
-            style={{ padding:'7px 12px', border:'1.5px solid var(--border)', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:13, cursor:'pointer', background:'var(--input-bg)', color:'var(--text)', outline:'none' }}>
+            style={{ padding:'7px 12px', border:'1.5px solid var(--border)', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:13, cursor:'pointer', background:'var(--input-bg)', color:'var(--text)', outline:'none' }}>
             <option value="default">ترتيب افتراضي</option>
             <option value="price_asc">الأرخص أولاً</option>
             <option value="price_desc">الأغلى أولاً</option>
@@ -1747,7 +1748,7 @@
           </select>
           {hasActive && (
             <button onClick={()=>setFilters({minPrice:0,maxPrice:9999,discountOnly:false,inStockOnly:false,sort:'default',labels:[]})}
-              style={{ background:'transparent', border:'none', cursor:'pointer', fontSize:12, color:'#e74c3c', fontFamily:'Tajawal,sans-serif', fontWeight:700, display:'flex', alignItems:'center', gap:4 }}>
+              style={{ background:'transparent', border:'none', cursor:'pointer', fontSize:12, color:'#e74c3c', fontFamily:'Almarai,sans-serif', fontWeight:700, display:'flex', alignItems:'center', gap:4 }}>
               <XIcon size={12} color="#e74c3c"/> مسح الكل
             </button>
           )}
@@ -1760,7 +1761,7 @@
               const active = (filters.labels||[]).includes(l.id);
               return (
                 <button key={l.id} onClick={()=>toggleLabel(l.id)}
-                  style={{ background:active?l.bg:'#f4f6f8', color:active?l.color:'#777', border:active?`1.5px solid ${l.color}66`:'1.5px solid transparent', borderRadius:20, padding:'4px 12px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, transition:'all 0.15s' }}>
+                  style={{ background:active?l.bg:'#f4f6f8', color:active?l.color:'#777', border:active?`1.5px solid ${l.color}66`:'1.5px solid transparent', borderRadius:20, padding:'4px 12px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, transition:'all 0.15s' }}>
                   {l.emoji} {l.label}
                 </button>
               );
@@ -1859,7 +1860,7 @@
                   <div style={{ fontSize:12, fontWeight:700, color:DARK, lineHeight:1.3, marginBottom:4 }}>{p.name}</div>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <span style={{ fontSize:14, fontWeight:900, color:GREEN }}>{fmt(finalP)}</span>
-                    <button onClick={()=>onAdd(p)} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:8, padding:'4px 8px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:11, fontWeight:700, display:'flex', alignItems:'center', gap:3 }}>
+                    <button onClick={()=>onAdd(p)} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:8, padding:'4px 8px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:11, fontWeight:700, display:'flex', alignItems:'center', gap:3 }}>
                       <PlusIcon size={10} color="#fff"/>{inCart>0?`(${inCart})`:'أضف'}
                     </button>
                   </div>
@@ -1918,10 +1919,10 @@
         {showHistory && (<>
           <div style={{ padding:'8px 14px 4px', fontSize:11, fontWeight:800, color:'#bbb', letterSpacing:'0.5px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <span>آخر عمليات البحث</span>
-            <button onClick={onClearHistory} style={{ background:'none', border:'none', cursor:'pointer', fontSize:11, color:'#e74c3c', fontWeight:700, fontFamily:'Tajawal,sans-serif' }}>مسح الكل</button>
+            <button onClick={onClearHistory} style={{ background:'none', border:'none', cursor:'pointer', fontSize:11, color:'#e74c3c', fontWeight:700, fontFamily:'Almarai,sans-serif' }}>مسح الكل</button>
           </div>
           {history.map((h,i)=>(
-            <button key={i} onClick={()=>onSelect(h)} style={{ width:'100%', padding:'9px 14px', background:'none', border:'none', textAlign:'right', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, color:'#555', display:'flex', alignItems:'center', gap:8, transition:'background 0.1s' }}
+            <button key={i} onClick={()=>onSelect(h)} style={{ width:'100%', padding:'9px 14px', background:'none', border:'none', textAlign:'right', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, color:'#555', display:'flex', alignItems:'center', gap:8, transition:'background 0.1s' }}
               onMouseEnter={e=>e.currentTarget.style.background='#f8f9fa'} onMouseLeave={e=>e.currentTarget.style.background='none'}>
               <ClockIcon size={14} color="#ccc"/> {h}
             </button>
@@ -1932,7 +1933,7 @@
           const ic     = CAT_IC[p.category]||'#888';
           const finalP = p.discount>0 ? p.price*(1-p.discount/100) : p.price;
           return (
-            <button key={p.id} onClick={()=>onSelect(p.name)} style={{ width:'100%', padding:'9px 14px', background:'none', border:'none', textAlign:'right', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, color:'#333', display:'flex', alignItems:'center', gap:10, transition:'background 0.1s' }}
+            <button key={p.id} onClick={()=>onSelect(p.name)} style={{ width:'100%', padding:'9px 14px', background:'none', border:'none', textAlign:'right', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, color:'#333', display:'flex', alignItems:'center', gap:10, transition:'background 0.1s' }}
               onMouseEnter={e=>e.currentTarget.style.background='#f8f9fa'} onMouseLeave={e=>e.currentTarget.style.background='none'}>
               <div style={{ width:28, height:28, borderRadius:8, background:CAT_BG[p.category]||'#f5f5f5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                 {CatIco && <CatIco size={15} color={ic}/>}
@@ -1966,9 +1967,9 @@
           {compareList.length<3 && <div style={{ background:'#f4f6f8', borderRadius:20, padding:'4px 14px', fontSize:12, color:'#aaa', display:'flex', alignItems:'center' }}>+ أضف منتجاً</div>}
         </div>
         <div style={{ display:'flex', gap:8, flexShrink:0 }}>
-          <button onClick={onClear} style={{ background:'#f4f6f8', border:'none', borderRadius:20, padding:'7px 14px', cursor:'pointer', fontSize:13, fontWeight:700, color:'#666', fontFamily:'Tajawal,sans-serif' }}>مسح</button>
+          <button onClick={onClear} style={{ background:'#f4f6f8', border:'none', borderRadius:20, padding:'7px 14px', cursor:'pointer', fontSize:13, fontWeight:700, color:'#666', fontFamily:'Almarai,sans-serif' }}>مسح</button>
           {compareList.length>=2 && (
-            <button onClick={onCompare} style={{ background:TEAL, color:'#fff', border:'none', borderRadius:20, padding:'7px 20px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:6, boxShadow:'0 3px 12px rgba(31,159,179,0.4)' }}>
+            <button onClick={onCompare} style={{ background:TEAL, color:'#fff', border:'none', borderRadius:20, padding:'7px 20px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:6, boxShadow:'0 3px 12px rgba(31,159,179,0.4)' }}>
               <ScaleIcon size={15} color="#fff"/> قارن الآن
             </button>
           )}
@@ -2078,13 +2079,13 @@
   };
 
   const OFFERS = [
-    { id:1, title:'عروض نهاية الأسبوع 🌿', sub:'خصم حتى 30% على الخضار والفواكه الطازجة', cat:'produce', badge:'30%', bg:'linear-gradient(130deg,#5a9e2f 0%,#8CC63F 60%,#a8d862 100%)' },
-    { id:2, title:'يوم منتجات الألبان 🥛',  sub:'خصم 15% على جميع منتجات الألبان والأجبان', cat:'dairy',   badge:'15%', bg:'linear-gradient(130deg,#0d7a8f 0%,#1F9FB3 60%,#4ec7d8 100%)' },
+    { id:1, title:'عروض نهاية الأسبوع 🌿', sub:'خصم حتى 30% على الخضار والفواكه الطازجة', cat:'produce', badge:'30%', bg:'linear-gradient(130deg,#5a9e2f 0%,#96cb3f 60%,#a8d862 100%)' },
+    { id:2, title:'يوم منتجات الألبان 🥛',  sub:'خصم 15% على جميع منتجات الألبان والأجبان', cat:'dairy',   badge:'15%', bg:'linear-gradient(130deg,#0d7a8f 0%,#08a6cb 60%,#4ec7d8 100%)' },
     { id:3, title:'تخفيضات اللحوم 🍗',       sub:'عروض حصرية على الدواجن والأسماك الطازجة',  cat:'meat',    badge:'خاص', bg:'linear-gradient(130deg,#c0392b 0%,#e74c3c 60%,#f1948a 100%)' },
   ];
 
   const BULK_DEALS = [
-    { id:1, emoji:'🥬', cat:'produce',   minQty:3, title:'اشترِ 3 خضار وفّر 10%',    color:'#8CC63F' },
+    { id:1, emoji:'🥬', cat:'produce',   minQty:3, title:'اشترِ 3 خضار وفّر 10%',    color:'#96cb3f' },
     { id:2, emoji:'🍿', cat:'snacks',    minQty:2, title:'مسليَّان بسعر واحد + خصم', color:'#ffa726' },
     { id:3, emoji:'🥤', cat:'beverages', minQty:4, title:'4 مشروبات بسعر 3',          color:'#42a5f5' },
   ];
@@ -2127,7 +2128,7 @@
                   <div style={{ fontSize:12, fontWeight:700, color:DARK, lineHeight:1.25, marginBottom:5, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{p.name}</div>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                     <span style={{ fontSize:13, fontWeight:900, color:GREEN }}>₪{fp.toFixed(2)}</span>
-                    <button onClick={e=>{ e.stopPropagation(); onAdd(p); }} style={{ background:cart[p.id]?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:7, padding:'3px 9px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:11, fontWeight:700 }}>
+                    <button onClick={e=>{ e.stopPropagation(); onAdd(p); }} style={{ background:cart[p.id]?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:7, padding:'3px 9px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:11, fontWeight:700 }}>
                       {cart[p.id]?`(${cart[p.id]})+`:'أضف'}
                     </button>
                   </div>
@@ -2183,7 +2184,7 @@
       <div style={{ marginBottom:16 }}>
         <label style={{ fontSize:12, fontWeight:700, color:'#666', display:'block', marginBottom:5 }}>{label}</label>
         <input value={form[k]||''} onChange={e=>upd(k,e.target.value)} type={type} placeholder={ph}
-          style={{ width:'100%', padding:'11px 14px', border:'2px solid #eef0f2', borderRadius:11, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none', transition:'border-color 0.2s' }}
+          style={{ width:'100%', padding:'11px 14px', border:'2px solid #eef0f2', borderRadius:11, fontFamily:'Almarai,sans-serif', fontSize:14, outline:'none', transition:'border-color 0.2s' }}
           onFocus={e=>e.target.style.borderColor=GREEN} onBlur={e=>e.target.style.borderColor='#eef0f2'}/>
       </div>
     );
@@ -2284,7 +2285,7 @@
               {/* ── Password change section ── */}
               <div style={{ marginTop:20, borderTop:'1.5px dashed #e8ecf0', paddingTop:18 }}>
                 <button onClick={()=>{ setShowPw(v=>!v); setPwError(''); setPwOk(false); }}
-                  style={{ background:'none', border:'none', cursor:'pointer', fontFamily:'Tajawal,sans-serif',
+                  style={{ background:'none', border:'none', cursor:'pointer', fontFamily:'Almarai,sans-serif',
                     fontSize:13, fontWeight:700, color:TEAL, padding:0, display:'flex', alignItems:'center', gap:6, marginBottom:showPw?14:0 }}>
                   🔑 {showPw ? 'إخفاء تغيير كلمة المرور' : 'تغيير كلمة المرور'}
                 </button>
@@ -2295,7 +2296,7 @@
                         <label style={{ fontSize:12, fontWeight:700, color:'#666', display:'block', marginBottom:4 }}>{label}</label>
                         <input type="password" value={pwForm[k]} onChange={e=>setPwForm(p=>({...p,[k]:e.target.value}))}
                           style={{ width:'100%', padding:'10px 13px', border:'2px solid #eef0f2', borderRadius:10,
-                            fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none' }}
+                            fontFamily:'Almarai,sans-serif', fontSize:14, outline:'none' }}
                           onFocus={e=>e.target.style.borderColor=TEAL} onBlur={e=>e.target.style.borderColor='#eef0f2'}/>
                       </div>
                     ))}
@@ -2309,7 +2310,7 @@
                     )}
                     <button onClick={doChangePassword}
                       style={{ background:`linear-gradient(135deg,${TEAL},#0b7d96)`, color:'#fff', border:'none',
-                        borderRadius:11, padding:'11px', cursor:'pointer', fontFamily:'Tajawal,sans-serif',
+                        borderRadius:11, padding:'11px', cursor:'pointer', fontFamily:'Almarai,sans-serif',
                         fontSize:14, fontWeight:800, boxShadow:'0 3px 12px rgba(31,159,179,0.3)' }}>
                       🔒 حفظ كلمة المرور الجديدة
                     </button>
@@ -2320,7 +2321,7 @@
           </div>
           <div style={{ padding:'16px 20px', borderTop:'1px solid #f0f0f0', display:'flex', flexDirection:'column', gap:10 }}>
             {!isGuest && (
-              <button onClick={()=>{ onSave(form); onClose(); }} style={{ width:'100%', background:`linear-gradient(135deg,${GREEN},#6fa832)`, color:'#fff', border:'none', borderRadius:13, padding:'14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', gap:8, boxShadow:'0 4px 14px rgba(140,198,63,0.35)' }}>
+              <button onClick={()=>{ onSave(form); onClose(); }} style={{ width:'100%', background:`linear-gradient(135deg,${GREEN},#6fa832)`, color:'#fff', border:'none', borderRadius:13, padding:'14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', gap:8, boxShadow:'0 4px 14px rgba(140,198,63,0.35)' }}>
                 <CheckIcon size={18} color="#fff"/> حفظ البيانات
               </button>
             )}
@@ -2329,7 +2330,7 @@
                 💡 أنت تتصفح كضيف — سجّل حساباً لحفظ بياناتك وطلباتك
               </div>
             )}
-            <button onClick={onLogout} style={{ width:'100%', background:'transparent', color:'#e74c3c', border:'1.5px solid #fecaca', borderRadius:13, padding:'12px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+            <button onClick={onLogout} style={{ width:'100%', background:'transparent', color:'#e74c3c', border:'1.5px solid #fecaca', borderRadius:13, padding:'12px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
               🚪 {isGuest ? 'إنشاء حساب / تسجيل الدخول' : 'تسجيل الخروج'}
             </button>
           </div>
@@ -2344,7 +2345,7 @@
     const fp     = product.discount > 0 ? product.price * (1 - product.discount/100) : product.price;
     const CatIco = window.CAT_ICONS && window.CAT_ICONS[product.category];
     const bg     = CAT_BG[product.category] || '#f1f8e9';
-    const ic     = CAT_IC[product.category] || '#8CC63F';
+    const ic     = CAT_IC[product.category] || '#96cb3f';
     const handleAdd = (e) => { e.stopPropagation(); if (product.stock===0) return; onAdd(product); setAdded(true); setTimeout(()=>setAdded(false),1300); };
     return (
       <div onClick={()=>onSelect&&onSelect(product)} style={{ borderRadius:20, overflow:'hidden', marginBottom:24, cursor:'pointer', background:`linear-gradient(135deg,${bg},${bg}cc)`, border:`2px solid ${ic}33`, position:'relative', display:'flex', alignItems:'stretch', minHeight:130, boxShadow:'0 4px 20px rgba(0,0,0,0.08)', transition:'transform 0.2s,box-shadow 0.2s' }}
@@ -2369,9 +2370,9 @@
                 <HeartIcon size={17} color={isFav?'#e74c3c':'#bbb'} filled={isFav}/>
               </button>
               {product.stock===0 ? (
-                <button disabled style={{ background:'var(--surface2)', color:'var(--text3)', border:'1px solid var(--border)', borderRadius:12, padding:'9px 18px', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, cursor:'not-allowed' }}>نفذ المخزون</button>
+                <button disabled style={{ background:'var(--surface2)', color:'var(--text3)', border:'1px solid var(--border)', borderRadius:12, padding:'9px 18px', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, cursor:'not-allowed' }}>نفذ المخزون</button>
               ) : (
-                <button onClick={handleAdd} style={{ background:added?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:12, padding:'9px 20px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:800, display:'flex', alignItems:'center', gap:6, boxShadow:'0 3px 10px rgba(140,198,63,0.35)', transition:'background 0.2s' }}>
+                <button onClick={handleAdd} style={{ background:added?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:12, padding:'9px 20px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:800, display:'flex', alignItems:'center', gap:6, boxShadow:'0 3px 10px rgba(140,198,63,0.35)', transition:'background 0.2s' }}>
                   {added ? <><CheckIcon size={14} color="#fff"/> أُضيف</> : cart[product.id]>0 ? <><PlusIcon size={14} color="#fff"/> ({cart[product.id]})</> : <><PlusIcon size={14} color="#fff"/> أضف للسلة</>}
                 </button>
               )}
@@ -2441,7 +2442,7 @@
                       <span style={{ fontSize:14, fontWeight:900, color:'#e74c3c' }}>₪{fp.toFixed(2)}</span>
                       {p.discount > 0 && <span style={{ fontSize:11, color:'#bbb', textDecoration:'line-through', marginRight:5 }}>₪{p.price.toFixed(2)}</span>}
                     </div>
-                    <button onClick={() => onAdd(p)} style={{ background:cart[p.id] ? '#27ae60' : 'linear-gradient(135deg,#e74c3c,#f39c12)', color:'#fff', border:'none', borderRadius:8, padding:'4px 10px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700 }}>
+                    <button onClick={() => onAdd(p)} style={{ background:cart[p.id] ? '#27ae60' : 'linear-gradient(135deg,#e74c3c,#f39c12)', color:'#fff', border:'none', borderRadius:8, padding:'4px 10px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700 }}>
                       {cart[p.id] ? `(${cart[p.id]})+` : 'أضف'}
                     </button>
                   </div>
@@ -2466,7 +2467,7 @@
           flex:1, display:'flex', flexDirection:'column', alignItems:'center',
           justifyContent:'flex-end', gap:3, paddingBottom:8, paddingTop:6,
           background:'none', border:'none', cursor:'pointer',
-          fontFamily:'Tajawal,sans-serif', position:'relative',
+          fontFamily:'Almarai,sans-serif', position:'relative',
           WebkitTapHighlightColor:'transparent', outline:'none'
         }}>
           {/* شريط التفعيل العلوي */}
@@ -2585,7 +2586,7 @@
                   <div style={{ fontSize:13, fontWeight:700, color:DARK, lineHeight:1.25, marginBottom:6 }}>{p.name}</div>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <span style={{ fontSize:14, fontWeight:900, color:GREEN }}>₪{fp.toFixed(2)}</span>
-                    <button onClick={()=>onAdd(p)} style={{ background:cart[p.id]?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:8, padding:'4px 10px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700 }}>
+                    <button onClick={()=>onAdd(p)} style={{ background:cart[p.id]?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:8, padding:'4px 10px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700 }}>
                       {cart[p.id]?`(${cart[p.id]})+`:'أضف'}
                     </button>
                   </div>
@@ -2630,7 +2631,7 @@
 
     const inp = (val, set, ph, extra={}) => (
       <input value={val} onChange={e=>set(e.target.value)} placeholder={ph}
-        style={{ width:'100%', padding:'11px 14px', border:'2px solid #eef0f2', borderRadius:11, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none', transition:'border-color 0.2s', ...extra }}
+        style={{ width:'100%', padding:'11px 14px', border:'2px solid #eef0f2', borderRadius:11, fontFamily:'Almarai,sans-serif', fontSize:14, outline:'none', transition:'border-color 0.2s', ...extra }}
         onFocus={e=>e.target.style.borderColor=GREEN} onBlur={e=>e.target.style.borderColor='#eef0f2'}/>
     );
 
@@ -2676,7 +2677,7 @@
                 <div>
                   <label style={{ fontSize:12, fontWeight:700, color:'#666', display:'block', marginBottom:5 }}>ملاحظات (اختياري)</label>
                   <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="مثال: اتصل عند الوصول، الطابق الثاني..." rows={3}
-                    style={{ width:'100%', padding:'11px 14px', border:'2px solid #eef0f2', borderRadius:11, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none', resize:'none', transition:'border-color 0.2s' }}
+                    style={{ width:'100%', padding:'11px 14px', border:'2px solid #eef0f2', borderRadius:11, fontFamily:'Almarai,sans-serif', fontSize:14, outline:'none', resize:'none', transition:'border-color 0.2s' }}
                     onFocus={e=>e.target.style.borderColor=GREEN} onBlur={e=>e.target.style.borderColor='#eef0f2'}/>
                 </div>
               </div>
@@ -2686,7 +2687,7 @@
                 <h3 style={{ fontSize:15, fontWeight:800, color:DARK, marginBottom:14 }}>🕐 موعد التوصيل</h3>
                 <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
                   {DELIVERY_SLOTS.map(s=>(
-                    <button key={s.id} onClick={()=>setSlot(s.id)} style={{ display:'flex', alignItems:'center', gap:14, padding:'13px 16px', background:slot===s.id?GREEN+'14':'var(--surface2)', border:`2px solid ${slot===s.id?GREEN:'transparent'}`, borderRadius:14, cursor:'pointer', fontFamily:'Tajawal,sans-serif', textAlign:'right', transition:'all 0.15s' }}>
+                    <button key={s.id} onClick={()=>setSlot(s.id)} style={{ display:'flex', alignItems:'center', gap:14, padding:'13px 16px', background:slot===s.id?GREEN+'14':'var(--surface2)', border:`2px solid ${slot===s.id?GREEN:'transparent'}`, borderRadius:14, cursor:'pointer', fontFamily:'Almarai,sans-serif', textAlign:'right', transition:'all 0.15s' }}>
                       <span style={{ fontSize:22 }}>{s.icon}</span>
                       <div style={{ flex:1 }}>
                         <div style={{ fontWeight:700, fontSize:14, color:slot===s.id?GREEN:DARK }}>{s.label}</div>
@@ -2705,7 +2706,7 @@
                 <h3 style={{ fontSize:15, fontWeight:800, color:DARK, marginBottom:14 }}>💳 طريقة الدفع</h3>
                 <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:18 }}>
                   {PAYMENT_METHODS.map(m=>(
-                    <button key={m.id} onClick={()=>setPayment(m.id)} style={{ display:'flex', alignItems:'center', gap:14, padding:'13px 16px', background:payment===m.id?GREEN+'14':'var(--surface2)', border:`2px solid ${payment===m.id?GREEN:'transparent'}`, borderRadius:14, cursor:'pointer', fontFamily:'Tajawal,sans-serif', textAlign:'right', transition:'all 0.15s' }}>
+                    <button key={m.id} onClick={()=>setPayment(m.id)} style={{ display:'flex', alignItems:'center', gap:14, padding:'13px 16px', background:payment===m.id?GREEN+'14':'var(--surface2)', border:`2px solid ${payment===m.id?GREEN:'transparent'}`, borderRadius:14, cursor:'pointer', fontFamily:'Almarai,sans-serif', textAlign:'right', transition:'all 0.15s' }}>
                       <span style={{ fontSize:22 }}>{m.icon}</span>
                       <div style={{ flex:1, fontWeight:700, fontSize:14, color:payment===m.id?GREEN:DARK }}>{m.label}</div>
                       <div style={{ width:20, height:20, borderRadius:'50%', border:`2px solid ${payment===m.id?GREEN:'#ddd'}`, background:payment===m.id?GREEN:'transparent', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s' }}>
@@ -2732,7 +2733,7 @@
             </div>
           )}
           <div style={{ padding:'14px 22px 18px', borderTop:'1px solid var(--border)', display:'flex', gap:10 }}>
-            {step>1 && <button onClick={()=>setStep(s=>s-1)} style={{ flex:1, padding:'12px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, color:'var(--text2)' }}>رجوع</button>}
+            {step>1 && <button onClick={()=>setStep(s=>s-1)} style={{ flex:1, padding:'12px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, color:'var(--text2)' }}>رجوع</button>}
             <button onClick={()=>{
               setFieldError('');
               if (step===1) {
@@ -2741,7 +2742,7 @@
               }
               if (step<3) { setStep(s=>s+1); return; }
               onConfirm({ address:address.trim(), phone:phone.trim(), notes:notes.trim(), slot, payment });
-            }} style={{ flex:2, padding:'12px', background:`linear-gradient(135deg,${GREEN},#6fa832)`, color:'#fff', border:'none', borderRadius:12, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', gap:8, boxShadow:'0 4px 14px rgba(140,198,63,0.35)' }}>
+            }} style={{ flex:2, padding:'12px', background:`linear-gradient(135deg,${GREEN},#6fa832)`, color:'#fff', border:'none', borderRadius:12, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', gap:8, boxShadow:'0 4px 14px rgba(140,198,63,0.35)' }}>
               {step<3 ? 'التالي ←' : <><CheckIcon size={17} color="#fff"/> تأكيد الطلب</>}
             </button>
           </div>
@@ -2762,10 +2763,10 @@
       return () => clearInterval(tick);
     }, []);
     return (
-      <div style={{ position:'fixed', bottom:100, left:'50%', transform:'translateX(-50%)', zIndex:2500, background:'#2d3436', color:'#fff', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', gap:12, boxShadow:'0 4px 20px rgba(0,0,0,0.28)', minWidth:270, fontFamily:'Tajawal,sans-serif', overflow:'hidden' }}>
+      <div style={{ position:'fixed', bottom:100, left:'50%', transform:'translateX(-50%)', zIndex:2500, background:'#2d3436', color:'#fff', borderRadius:14, padding:'12px 18px', display:'flex', alignItems:'center', gap:12, boxShadow:'0 4px 20px rgba(0,0,0,0.28)', minWidth:270, fontFamily:'Almarai,sans-serif', overflow:'hidden' }}>
         <div style={{ position:'absolute', bottom:0, right:0, height:3, background:GREEN, transition:'width 0.05s linear', width:`${prog}%` }}/>
         <span style={{ fontSize:14, flex:1 }}>تم حذف <b>{snack.name}</b> من السلة</span>
-        <button onClick={onUndo} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:8, padding:'5px 12px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, flexShrink:0 }}>تراجع</button>
+        <button onClick={onUndo} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:8, padding:'5px 12px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, flexShrink:0 }}>تراجع</button>
       </div>
     );
   }
@@ -2791,7 +2792,7 @@
             <input value={newItem} onChange={e=>setNewItem(e.target.value)}
               onKeyDown={e=>{ if(e.key==='Enter'&&newItem.trim()){ onAdd(newItem.trim()); setNewItem(''); } }}
               placeholder="أضف عنصراً جديداً..."
-              style={{ flex:1, padding:'9px 13px', border:'2px solid #eef0f2', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:14, outline:'none' }}
+              style={{ flex:1, padding:'9px 13px', border:'2px solid #eef0f2', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:14, outline:'none' }}
               onFocus={e=>e.target.style.borderColor=GREEN} onBlur={e=>e.target.style.borderColor='#eef0f2'}/>
             <button onClick={()=>{ if(newItem.trim()){ onAdd(newItem.trim()); setNewItem(''); } }} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:10, width:40, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><PlusIcon size={18} color="#fff"/></button>
           </div>
@@ -2809,7 +2810,7 @@
           </div>
           {doneCount>0 && (
             <div style={{ padding:'12px 16px', borderTop:'1px solid #f0f0f0' }}>
-              <button onClick={onClearDone} style={{ width:'100%', background:'#fee', color:'#e74c3c', border:'1.5px solid #fcc', borderRadius:10, padding:'9px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+              <button onClick={onClearDone} style={{ width:'100%', background:'#fee', color:'#e74c3c', border:'1.5px solid #fcc', borderRadius:10, padding:'9px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
                 <TrashIcon size={15} color="#e74c3c"/> حذف المكتملة ({doneCount})
               </button>
             </div>
@@ -2822,8 +2823,8 @@
   /* ── LuckyWheelModal ────────────────────────────────────────────────── */
   function LuckyWheelModal({ onClose, onClaim }) {
     const PRIZES = [
-      { label:'+5 نقاط',   pts:5,   color:'#8CC63F', emoji:'⭐' },
-      { label:'+20 نقاط',  pts:20,  color:'#1F9FB3', emoji:'🎯' },
+      { label:'+5 نقاط',   pts:5,   color:'#96cb3f', emoji:'⭐' },
+      { label:'+20 نقاط',  pts:20,  color:'#08a6cb', emoji:'🎯' },
       { label:'+50 نقاط',  pts:50,  color:'#f39c12', emoji:'🌟' },
       { label:'+10 نقاط',  pts:10,  color:'#e91e63', emoji:'💫' },
       { label:'+100 نقاط', pts:100, color:'#9c27b0', emoji:'💎' },
@@ -2889,7 +2890,7 @@
                   <g key={i}>
                     <path d={arc(150,150,140,a1,a2)} fill={p.color} stroke="#fff" strokeWidth={2.5}/>
                     <text x={t.x} y={t.y} textAnchor="middle" dominantBaseline="middle"
-                      fontSize={9} fontWeight={700} fill="#fff" fontFamily="Tajawal,sans-serif"
+                      fontSize={9} fontWeight={700} fill="#fff" fontFamily="Almarai,sans-serif"
                       transform={`rotate(${mid},${t.x},${t.y})`} style={{ pointerEvents:'none' }}>
                       {p.emoji}
                     </text>
@@ -2917,7 +2918,7 @@
                 {winner.pts>0 ? `🎉 ربحت ${winner.label}!` : `${winner.emoji} ${winner.label}!`}
               </div>
               {!claimed ? (
-                <button onClick={claim} style={{ background:'linear-gradient(135deg,#f39c12,#e67e22)', color:'#fff', border:'none', borderRadius:14, padding:'12px 0', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, cursor:'pointer', width:'100%' }}>
+                <button onClick={claim} style={{ background:'linear-gradient(135deg,#f39c12,#e67e22)', color:'#fff', border:'none', borderRadius:14, padding:'12px 0', fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, cursor:'pointer', width:'100%' }}>
                   {winner.pts>0 ? `🎁 استلام ${winner.pts} نقطة` : '👍 حسناً'}
                 </button>
               ) : (
@@ -2925,7 +2926,7 @@
               )}
             </div>
           ) : (
-            <button onClick={spin} disabled={spinning} style={{ background:spinning?'#ccc':'linear-gradient(135deg,#8CC63F,#5e9627)', color:'#fff', border:'none', borderRadius:14, padding:'12px 0', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, cursor:spinning?'not-allowed':'pointer', width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'background 0.2s' }}>
+            <button onClick={spin} disabled={spinning} style={{ background:spinning?'#ccc':'linear-gradient(135deg,#96cb3f,#5e9627)', color:'#fff', border:'none', borderRadius:14, padding:'12px 0', fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, cursor:spinning?'not-allowed':'pointer', width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'background 0.2s' }}>
               {spinning ? '⏳ جاري الدوران...' : '🎰 أدِر العجلة'}
             </button>
           )}
@@ -3021,11 +3022,11 @@
           <div style={{ padding:'10px 24px 20px', textAlign:'center', borderTop:'1px dashed #ebebeb' }}>
             <div style={{ fontSize:13, color:'#aaa', marginBottom:14 }}>شكراً لثقتكم بنا 🙏</div>
             <div style={{ display:'flex', gap:8, flexWrap:'wrap' }} className="no-print">
-              <button onClick={onClose} style={{ flex:1, minWidth:80, padding:'11px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, color:'var(--text2)' }}>إغلاق</button>
-              <button onClick={copyReceipt} style={{ flex:1, minWidth:100, padding:'11px', background:copiedReceipt?'#e8f5e9':'#f0f4ff', border:`1.5px solid ${copiedReceipt?GREEN:'#c5cae9'}`, borderRadius:12, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, color:copiedReceipt?GREEN:'#3949ab', display:'flex', alignItems:'center', justifyContent:'center', gap:6, transition:'all 0.2s' }}>
+              <button onClick={onClose} style={{ flex:1, minWidth:80, padding:'11px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, color:'var(--text2)' }}>إغلاق</button>
+              <button onClick={copyReceipt} style={{ flex:1, minWidth:100, padding:'11px', background:copiedReceipt?'#e8f5e9':'#f0f4ff', border:`1.5px solid ${copiedReceipt?GREEN:'#c5cae9'}`, borderRadius:12, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, color:copiedReceipt?GREEN:'#3949ab', display:'flex', alignItems:'center', justifyContent:'center', gap:6, transition:'all 0.2s' }}>
                 {copiedReceipt ? <><CheckIcon size={14} color={GREEN}/> تم النسخ!</> : <><ShareIcon size={14} color="#3949ab"/> مشاركة</>}
               </button>
-              <button onClick={()=>window.print()} style={{ flex:2, minWidth:120, padding:'11px', background:`linear-gradient(135deg,${GREEN},${TEAL})`, border:'none', borderRadius:12, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:14, fontWeight:700, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', gap:7, boxShadow:'0 4px 14px rgba(140,198,63,0.35)' }}>
+              <button onClick={()=>window.print()} style={{ flex:2, minWidth:120, padding:'11px', background:`linear-gradient(135deg,${GREEN},${TEAL})`, border:'none', borderRadius:12, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:14, fontWeight:700, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', gap:7, boxShadow:'0 4px 14px rgba(140,198,63,0.35)' }}>
                 <PrinterIcon size={16} color="#fff"/> طباعة
               </button>
             </div>
@@ -3039,12 +3040,12 @@
   function OrdersPanel({ orders, products, onReorder, onCancel, onClose }) {
     const [receiptOrder,    setReceiptOrder]    = useState(null);
     const [cancelConfirmId, setCancelConfirmId] = useState(null);
-    const statusColor = { pending:'#f39c12', preparing:'#1F9FB3', shipping:'#8e44ad', done:'#8CC63F', cancelled:'#e74c3c' };
+    const statusColor = { pending:'#f39c12', preparing:'#08a6cb', shipping:'#8e44ad', done:'#96cb3f', cancelled:'#e74c3c' };
     const statusLabel = { pending:'قيد الانتظار', preparing:'جار التحضير', shipping:'في الطريق', done:'تم التسليم', cancelled:'ملغى' };
     return (
       <div style={{ position:'fixed', inset:0, zIndex:2000, display:'flex', justifyContent:'flex-end', background:'rgba(0,0,0,0.4)' }} onClick={e=>e.target===e.currentTarget&&onClose()}>
         <div style={{ width:380, maxWidth:'95vw', background:'var(--surface)', height:'100%', display:'flex', flexDirection:'column', boxShadow:'-8px 0 32px rgba(0,0,0,0.15)', animation:'drawerIn 0.28s ease' }}>
-          <div style={{ background:'linear-gradient(135deg,#1F9FB3,#0b7d96)', padding:'20px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div style={{ background:'linear-gradient(135deg,#08a6cb,#0b7d96)', padding:'20px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
             <div style={{ display:'flex', alignItems:'center', gap:10 }}>
               <ClockIcon size={22} color="#fff"/>
               <div>
@@ -3087,8 +3088,8 @@
                   <div style={{ background:'#fff3cd', border:'1px solid #ffc107', borderRadius:10, padding:'10px 14px', marginBottom:10, display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
                     <span style={{ fontSize:13, fontWeight:700, color:'#856404' }}>تأكيد إلغاء الطلب؟</span>
                     <div style={{ display:'flex', gap:6 }}>
-                      <button onClick={()=>setCancelConfirmId(null)} style={{ background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:8, padding:'5px 12px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, color:'var(--text2)' }}>لا</button>
-                      <button onClick={()=>{ onCancel(order.id); setCancelConfirmId(null); }} style={{ background:'#e74c3c', color:'#fff', border:'none', borderRadius:8, padding:'5px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700 }}>نعم، إلغاء</button>
+                      <button onClick={()=>setCancelConfirmId(null)} style={{ background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:8, padding:'5px 12px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, color:'var(--text2)' }}>لا</button>
+                      <button onClick={()=>{ onCancel(order.id); setCancelConfirmId(null); }} style={{ background:'#e74c3c', color:'#fff', border:'none', borderRadius:8, padding:'5px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700 }}>نعم، إلغاء</button>
                     </div>
                   </div>
                 )}
@@ -3099,14 +3100,14 @@
                   </div>
                   <div style={{ display:'flex', gap:7, flexWrap:'wrap', justifyContent:'flex-end' }}>
                     {order.status === 'pending' && (
-                      <button onClick={()=>setCancelConfirmId(cancelConfirmId===order.id?null:order.id)} style={{ background:'#fce4ec', color:'#e74c3c', border:'none', borderRadius:9, padding:'7px 11px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:4 }}>
+                      <button onClick={()=>setCancelConfirmId(cancelConfirmId===order.id?null:order.id)} style={{ background:'#fce4ec', color:'#e74c3c', border:'none', borderRadius:9, padding:'7px 11px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:4 }}>
                         <XIcon size={12} color="#e74c3c"/> إلغاء
                       </button>
                     )}
-                    <button onClick={()=>setReceiptOrder(order)} style={{ background:GREEN+'18', color:GREEN, border:'none', borderRadius:9, padding:'7px 12px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:4 }}>
+                    <button onClick={()=>setReceiptOrder(order)} style={{ background:GREEN+'18', color:GREEN, border:'none', borderRadius:9, padding:'7px 12px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:4 }}>
                       <PrinterIcon size={13} color={GREEN}/> فاتورة
                     </button>
-                    <button onClick={()=>onReorder(order)} style={{ background:TEAL, color:'#fff', border:'none', borderRadius:9, padding:'7px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:5 }}>
+                    <button onClick={()=>onReorder(order)} style={{ background:TEAL, color:'#fff', border:'none', borderRadius:9, padding:'7px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, display:'flex', alignItems:'center', gap:5 }}>
                       <RefreshIcon size={14} color="#fff"/> أعد الطلب
                     </button>
                   </div>
@@ -3126,10 +3127,10 @@
     const [text,   setText]   = useState('');
     const [stars,  setStars]  = useState(0);
     const [open,   setOpen]   = useState(false);
-    const inp = { width:'100%', padding:'9px 12px', border:'2px solid var(--input-border)', borderRadius:10, fontFamily:'Tajawal,sans-serif', fontSize:13, outline:'none', transition:'border-color 0.2s', background:'var(--input-bg)', color:'var(--text)' };
+    const inp = { width:'100%', padding:'9px 12px', border:'2px solid var(--input-border)', borderRadius:10, fontFamily:'Almarai,sans-serif', fontSize:13, outline:'none', transition:'border-color 0.2s', background:'var(--input-bg)', color:'var(--text)' };
     const canSubmit = text.trim() && stars > 0;
     if (!open) return (
-      <button onClick={()=>setOpen(true)} style={{ display:'flex', alignItems:'center', gap:6, background:'var(--surface2)', border:'1.5px dashed var(--border)', borderRadius:10, padding:'9px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, color:'var(--text2)', width:'100%', justifyContent:'center', marginTop:8 }}>
+      <button onClick={()=>setOpen(true)} style={{ display:'flex', alignItems:'center', gap:6, background:'var(--surface2)', border:'1.5px dashed var(--border)', borderRadius:10, padding:'9px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, color:'var(--text2)', width:'100%', justifyContent:'center', marginTop:8 }}>
         ✏️ أضف مراجعتك
       </button>
     );
@@ -3146,13 +3147,13 @@
           style={{...inp, resize:'none', marginBottom:10}}
           onFocus={e=>e.target.style.borderColor=GREEN} onBlur={e=>e.target.style.borderColor='var(--input-border)'}/>
         <div style={{ display:'flex', gap:8 }}>
-          <button onClick={()=>{ setOpen(false); setAuthor(''); setText(''); setStars(0); }} style={{ flex:1, padding:'8px', background:'var(--surface)', border:'1px solid var(--border)', borderRadius:9, cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, color:'var(--text2)' }}>إلغاء</button>
+          <button onClick={()=>{ setOpen(false); setAuthor(''); setText(''); setStars(0); }} style={{ flex:1, padding:'8px', background:'var(--surface)', border:'1px solid var(--border)', borderRadius:9, cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, color:'var(--text2)' }}>إلغاء</button>
           <button onClick={()=>{
             if (!canSubmit) return;
             onAdd({ author:author.trim()||'زائر', text:text.trim(), stars, date:new Date().toISOString() });
             setOpen(false); setAuthor(''); setText(''); setStars(0);
           }} disabled={!canSubmit}
-          style={{ flex:2, padding:'8px', background:canSubmit?GREEN:'#ccc', border:'none', borderRadius:9, cursor:canSubmit?'pointer':'not-allowed', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', gap:5 }}>
+          style={{ flex:2, padding:'8px', background:canSubmit?GREEN:'#ccc', border:'none', borderRadius:9, cursor:canSubmit?'pointer':'not-allowed', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', gap:5 }}>
             <CheckIcon size={14} color="#fff"/> نشر المراجعة
           </button>
         </div>
@@ -3312,7 +3313,7 @@
                 <button onClick={()=>onUpdate(product.id,inCart+1)} style={{ width:36, height:36, borderRadius:'50%', background:GREEN, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><PlusIcon size={16} color="#fff"/></button>
               </div>
             ) : (
-              <button onClick={()=>onAdd(product)} style={{ width:'100%', padding:'13px', background:GREEN, color:'#fff', border:'none', borderRadius:14, fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, marginBottom:16, transition:'opacity 0.2s' }}>
+              <button onClick={()=>onAdd(product)} style={{ width:'100%', padding:'13px', background:GREEN, color:'#fff', border:'none', borderRadius:14, fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, marginBottom:16, transition:'opacity 0.2s' }}>
                 <CartIcon size={18} color="#fff"/> أضف إلى السلة
               </button>
             )}
@@ -3393,7 +3394,7 @@
             <div style={{ fontSize:12, color:'#bbb', marginTop:2 }}>{product.desc}</div>
             {!outOfStock && rating&&rating.count>0 && <StarRating avg={rating.avg} count={rating.count} small/>}
             {outOfStock && <span style={{ fontSize:11, color:'#999', fontWeight:700 }}>نفذت الكمية</span>}
-            {!outOfStock && lowStock && <span style={{ fontSize:11, color: veryLow ? '#c0392b' : '#ff8f00', fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none' }}>🔥 آخر {product.stock} قطع!</span>}
+            {!outOfStock && lowStock && <span style={{ fontSize:11, color: veryLow ? '#ef4444' : '#f97316', fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none' }}>🔥 آخر {product.stock} قطع!</span>}
             {!outOfStock && !lowStock && !product.label && isNew && <span style={{ fontSize:11, color:TEAL, fontWeight:700 }}>✦ جديد</span>}
             {!outOfStock && product.label && window.PRODUCT_LABELS && (() => { const lbl=window.PRODUCT_LABELS.find(l=>l.id===product.label); return lbl&&lbl.id ? <span style={{ fontSize:11, fontWeight:800, color:lbl.color }}>{lbl.emoji} {lbl.label}</span> : null; })()}
           </div>
@@ -3401,9 +3402,9 @@
             <span style={{ fontWeight:900, fontSize:16, color:outOfStock?'#bbb':GREEN }}>{fmt(finalPrice)}</span>
             {!outOfStock && product.discount>0 && <span style={{ fontSize:11, color:'#bbb', textDecoration:'line-through' }}>{fmt(product.price)}</span>}
             {outOfStock ? (
-              <button disabled style={{ background:'var(--surface2)', color:'var(--text3)', border:'1px solid var(--border)', borderRadius:9, padding:'6px 12px', fontFamily:'Tajawal,sans-serif', fontSize:11, fontWeight:700, cursor:'not-allowed' }}>نفذ</button>
+              <button disabled style={{ background:'var(--surface2)', color:'var(--text3)', border:'1px solid var(--border)', borderRadius:9, padding:'6px 12px', fontFamily:'Almarai,sans-serif', fontSize:11, fontWeight:700, cursor:'not-allowed' }}>نفذ</button>
             ) : (
-              <button onClick={handleAdd} style={{ background:added?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:9, padding:'6px 14px', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:4, transition:'background 0.2s' }}>
+              <button onClick={handleAdd} style={{ background:added?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:9, padding:'6px 14px', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:4, transition:'background 0.2s' }}>
                 {added ? <><CheckIcon size={12} color="#fff"/> أُضيف</> : inCart>0 ? `(${inCart})+` : <><PlusIcon size={12} color="#fff"/> أضف</>}
               </button>
             )}
@@ -3420,16 +3421,16 @@
         {outOfStock ? (
           <div style={{ position:'absolute', top:10, left:10, zIndex:2, background:'#757575', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:12, fontWeight:800 }}>نفذت الكمية</div>
         ) : product.discount>0 ? (
-          <div style={{ position:'absolute', top:10, left:10, zIndex:2, background:'#e74c3c', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:12, fontWeight:800, display:'flex', alignItems:'center', gap:4 }}>
+          <div style={{ position:'absolute', top:10, left:10, zIndex:2, background:'#96cb3f', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:12, fontWeight:800, display:'flex', alignItems:'center', gap:4 }}>
             <TagIcon size={11} color="#fff"/>-{product.discount}%
           </div>
         ) : lowStock ? (
-          <div style={{ position:'absolute', top:10, left:10, zIndex:2, background: veryLow ? '#c0392b' : '#ff8f00', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none', display:'flex', alignItems:'center', gap:3 }}>
+          <div style={{ position:'absolute', top:10, left:10, zIndex:2, background: veryLow ? '#ef4444' : '#f97316', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none', display:'flex', alignItems:'center', gap:3 }}>
             🔥 آخر {product.stock} قطع!
           </div>
         ) : null}
         {!outOfStock && product.discount>0 && lowStock && (
-          <div style={{ position:'absolute', bottom:7, left:7, zIndex:2, background: veryLow ? '#c0392b' : '#ff8f00', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none', display:'flex', alignItems:'center', gap:3 }}>
+          <div style={{ position:'absolute', bottom:7, left:7, zIndex:2, background: veryLow ? '#ef4444' : '#f97316', color:'#fff', borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:800, animation: veryLow ? 'stockPulse 1s ease-in-out infinite' : 'none', display:'flex', alignItems:'center', gap:3 }}>
             🔥 آخر {product.stock} قطع!
           </div>
         )}
@@ -3470,9 +3471,9 @@
               {!outOfStock && product.discount>0 && <span style={{ fontSize:12, color:'#bbb', textDecoration:'line-through' }}>{fmt(product.price)}</span>}
             </div>
             {outOfStock ? (
-              <button disabled style={{ background:'#eeeeee', color:'#aaa', border:'none', borderRadius:11, padding:'8px 14px', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, cursor:'not-allowed', whiteSpace:'nowrap' }}>نفذ المخزون</button>
+              <button disabled style={{ background:'#eeeeee', color:'#aaa', border:'none', borderRadius:11, padding:'8px 14px', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, cursor:'not-allowed', whiteSpace:'nowrap' }}>نفذ المخزون</button>
             ) : (
-              <button onClick={handleAdd} style={{ background:added?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:11, padding:'8px 16px', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', transition:'all 0.2s', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:5 }}>
+              <button onClick={handleAdd} style={{ background:added?'#27ae60':GREEN, color:'#fff', border:'none', borderRadius:11, padding:'8px 16px', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer', transition:'all 0.2s', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:5 }}>
                 {added ? <><CheckIcon size={14} color="#fff"/> أُضيف</> : inCart>0 ? <><PlusIcon size={14} color="#fff"/> ({inCart})</> : <><PlusIcon size={14} color="#fff"/> أضف</>}
               </button>
             )}
@@ -3501,7 +3502,7 @@
             </div>
             <div style={{ display:'flex', gap:6 }}>
               {notifications.length>0 && (
-                <button onClick={onClear} style={{ background:'rgba(255,255,255,0.18)', border:'none', borderRadius:8, padding:'5px 11px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:11, fontWeight:700, color:'#fff' }}>مسح الكل</button>
+                <button onClick={onClear} style={{ background:'rgba(255,255,255,0.18)', border:'none', borderRadius:8, padding:'5px 11px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:11, fontWeight:700, color:'#fff' }}>مسح الكل</button>
               )}
               <button onClick={onClose} style={{ background:'rgba(255,255,255,0.18)', border:'none', borderRadius:'50%', width:32, height:32, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><XIcon size={15} color="#fff"/></button>
             </div>
@@ -3635,7 +3636,7 @@
                       <div style={{ fontSize:14, fontWeight:700, color:'var(--text)' }}>{product.name}</div>
                       <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                         <span style={{ fontSize:13, color:GREEN, fontWeight:800 }}>{fmt(price)}</span>
-                        <button onClick={()=>setOpenNoteId(openNoteId===product.id?null:product.id)} style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, color:cartNotes[product.id]?TEAL:'#ccc', fontFamily:'Tajawal,sans-serif', fontWeight:700, padding:0, display:'flex', alignItems:'center', gap:3 }}>
+                        <button onClick={()=>setOpenNoteId(openNoteId===product.id?null:product.id)} style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, color:cartNotes[product.id]?TEAL:'#ccc', fontFamily:'Almarai,sans-serif', fontWeight:700, padding:0, display:'flex', alignItems:'center', gap:3 }}>
                           📝{cartNotes[product.id]?<span style={{ fontSize:11, color:TEAL }}> ملاحظة ✓</span>:<span style={{ fontSize:11 }}> أضف ملاحظة</span>}
                         </button>
                       </div>
@@ -3648,7 +3649,7 @@
                   </div>
                   {openNoteId===product.id && (
                     <div style={{ marginTop:8 }}>
-                      <textarea value={cartNotes[product.id]||''} onChange={e=>setCartNotes(prev=>({...prev,[product.id]:e.target.value}))} placeholder="ملاحظة خاصة (مثال: بدون بصل، مقطّع شرائح...)" rows={2} style={{ width:'100%', padding:'8px 10px', border:'1.5px solid #e0e0e0', borderRadius:9, fontFamily:'Tajawal,sans-serif', fontSize:12, resize:'none', outline:'none', color:DARK, transition:'border-color 0.2s' }} onFocus={e=>e.target.style.borderColor=TEAL} onBlur={e=>e.target.style.borderColor='#e0e0e0'}/>
+                      <textarea value={cartNotes[product.id]||''} onChange={e=>setCartNotes(prev=>({...prev,[product.id]:e.target.value}))} placeholder="ملاحظة خاصة (مثال: بدون بصل، مقطّع شرائح...)" rows={2} style={{ width:'100%', padding:'8px 10px', border:'1.5px solid #e0e0e0', borderRadius:9, fontFamily:'Almarai,sans-serif', fontSize:12, resize:'none', outline:'none', color:DARK, transition:'border-color 0.2s' }} onFocus={e=>e.target.style.borderColor=TEAL} onBlur={e=>e.target.style.borderColor='#e0e0e0'}/>
                     </div>
                   )}
                 </div>
@@ -3679,7 +3680,7 @@
                             <span style={{ fontSize:13, fontWeight:700, color:'#333', flex:1 }}>{p.name}</span>
                             <span style={{ fontSize:12, fontWeight:800, color:GREEN }}>₪{eff.toFixed(2)}</span>
                             <button onClick={() => onUpdate(p.id, (cart[p.id]||0)+1)}
-                              style={{ background:cart[p.id]?GREEN:TEAL, color:'#fff', border:'none', borderRadius:8, padding:'5px 12px', cursor:'pointer', fontSize:12, fontWeight:800, fontFamily:'Tajawal,sans-serif', whiteSpace:'nowrap', flexShrink:0 }}>
+                              style={{ background:cart[p.id]?GREEN:TEAL, color:'#fff', border:'none', borderRadius:8, padding:'5px 12px', cursor:'pointer', fontSize:12, fontWeight:800, fontFamily:'Almarai,sans-serif', whiteSpace:'nowrap', flexShrink:0 }}>
                               {cart[p.id] ? `(${cart[p.id]}) +` : '+ أضف'}
                             </button>
                           </div>
@@ -3687,7 +3688,7 @@
                       })}
                       {aiTip.products.length > 1 && (
                         <button onClick={() => aiTip.products.forEach(p => onUpdate(p.id, (cart[p.id]||0)+1))}
-                          style={{ width:'100%', marginTop:2, background:`linear-gradient(135deg,${TEAL},${GREEN})`, color:'#fff', border:'none', borderRadius:10, padding:'8px', cursor:'pointer', fontSize:13, fontWeight:800, fontFamily:'Tajawal,sans-serif' }}>
+                          style={{ width:'100%', marginTop:2, background:`linear-gradient(135deg,${TEAL},${GREEN})`, color:'#fff', border:'none', borderRadius:10, padding:'8px', cursor:'pointer', fontSize:13, fontWeight:800, fontFamily:'Almarai,sans-serif' }}>
                           🛒 أضف الكل للسلة
                         </button>
                       )}
@@ -3736,7 +3737,7 @@
                     </div>
                     {!giftAdded ? (
                       <button onClick={()=>setGiftAdded(true)}
-                        style={{ width:'100%', background:'#f57f17', color:'#fff', border:'none', borderRadius:10, padding:'8px 0', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:800, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+                        style={{ width:'100%', background:'#f57f17', color:'#fff', border:'none', borderRadius:10, padding:'8px 0', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:800, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
                         <GiftIcon size={15} color="#fff"/> أضف هديتك المجانية
                       </button>
                     ) : (
@@ -3775,8 +3776,8 @@
                   <div style={{ display:'flex', gap:7 }}>
                     <input value={couponInput} onChange={e=>{setCouponInput(e.target.value);setCouponError('');}}
                       onKeyDown={e=>e.key==='Enter'&&applyCoupon()}
-                      placeholder="كود الخصم" style={{ flex:1, padding:'8px 12px', border:`2px solid ${couponError?'#e74c3c':'#e0e0e0'}`, borderRadius:9, fontFamily:'Tajawal,sans-serif', fontSize:13, outline:'none' }}/>
-                    <button onClick={applyCoupon} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:9, padding:'8px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700 }}>تطبيق</button>
+                      placeholder="كود الخصم" style={{ flex:1, padding:'8px 12px', border:`2px solid ${couponError?'#e74c3c':'#e0e0e0'}`, borderRadius:9, fontFamily:'Almarai,sans-serif', fontSize:13, outline:'none' }}/>
+                    <button onClick={applyCoupon} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:9, padding:'8px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700 }}>تطبيق</button>
                   </div>
                 )}
                 {couponError && <p style={{ fontSize:12, color:'#e74c3c', marginTop:4, marginBottom:0 }}>{couponError}</p>}
@@ -3810,7 +3811,7 @@
               </div>
               {waNumber && items.length>0 && (
                 <a href={`https://wa.me/${waNumber.replace(/\D/g,'')}?text=${encodeURIComponent(`🛒 طلبي من Top Quality Super Market:\n\n${items.map(({product,qty})=>{const p=product.discount>0?product.price*(1-product.discount/100):product.price;return `• ${product.name} ×${qty} — ${fmt(p*qty)}`;}).join('\n')}\n\n💰 الإجمالي: ${fmt(finalTotal)}\n\nأريد تأكيد هذا الطلب`)}`} target="_blank" rel="noopener noreferrer"
-                  style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:7, background:'#e8f5e9', border:'1.5px solid #a5d6a7', borderRadius:12, padding:'10px 14px', textDecoration:'none', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, color:'#2e7d32', marginBottom:10 }}>
+                  style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:7, background:'#e8f5e9', border:'1.5px solid #a5d6a7', borderRadius:12, padding:'10px 14px', textDecoration:'none', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, color:'#2e7d32', marginBottom:10 }}>
                   <WhatsAppIcon size={16} fill="#25D366"/> أرسل طلبك عبر واتساب
                 </a>
               )}
@@ -3819,7 +3820,7 @@
                   🔐 سجّل دخولك لإتمام الطلب والاستمتاع بنقاط الولاء
                 </div>
               )}
-              <button onClick={storeOpen && !isGuest ? ()=>setShowCheckout(true) : isGuest ? ()=>onCheckout() : undefined} style={{ width:'100%', padding:'13px', background:isGuest?'#f39c12':storeOpen?GREEN:'#ccc', color:'#fff', border:'none', borderRadius:13, fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, cursor:(storeOpen||isGuest)?'pointer':'not-allowed', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+              <button onClick={storeOpen && !isGuest ? ()=>setShowCheckout(true) : isGuest ? ()=>onCheckout() : undefined} style={{ width:'100%', padding:'13px', background:isGuest?'#f39c12':storeOpen?GREEN:'#ccc', color:'#fff', border:'none', borderRadius:13, fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, cursor:(storeOpen||isGuest)?'pointer':'not-allowed', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
                 {isGuest ? <><UserIcon size={18} color="#fff"/> سجّل الدخول للطلب</> : storeOpen ? <><ShoppingBagIcon size={18} color="#fff"/> إتمام الطلب</> : <><LockIcon size={18} color="#fff"/> المتجر مغلق</>}
               </button>
               {showCheckout && <CheckoutModal cart={cart} products={products} appliedCoupon={appliedCoupon} userProfile={userProfile||{}} onConfirm={(data)=>{ onCheckout({...data, loyaltyUsed:loyaltyDiscount, cartNotes}); setShowCheckout(false); setUseLoyalty(false); setCartNotes({}); }} onClose={()=>setShowCheckout(false)}/>}
@@ -3976,27 +3977,27 @@
       onLogin(newUser);
     };
 
-    const inp = (extra={}) => ({ width:'100%', padding:'12px 14px', borderRadius:12, border:`1.5px solid ${darkMode?'#2d3e50':'#dee2e6'}`, background:darkMode?'#1a2535':'#f8f9fa', color:darkMode?'#f1f5f9':'#2d3436', fontSize:15, outline:'none', fontFamily:'Tajawal,sans-serif', boxSizing:'border-box', ...extra });
+    const inp = (extra={}) => ({ width:'100%', padding:'12px 14px', borderRadius:12, border:`1.5px solid ${darkMode?'#2d3e50':'#dee2e6'}`, background:darkMode?'#1a2535':'#f8f9fa', color:darkMode?'#f1f5f9':'#2d3436', fontSize:15, outline:'none', fontFamily:'Almarai,sans-serif', boxSizing:'border-box', ...extra });
     const bg = darkMode ? '#1e293b' : '#fff';
     const clr = darkMode ? '#f1f5f9' : '#2d3436';
 
     return (
-      <div style={{ minHeight:'100vh', background:darkMode?'#0f172a':'linear-gradient(160deg,#8CC63F 0%,#1F9FB3 100%)', display:'flex', alignItems:'center', justifyContent:'center', padding:20, fontFamily:'Tajawal,sans-serif' }}>
+      <div style={{ minHeight:'100vh', background:darkMode?'#0f172a':'linear-gradient(160deg,#96cb3f 0%,#08a6cb 100%)', display:'flex', alignItems:'center', justifyContent:'center', padding:20, fontFamily:'Almarai,sans-serif' }}>
         <div style={{ background:bg, borderRadius:24, padding:'36px 28px', width:'100%', maxWidth:420, boxShadow:'0 24px 80px rgba(0,0,0,0.22)' }}>
           {/* Logo */}
           <div style={{ textAlign:'center', marginBottom:30 }}>
-            <div style={{ width:82, height:82, borderRadius:'50%', background:'linear-gradient(135deg,#8CC63F,#1F9FB3)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px', boxShadow:'0 8px 28px rgba(140,198,63,0.45)' }}>
+            <div style={{ width:82, height:82, borderRadius:'50%', background:'linear-gradient(135deg,#96cb3f,#08a6cb)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px', boxShadow:'0 8px 28px rgba(140,198,63,0.45)' }}>
               <StoreIcon size={42} color="#fff"/>
             </div>
             <h1 style={{ fontSize:24, fontWeight:900, color:clr, margin:0 }}>توب كواليتي</h1>
-            <p style={{ color:darkMode?'#94a3b8':'#78909c', fontSize:13, margin:'5px 0 0' }}>سوبر ماركت الجودة العالية</p>
+            <p style={{ color:darkMode?'#94a3b8':'#78909c', fontSize:13, margin:'5px 0 0' }}>الثقة تستحق جودة</p>
           </div>
 
           {/* Tabs */}
           <div style={{ display:'flex', background:darkMode?'#0f172a':'#f1f5f9', borderRadius:14, padding:4, marginBottom:26, gap:3 }}>
             {[['login','تسجيل الدخول'],['register','حساب جديد']].map(([m,label])=>(
               <button key={m} onClick={()=>switchMode(m)}
-                style={{ flex:1, padding:'10px 0', border:'none', borderRadius:11, fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:'Tajawal,sans-serif', background:mode===m?bg:'transparent', color:mode===m?clr:'#94a3b8', boxShadow:mode===m?'0 2px 10px rgba(0,0,0,0.1)':'none', transition:'all 0.2s' }}>{label}</button>
+                style={{ flex:1, padding:'10px 0', border:'none', borderRadius:11, fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:'Almarai,sans-serif', background:mode===m?bg:'transparent', color:mode===m?clr:'#94a3b8', boxShadow:mode===m?'0 2px 10px rgba(0,0,0,0.1)':'none', transition:'all 0.2s' }}>{label}</button>
             ))}
           </div>
 
@@ -4042,7 +4043,7 @@
 
           {/* Submit */}
           <button onClick={mode==='login'?doLogin:doRegister} disabled={loading}
-            style={{ width:'100%', marginTop:22, padding:'14px', borderRadius:14, border:'none', background:'linear-gradient(135deg,#8CC63F,#6ea82d)', color:'#fff', fontSize:16, fontWeight:800, cursor:loading?'not-allowed':'pointer', fontFamily:'Tajawal,sans-serif', boxShadow:'0 6px 20px rgba(140,198,63,0.4)', transition:'transform 0.15s', opacity:loading?0.75:1 }}
+            style={{ width:'100%', marginTop:22, padding:'14px', borderRadius:14, border:'none', background:'linear-gradient(135deg,#96cb3f,#6ea82d)', color:'#fff', fontSize:16, fontWeight:800, cursor:loading?'not-allowed':'pointer', fontFamily:'Almarai,sans-serif', boxShadow:'0 6px 20px rgba(140,198,63,0.4)', transition:'transform 0.15s', opacity:loading?0.75:1 }}
             onMouseEnter={e=>!loading&&(e.currentTarget.style.transform='scale(1.02)')} onMouseLeave={e=>e.currentTarget.style.transform=''}>
             {loading ? '⏳ جاري التحقق...' : mode==='login'?'🔐 تسجيل الدخول':'✅ إنشاء حساب'}
           </button>
@@ -4056,14 +4057,14 @@
 
           {/* Google Sign-In */}
           <button onClick={handleGoogleLogin}
-            style={{ width:'100%', padding:'12px', borderRadius:14, border:`1.5px solid ${darkMode?'#334155':'#e2e8f0'}`, background:darkMode?'#1e293b':'#fff', color:clr, fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'Tajawal,sans-serif', display:'flex', alignItems:'center', justifyContent:'center', gap:10, transition:'all 0.2s' }}
+            style={{ width:'100%', padding:'12px', borderRadius:14, border:`1.5px solid ${darkMode?'#334155':'#e2e8f0'}`, background:darkMode?'#1e293b':'#fff', color:clr, fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'Almarai,sans-serif', display:'flex', alignItems:'center', justifyContent:'center', gap:10, transition:'all 0.2s' }}
             onMouseEnter={e=>e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'} onMouseLeave={e=>e.currentTarget.style.boxShadow=''}>
             <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
             تسجيل الدخول بـ Google
           </button>
 
           {/* Guest */}
-          <button onClick={()=>onLogin({ id:'guest_'+Math.random().toString(36).slice(2,9), name:'ضيف', phone:'', email:'', isAdmin:false, isGuest:true })} style={{ width:'100%', marginTop:10, padding:'12px', borderRadius:14, border:`1.5px solid ${darkMode?'#334155':'#e2e8f0'}`, background:'transparent', color:darkMode?'#94a3b8':'#64748b', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'Tajawal,sans-serif', transition:'all 0.2s' }}>
+          <button onClick={()=>onLogin({ id:'guest_'+Math.random().toString(36).slice(2,9), name:'ضيف', phone:'', email:'', isAdmin:false, isGuest:true })} style={{ width:'100%', marginTop:10, padding:'12px', borderRadius:14, border:`1.5px solid ${darkMode?'#334155':'#e2e8f0'}`, background:'transparent', color:darkMode?'#94a3b8':'#64748b', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'Almarai,sans-serif', transition:'all 0.2s' }}>
             👤 متابعة كضيف
           </button>
 
@@ -4102,7 +4103,7 @@
       );
     }
     return (
-      <footer style={{ background:'linear-gradient(135deg,#1a2535 0%,#0f1923 100%)', color:'#fff', marginTop:60, fontFamily:'Tajawal,sans-serif', direction:'rtl' }}>
+      <footer style={{ background:'linear-gradient(135deg,#1a2535 0%,#0f1923 100%)', color:'#fff', marginTop:60, fontFamily:'Almarai,sans-serif', direction:'rtl' }}>
         <div style={{ maxWidth:1200, margin:'0 auto', padding:'48px 24px 0' }}>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:40, paddingBottom:40 }}>
 
@@ -4578,7 +4579,7 @@
     if (view==='admin') return <AdminPanel products={products} setProducts={setProducts} storeOpen={storeOpen} setStoreOpen={setStoreOpen} onExit={()=>setView('customer')} orders={orders} setOrders={setOrders} waNumber={waNumber} setWaNumber={setWaNumber} coupons={coupons} setCoupons={setCoupons} announcement={announcement} setAnnouncement={setAnnouncement} freeGiftConfig={freeGiftConfig} setFreeGiftConfig={setFreeGiftConfig} sendBroadcast={sendBroadcast}/>;
 
     return (
-      <div data-theme={darkMode?'dark':''} style={{ minHeight:'100vh', background:'var(--bg)', fontFamily:'Tajawal,sans-serif', color:'var(--text)' }}>
+      <div data-theme={darkMode?'dark':''} style={{ minHeight:'100vh', background:'var(--bg)', fontFamily:'Almarai,sans-serif', color:'var(--text)' }}>
         <style>{`
           @keyframes drawerIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
           @keyframes toastUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
@@ -4620,13 +4621,13 @@
               </div>
               {winW>768 && (
                 <div style={{ lineHeight:1.2 }}>
-                  <div style={{ fontWeight:900, fontSize:16, color:dm }}>Top Quality</div>
+                  <div style={{ fontWeight:900, fontSize:16, color:dm, fontFamily:"'Cairo',sans-serif" }}>Top Quality</div>
                   {(userProfile?.name || currentUser?.name) && !currentUser?.isGuest ? (
                     <div style={{ fontSize:10, color:TEAL, fontWeight:700 }}>{greeting}، {(userProfile.name||currentUser.name).split(' ')[0]}</div>
                   ) : currentUser?.isGuest ? (
                     <div style={{ fontSize:10, color:'#f39c12', fontWeight:700 }}>تصفح كضيف</div>
                   ) : (
-                    <div style={{ fontWeight:600, fontSize:11, color:TEAL, letterSpacing:'0.5px' }}>SUPER MARKET</div>
+                    <div style={{ fontWeight:600, fontSize:11, color:TEAL, letterSpacing:'0.5px', fontFamily:"'Cairo',sans-serif" }}>Quality You Can Trust</div>
                   )}
                 </div>
               )}
@@ -4639,7 +4640,7 @@
                 onFocus={e=>{ e.target.style.borderColor=GREEN; setShowSearchDrop(true); }}
                 onBlur={e=>{ e.target.style.borderColor='#eef0f2'; setTimeout(()=>setShowSearchDrop(false), 160); }}
                 onKeyDown={e=>{ if(e.key==='Escape'){ setShowSearchDrop(false); e.target.blur(); } if(e.key==='Enter'&&search.trim()){ addToHistory(search.trim()); setShowSearchDrop(false); } }}
-                style={{ width:'100%', padding:'10px 38px 10px 38px', border:'2px solid var(--border)', borderRadius:12, fontFamily:'Tajawal,sans-serif', fontSize:14, color:'var(--text)', outline:'none', transition:'border-color 0.2s', background:'var(--input-bg)' }}/>
+                style={{ width:'100%', padding:'10px 38px 10px 38px', border:'2px solid var(--border)', borderRadius:12, fontFamily:'Almarai,sans-serif', fontSize:14, color:'var(--text)', outline:'none', transition:'border-color 0.2s', background:'var(--input-bg)' }}/>
               <button onClick={startVoice} title="بحث صوتي" style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', zIndex:2, background:voiceActive?'#fce4ec':'transparent', border:'none', borderRadius:8, cursor:'pointer', display:'flex', alignItems:'center', padding:'4px', transition:'background 0.2s' }}>
                 <MicIcon size={17} color={voiceActive?'#e74c3c':'#bbb'}/>
               </button>
@@ -4654,7 +4655,7 @@
               {/* ── أزرار سطح المكتب فقط ── */}
               {winW>768 && installPrompt && (
                 <button onClick={()=>{ installPrompt.prompt(); installPrompt.userChoice.then(()=>setInstallPrompt(null)); }} title="تثبيت التطبيق"
-                  style={{ background:'#e8f5e9', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, color:GREEN, fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700 }}>
+                  style={{ background:'#e8f5e9', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:5, color:GREEN, fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700 }}>
                   <DownloadIcon size={16} color={GREEN}/> تثبيت
                 </button>
               )}
@@ -4695,7 +4696,7 @@
                 {unreadNotifCount>0 && <span style={{ position:'absolute', top:4, right:4, minWidth:17, height:17, borderRadius:9, background:'#e74c3c', border:'2px solid #fff', fontSize:9, fontWeight:900, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', padding:'0 2px' }}>{unreadNotifCount>9?'9+':unreadNotifCount}</span>}
               </button>
               {/* ── سلة التسوق (تظهر دائماً) ── */}
-              <button onClick={()=>setCartOpen(true)} style={{ background:cartCount>0?GREEN:'var(--bg)', border:'none', borderRadius:11, padding:'9px 14px', cursor:'pointer', display:'flex', alignItems:'center', gap:7, fontFamily:'Tajawal,sans-serif', fontWeight:800, fontSize:14, color:cartCount>0?'#fff':'var(--text2)', transition:'all 0.2s', position:'relative' }}>
+              <button onClick={()=>setCartOpen(true)} style={{ background:cartCount>0?GREEN:'var(--bg)', border:'none', borderRadius:11, padding:'9px 14px', cursor:'pointer', display:'flex', alignItems:'center', gap:7, fontFamily:'Almarai,sans-serif', fontWeight:800, fontSize:14, color:cartCount>0?'#fff':'var(--text2)', transition:'all 0.2s', position:'relative' }}>
                 <CartIcon size={18} color={cartCount>0?'#fff':'#888'}/>
                 {cartCount>0 && <span>{cartCount}</span>}
               </button>
@@ -4706,7 +4707,7 @@
               )}
               {winW>768 && (
                 currentUser.isGuest ? (
-                  <button onClick={onLogout} title="تسجيل الدخول" style={{ background:`linear-gradient(135deg,${GREEN},${TEAL})`, border:'none', borderRadius:11, padding:'8px 14px', cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.18s', color:'#fff', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700 }}>
+                  <button onClick={onLogout} title="تسجيل الدخول" style={{ background:`linear-gradient(135deg,${GREEN},${TEAL})`, border:'none', borderRadius:11, padding:'8px 14px', cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.18s', color:'#fff', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700 }}>
                     <UserIcon size={16} color="#fff"/> دخول / تسجيل
                   </button>
                 ) : (
@@ -4729,7 +4730,7 @@
                 const CatIco = window.CAT_ICONS && window.CAT_ICONS[cat.id];
                 const active = selectedCat===cat.id;
                 return (
-                  <button key={cat.id} onClick={()=>setSelectedCat(cat.id)} style={{ background:active?GREEN:'var(--surface2)', color:active?'#fff':'var(--text2)', border:'1.5px solid '+(active?GREEN:'var(--border)'), borderRadius:22, padding:'7px 16px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:active?800:600, whiteSpace:'nowrap', flexShrink:0, transition:'all 0.18s', display:'flex', alignItems:'center', gap:6 }}>
+                  <button key={cat.id} onClick={()=>setSelectedCat(cat.id)} style={{ background:active?GREEN:'var(--surface2)', color:active?'#fff':'var(--text2)', border:'1.5px solid '+(active?GREEN:'var(--border)'), borderRadius:22, padding:'7px 16px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:active?800:600, whiteSpace:'nowrap', flexShrink:0, transition:'all 0.18s', display:'flex', alignItems:'center', gap:6 }}>
                     {CatIco && <CatIco size={15} color={active?'#fff':'#777'}/>}
                     {cat.name}
                   </button>
@@ -4743,19 +4744,19 @@
           {/* شريط أدوات الجوال السريع */}
           {winW<=768 && (
             <div style={{ display:'flex', gap:8, marginBottom:12, overflowX:'auto', paddingBottom:4 }}>
-              <button onClick={()=>setShowFilters(v=>!v)} style={{ background:(showFilters||hasActiveFilters)?GREEN+'22':'#fff', color:(showFilters||hasActiveFilters)?GREEN:'#666', border:`1.5px solid ${(showFilters||hasActiveFilters)?GREEN:'#e0e0e0'}`, borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0, whiteSpace:'nowrap' }}>
+              <button onClick={()=>setShowFilters(v=>!v)} style={{ background:(showFilters||hasActiveFilters)?GREEN+'22':'#fff', color:(showFilters||hasActiveFilters)?GREEN:'#666', border:`1.5px solid ${(showFilters||hasActiveFilters)?GREEN:'#e0e0e0'}`, borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0, whiteSpace:'nowrap' }}>
                 <SlidersIcon size={14} color={(showFilters||hasActiveFilters)?GREEN:'#888'}/>
                 فلتر {hasActiveFilters?'●':''}
               </button>
-              <button onClick={()=>setListView(v=>!v)} style={{ background:listView?GREEN+'22':'#fff', color:listView?GREEN:'#666', border:`1.5px solid ${listView?GREEN:'#e0e0e0'}`, borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
+              <button onClick={()=>setListView(v=>!v)} style={{ background:listView?GREEN+'22':'#fff', color:listView?GREEN:'#666', border:`1.5px solid ${listView?GREEN:'#e0e0e0'}`, borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
                 {listView ? <GridIcon size={13} color={GREEN}/> : <ListIcon size={13} color="#888"/>}
                 {listView?'شبكة':'قائمة'}
               </button>
-              <button onClick={()=>setShowShoppingList(true)} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
+              <button onClick={()=>setShowShoppingList(true)} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
                 <ListCheckIcon size={13} color="#888"/> قائمة التسوق
               </button>
               {currentUser?.isAdmin && (
-                <button onClick={()=>setView('admin')} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
+                <button onClick={()=>setView('admin')} style={{ background:'#fff', color:'#666', border:'1.5px solid #e0e0e0', borderRadius:20, padding:'6px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5, flexShrink:0 }}>
                   <SettingsIcon size={13} color="#888"/> الإدارة
                 </button>
               )}
@@ -4776,7 +4777,7 @@
                     <div style={{ fontSize:12, color:'#666', marginTop:2 }}>{itemCount} منتج · {fmt(lastOrder.total)}</div>
                   </div>
                 </div>
-                <button onClick={()=>{ validItems.forEach(item=>{ setCart(prev=>({...prev,[item.id]:(prev[item.id]||0)+item.qty})); }); showToast(`✅ تمت إضافة ${validItems.length} منتج إلى السلة`); }} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:11, padding:'9px 20px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:700, flexShrink:0 }}>
+                <button onClick={()=>{ validItems.forEach(item=>{ setCart(prev=>({...prev,[item.id]:(prev[item.id]||0)+item.qty})); }); showToast(`✅ تمت إضافة ${validItems.length} منتج إلى السلة`); }} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:11, padding:'9px 20px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700, flexShrink:0 }}>
                   أضف للسلة
                 </button>
               </div>
@@ -4794,7 +4795,7 @@
                   </div>
                 </div>
               </div>
-              <button onClick={doCheckIn} style={{ background:'linear-gradient(135deg,#f39c12,#f1c40f)', color:'#fff', border:'none', borderRadius:11, padding:'9px 20px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:13, fontWeight:800, flexShrink:0, boxShadow:'0 3px 10px rgba(243,156,18,0.35)' }}>
+              <button onClick={doCheckIn} style={{ background:'linear-gradient(135deg,#f39c12,#f1c40f)', color:'#fff', border:'none', borderRadius:11, padding:'9px 20px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:800, flexShrink:0, boxShadow:'0 3px 10px rgba(243,156,18,0.35)' }}>
                 +{checkInStreak>=7?15:checkInStreak>=3?10:5} نقطة 🎉
               </button>
             </div>
@@ -4815,7 +4816,7 @@
               </h2>
               <span style={{ background:GREEN+'18', color:GREEN, borderRadius:20, padding:'3px 12px', fontSize:13, fontWeight:700 }}>{filteredProducts.length} منتج</span>
               {showFavs && filteredProducts.length>0 && (
-                <button onClick={()=>filteredProducts.forEach(p=>addToCart(p))} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:20, padding:'5px 14px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5 }}>
+                <button onClick={()=>filteredProducts.forEach(p=>addToCart(p))} style={{ background:GREEN, color:'#fff', border:'none', borderRadius:20, padding:'5px 14px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:12, fontWeight:700, display:'flex', alignItems:'center', gap:5 }}>
                   <CartIcon size={13} color="#fff"/> أضف الكل للسلة
                 </button>
               )}
@@ -4847,7 +4848,7 @@
         }}/>
 
         {winW > 768 && (
-          <button onClick={()=>setShowAI(true)} style={{ position:'fixed', bottom:compareList.length>0?86:28, left:28, zIndex:500, background:`linear-gradient(135deg,${TEAL},#0b7d96)`, color:'#fff', border:'none', borderRadius:26, padding:'14px 22px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:`0 6px 24px rgba(31,159,179,0.45)`, transition:'all 0.25s' }}
+          <button onClick={()=>setShowAI(true)} style={{ position:'fixed', bottom:compareList.length>0?86:28, left:28, zIndex:500, background:`linear-gradient(135deg,${TEAL},#0b7d96)`, color:'#fff', border:'none', borderRadius:26, padding:'14px 22px', cursor:'pointer', fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:`0 6px 24px rgba(31,159,179,0.45)`, transition:'all 0.25s' }}
             onMouseEnter={e=>e.currentTarget.style.transform='scale(1.06)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
             <BotIcon size={20} color="#fff"/> مساعد ذكي
           </button>
@@ -4865,7 +4866,7 @@
         {selectedProduct && <ProductDetailModal product={selectedProduct} products={products} cart={cart} onClose={()=>setSelectedProduct(null)} onAdd={addToCart} onFav={toggleFav} isFav={favorites.has(selectedProduct.id)} inCart={cart[selectedProduct.id]||0} onUpdate={updateCart} onSelect={openProduct} rating={productRatings[selectedProduct.id]} myRating={myRatings[selectedProduct.id]} onRate={(s)=>rateProduct(selectedProduct.id,s)} reviews={textReviews[selectedProduct.id]||[]} onAddReview={(r)=>addReview({...r, productId:selectedProduct.id})}/>}
         {waNumber && (
           <a href={`https://wa.me/${waNumber.replace(/\D/g,'')}?text=${encodeURIComponent('مرحباً، أريد الاستفسار عن منتجاتكم')}`} target="_blank" rel="noopener noreferrer"
-            style={{ position:'fixed', bottom: winW<=768 ? 74 : (compareList.length>0?86:28), right:winW<=768?14:28, zIndex:500, background:'#25D366', color:'#fff', borderRadius:winW<=768?'50%':26, padding:winW<=768?'12px':('14px 20px'), textDecoration:'none', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:'0 6px 24px rgba(37,211,102,0.45)', transition:'all 0.25s', width:winW<=768?50:undefined, height:winW<=768?50:undefined, justifyContent:winW<=768?'center':undefined }}
+            style={{ position:'fixed', bottom: winW<=768 ? 74 : (compareList.length>0?86:28), right:winW<=768?14:28, zIndex:500, background:'#25D366', color:'#fff', borderRadius:winW<=768?'50%':26, padding:winW<=768?'12px':('14px 20px'), textDecoration:'none', fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:'0 6px 24px rgba(37,211,102,0.45)', transition:'all 0.25s', width:winW<=768?50:undefined, height:winW<=768?50:undefined, justifyContent:winW<=768?'center':undefined }}
             onMouseEnter={e=>e.currentTarget.style.transform='scale(1.06)'} onMouseLeave={e=>e.currentTarget.style.transform=''}>
             <WhatsAppIcon size={winW<=768?22:20}/>{winW>768 && ' واتساب'}
           </a>
@@ -4905,7 +4906,7 @@
     render() {
       if (!this.state.hasError) return this.props.children;
       return (
-        <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(160deg,#8CC63F,#1F9FB3)', fontFamily:'Tajawal,sans-serif', padding:24 }}>
+        <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(160deg,#96cb3f,#08a6cb)', fontFamily:'Almarai,sans-serif', padding:24 }}>
           <div style={{ background:'#fff', borderRadius:24, padding:'36px 28px', maxWidth:420, width:'100%', textAlign:'center', boxShadow:'0 24px 60px rgba(0,0,0,0.18)' }}>
             <div style={{ fontSize:52, marginBottom:16 }}>⚠️</div>
             <h2 style={{ fontSize:20, fontWeight:900, color:'#2d3436', marginBottom:10 }}>حدث خطأ غير متوقع</h2>
@@ -4913,7 +4914,7 @@
               نعتذر عن الإزعاج. يمكنك إعادة تحميل الصفحة لإصلاح المشكلة.
             </p>
             <button onClick={()=>window.location.reload()}
-              style={{ background:'linear-gradient(135deg,#8CC63F,#6ea82d)', color:'#fff', border:'none', borderRadius:14, padding:'13px 32px', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, cursor:'pointer', boxShadow:'0 4px 16px rgba(140,198,63,0.4)' }}>
+              style={{ background:'linear-gradient(135deg,#96cb3f,#6ea82d)', color:'#fff', border:'none', borderRadius:14, padding:'13px 32px', fontFamily:'Almarai,sans-serif', fontSize:15, fontWeight:800, cursor:'pointer', boxShadow:'0 4px 16px rgba(140,198,63,0.4)' }}>
               🔄 إعادة تحميل الصفحة
             </button>
           </div>
