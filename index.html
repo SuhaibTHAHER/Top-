@@ -134,33 +134,37 @@
   <!-- ── Splash loader (shown during Babel compile) ── -->
   <div id="app-loader" style="
     position:fixed;inset:0;z-index:9999;
-    background:linear-gradient(160deg,#96cb3f 0%,#08a6cb 100%);
+    background:#f7faef;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    font-family:Almarai,sans-serif;gap:0;
+    font-family:'Cairo',sans-serif;gap:0;
     transition:opacity 0.4s ease;
   ">
-    <div style="width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.2);
-      display:flex;align-items:center;justify-content:center;margin-bottom:22px;
-      animation:splashPulse 1.5s ease-in-out infinite;">
-      <svg width="50" height="50" viewBox="0 0 24 24" fill="none"
-        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
+    <!-- Logo -->
+    <img src="logo.png" alt="Top Quality Super Market"
+      style="width:180px;height:auto;margin-bottom:32px;animation:splashPulse 2s ease-in-out infinite;"/>
+
+    <!-- Cart rolling animation -->
+    <div style="position:relative;width:200px;height:48px;margin-bottom:24px;overflow:visible;">
+      <!-- trail dots -->
+      <span style="position:absolute;top:32px;left:10px;width:8px;height:8px;border-radius:50%;background:#96cb3f;animation:trailDot 1.4s 0.4s ease-in-out infinite;"></span>
+      <span style="position:absolute;top:32px;left:32px;width:8px;height:8px;border-radius:50%;background:#96cb3f;animation:trailDot 1.4s 0.25s ease-in-out infinite;"></span>
+      <span style="position:absolute;top:32px;left:54px;width:8px;height:8px;border-radius:50%;background:#96cb3f;animation:trailDot 1.4s 0.1s ease-in-out infinite;"></span>
+      <!-- cart -->
+      <div style="position:absolute;right:0;top:0;animation:cartRoll 1.4s ease-in-out infinite;">
+        <svg width="52" height="40" viewBox="0 0 24 24" fill="none" stroke="#08a6cb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1" fill="#96cb3f" stroke="none"/>
+          <circle cx="20" cy="21" r="1" fill="#96cb3f" stroke="none"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/>
+        </svg>
+      </div>
     </div>
-    <h1 style="color:#fff;font-size:24px;font-weight:900;margin:0 0 6px;font-family:'Cairo',sans-serif;">توب كواليتي</h1>
-    <p style="color:rgba(255,255,255,0.75);font-size:14px;margin:0 0 28px;font-family:'Cairo',sans-serif;">الثقة تستحق جودة</p>
-    <div style="display:flex;gap:8px;">
-      <span style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.9);
-        animation:splashDot 1.2s ease-in-out infinite;"></span>
-      <span style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.9);
-        animation:splashDot 1.2s ease-in-out 0.2s infinite;"></span>
-      <span style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.9);
-        animation:splashDot 1.2s ease-in-out 0.4s infinite;"></span>
-    </div>
+
+    <p style="color:#64748b;font-size:14px;margin:0;font-family:'Cairo',sans-serif;letter-spacing:0.5px;">الثقة تستحق جودة</p>
+
     <style>
-      @keyframes splashPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.07);opacity:.85}}
-      @keyframes splashDot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-8px);opacity:1}}
+      @keyframes splashPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.9}}
+      @keyframes cartRoll{0%,100%{transform:translateX(0)}50%{transform:translateX(-120px)}}
+      @keyframes trailDot{0%,100%{opacity:0;transform:scale(0.4)}50%{opacity:1;transform:scale(1)}}
     </style>
   </div>
 
@@ -3977,20 +3981,23 @@
       onLogin(newUser);
     };
 
-    const inp = (extra={}) => ({ width:'100%', padding:'12px 14px', borderRadius:12, border:`1.5px solid ${darkMode?'#2d3e50':'#dee2e6'}`, background:darkMode?'#1a2535':'#f8f9fa', color:darkMode?'#f1f5f9':'#2d3436', fontSize:15, outline:'none', fontFamily:'Almarai,sans-serif', boxSizing:'border-box', ...extra });
+    const inp = (extra={}) => ({ width:'100%', padding:'13px 16px', borderRadius:12, border:`1.5px solid ${darkMode?'#2d3e50':'#d1d5db'}`, background:darkMode?'#1a2535':'#fff', color:darkMode?'#f1f5f9':'#1a1a1a', fontSize:15, outline:'none', fontFamily:'Almarai,sans-serif', boxSizing:'border-box', transition:'border-color 0.2s, box-shadow 0.2s', ...extra });
     const bg = darkMode ? '#1e293b' : '#fff';
-    const clr = darkMode ? '#f1f5f9' : '#2d3436';
+    const clr = darkMode ? '#f1f5f9' : '#1a1a1a';
 
     return (
-      <div style={{ minHeight:'100vh', background:darkMode?'#0f172a':'linear-gradient(160deg,#96cb3f 0%,#08a6cb 100%)', display:'flex', alignItems:'center', justifyContent:'center', padding:20, fontFamily:'Almarai,sans-serif' }}>
-        <div style={{ background:bg, borderRadius:24, padding:'36px 28px', width:'100%', maxWidth:420, boxShadow:'0 24px 80px rgba(0,0,0,0.22)' }}>
+      <div style={{ minHeight:'100vh', background:darkMode?'#0f172a':'#f7faef', display:'flex', alignItems:'center', justifyContent:'center', padding:20, fontFamily:'Almarai,sans-serif', position:'relative', overflow:'hidden' }}>
+        {/* decorative circles */}
+        {!darkMode && <>
+          <div style={{ position:'absolute', top:-80, right:-80, width:280, height:280, borderRadius:'50%', background:'rgba(8,166,203,0.08)', pointerEvents:'none' }}/>
+          <div style={{ position:'absolute', bottom:-60, left:-60, width:220, height:220, borderRadius:'50%', background:'rgba(150,203,63,0.1)', pointerEvents:'none' }}/>
+        </>}
+        <div style={{ background:bg, borderRadius:28, padding:'40px 32px 36px', width:'100%', maxWidth:420, boxShadow: darkMode?'0 24px 80px rgba(0,0,0,0.5)':'0 16px 60px rgba(8,166,203,0.15)', position:'relative', zIndex:1 }}>
           {/* Logo */}
-          <div style={{ textAlign:'center', marginBottom:30 }}>
-            <div style={{ width:82, height:82, borderRadius:'50%', background:'linear-gradient(135deg,#96cb3f,#08a6cb)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px', boxShadow:'0 8px 28px rgba(140,198,63,0.45)' }}>
-              <StoreIcon size={42} color="#fff"/>
-            </div>
-            <h1 style={{ fontSize:24, fontWeight:900, color:clr, margin:0 }}>توب كواليتي</h1>
-            <p style={{ color:darkMode?'#94a3b8':'#78909c', fontSize:13, margin:'5px 0 0' }}>الثقة تستحق جودة</p>
+          <div style={{ textAlign:'center', marginBottom:32 }}>
+            <img src="logo.png" alt="Top Quality Super Market"
+              style={{ width:150, height:'auto', marginBottom:10, filter: darkMode ? 'brightness(0) invert(1)' : 'none' }}/>
+            <p style={{ color:darkMode?'#94a3b8':'#64748b', fontSize:13, margin:0, fontFamily:"'Cairo',sans-serif", letterSpacing:'0.5px' }}>الثقة تستحق جودة | Quality You Can Trust</p>
           </div>
 
           {/* Tabs */}
@@ -4043,9 +4050,9 @@
 
           {/* Submit */}
           <button onClick={mode==='login'?doLogin:doRegister} disabled={loading}
-            style={{ width:'100%', marginTop:22, padding:'14px', borderRadius:14, border:'none', background:'linear-gradient(135deg,#96cb3f,#6ea82d)', color:'#fff', fontSize:16, fontWeight:800, cursor:loading?'not-allowed':'pointer', fontFamily:'Almarai,sans-serif', boxShadow:'0 6px 20px rgba(140,198,63,0.4)', transition:'transform 0.15s', opacity:loading?0.75:1 }}
-            onMouseEnter={e=>!loading&&(e.currentTarget.style.transform='scale(1.02)')} onMouseLeave={e=>e.currentTarget.style.transform=''}>
-            {loading ? '⏳ جاري التحقق...' : mode==='login'?'🔐 تسجيل الدخول':'✅ إنشاء حساب'}
+            style={{ width:'100%', marginTop:24, padding:'15px', borderRadius:12, border:'none', background:loading?'#94a3b8':'#08a6cb', color:'#fff', fontSize:16, fontWeight:800, cursor:loading?'not-allowed':'pointer', fontFamily:"'Cairo',sans-serif", boxShadow:loading?'none':'0 6px 20px rgba(8,166,203,0.4)', transition:'all 0.2s', opacity:loading?0.8:1, letterSpacing:'0.5px' }}
+            onMouseEnter={e=>!loading&&(e.currentTarget.style.background='#158fa6')} onMouseLeave={e=>!loading&&(e.currentTarget.style.background='#08a6cb')}>
+            {loading ? '⏳ جاري التحقق...' : mode==='login'?'تسجيل الدخول':'إنشاء حساب جديد'}
           </button>
 
           {/* Divider */}
@@ -4109,14 +4116,9 @@
 
             {/* عمود 1: عن المتجر */}
             <div>
-              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18 }}>
-                <div style={{ width:48, height:48, borderRadius:14, background:`linear-gradient(135deg,${GREEN},${TEAL})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                  <CartIcon size={24} color="#fff"/>
-                </div>
-                <div>
-                  <div style={{ fontWeight:900, fontSize:18, color:'#fff', lineHeight:1.2 }}>توب كواليتي</div>
-                  <div style={{ fontSize:11, color:'#64748b', letterSpacing:'0.5px' }}>TOP QUALITY SUPER MARKET</div>
-                </div>
+              <div style={{ marginBottom:18 }}>
+                <img src="logo.png" alt="Top Quality Super Market"
+                  style={{ height:64, width:'auto', filter:'brightness(0) invert(1)', display:'block' }}/>
               </div>
               <p style={{ fontSize:14, color:'#94a3b8', lineHeight:1.9, marginBottom:20 }}>
                 جودة عالية بأسعار منافسة. نوفّر أفضل المنتجات الطازجة والغذائية مع توصيل سريع لباب بيتك.
@@ -4615,21 +4617,16 @@
 
         <header style={{ background:'var(--surface)', boxShadow:'0 2px 14px rgba(0,0,0,0.1)', position:'sticky', top:0, zIndex:200 }}>
           <div style={{ maxWidth:1200, margin:'0 auto', padding:winW<=768?'10px 14px':'12px 20px', display:'flex', alignItems:'center', gap:winW<=768?10:14 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
-              <div style={{ width:winW<=768?38:46, height:winW<=768?38:46, borderRadius:13, background:`linear-gradient(135deg,${GREEN},${TEAL})`, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <CartIcon size={winW<=768?20:24} color="#fff"/>
-              </div>
-              {winW>768 && (
-                <div style={{ lineHeight:1.2 }}>
-                  <div style={{ fontWeight:900, fontSize:16, color:dm, fontFamily:"'Cairo',sans-serif" }}>Top Quality</div>
-                  {(userProfile?.name || currentUser?.name) && !currentUser?.isGuest ? (
-                    <div style={{ fontSize:10, color:TEAL, fontWeight:700 }}>{greeting}، {(userProfile.name||currentUser.name).split(' ')[0]}</div>
-                  ) : currentUser?.isGuest ? (
-                    <div style={{ fontSize:10, color:'#f39c12', fontWeight:700 }}>تصفح كضيف</div>
-                  ) : (
-                    <div style={{ fontWeight:600, fontSize:11, color:TEAL, letterSpacing:'0.5px', fontFamily:"'Cairo',sans-serif" }}>Quality You Can Trust</div>
-                  )}
+            <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
+              <img src="logo.png" alt="Top Quality Super Market"
+                style={{ height:winW<=768?38:46, width:'auto', display:'block' }}/>
+              {winW>768 && (userProfile?.name||currentUser?.name) && !currentUser?.isGuest && (
+                <div style={{ fontSize:12, color:TEAL, fontWeight:700, fontFamily:"'Cairo',sans-serif" }}>
+                  {greeting}، {(userProfile?.name||currentUser?.name||'').split(' ')[0]}
                 </div>
+              )}
+              {winW>768 && currentUser?.isGuest && (
+                <div style={{ fontSize:11, color:'#f39c12', fontWeight:700, fontFamily:"'Cairo',sans-serif" }}>تصفح كضيف</div>
               )}
             </div>
             <div style={{ flex:1, position:'relative' }}>

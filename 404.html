@@ -7,28 +7,52 @@
   <meta name="robots" content="noindex"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Almarai:wght@400;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Almarai:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Almarai', sans-serif;
-      background: linear-gradient(160deg, #96cb3f 0%, #08a6cb 100%);
+      background: #f7faef;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
       direction: rtl;
+      overflow: hidden;
+    }
+
+    /* Decorative background circles */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -100px; right: -100px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: rgba(8, 166, 203, 0.07);
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -80px; left: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: rgba(150, 203, 63, 0.1);
+      pointer-events: none;
     }
 
     .card {
       background: #fff;
       border-radius: 28px;
-      padding: 52px 36px 42px;
-      max-width: 520px;
+      padding: 52px 36px 44px;
+      max-width: 500px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.18);
+      box-shadow: 0 16px 60px rgba(8, 166, 203, 0.13);
+      position: relative;
+      z-index: 1;
       animation: cardUp 0.5s cubic-bezier(.22,.68,0,1.2) both;
     }
 
@@ -37,46 +61,75 @@
       to   { opacity:1; transform: translateY(0)    scale(1);    }
     }
 
-    .cart-icon-wrap {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #96cb3f, #08a6cb);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    /* Cart illustration */
+    .cart-wrap {
+      position: relative;
+      width: 140px;
+      height: 120px;
       margin: 0 auto 24px;
-      animation: float 3s ease-in-out infinite;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0);   }
-      50%       { transform: translateY(-8px); }
+    .cart-svg {
+      animation: cartFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes cartFloat {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    /* Shadow under cart */
+    .cart-shadow {
+      width: 80px;
+      height: 10px;
+      background: rgba(8,166,203,0.15);
+      border-radius: 50%;
+      margin: 0 auto;
+      animation: shadowPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes shadowPulse {
+      0%, 100% { transform: scaleX(1);   opacity: 0.5; }
+      50%       { transform: scaleX(0.7); opacity: 0.2; }
+    }
+
+    /* Spilled items (dots) around cart */
+    .item {
+      position: absolute;
+      border-radius: 50%;
+      animation: itemBounce 2.5s ease-in-out infinite;
+    }
+
+    @keyframes itemBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%       { transform: translateY(-6px) rotate(15deg); }
     }
 
     .code-404 {
-      font-size: 90px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 88px;
       font-weight: 900;
-      background: linear-gradient(135deg, #96cb3f, #08a6cb);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #08a6cb;
       line-height: 1;
-      margin-bottom: 12px;
-      letter-spacing: -3px;
+      margin-bottom: 8px;
+      letter-spacing: -4px;
     }
 
-    h1, h2, h3 { font-family: 'Cairo', sans-serif; }
+    .code-404 span {
+      color: #96cb3f;
+    }
+
     h1 {
-      font-size: 22px;
-      font-weight: 800;
-      color: #2d3436;
-      margin-bottom: 12px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 10px;
     }
 
-    p {
-      font-size: 15px;
-      color: #78909c;
+    .sub {
+      font-size: 14px;
+      color: #64748b;
       line-height: 1.8;
       margin-bottom: 32px;
     }
@@ -86,18 +139,18 @@
       gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 36px;
+      margin-bottom: 32px;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 13px 26px;
-      border-radius: 14px;
-      font-family: 'Tajawal', sans-serif;
+      padding: 13px 28px;
+      border-radius: 12px;
+      font-family: 'Cairo', sans-serif;
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
       text-decoration: none;
       cursor: pointer;
       border: none;
@@ -105,24 +158,25 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #96cb3f, #6ea82d);
+      background: #08a6cb;
       color: #fff;
-      box-shadow: 0 6px 20px rgba(140,198,63,0.4);
+      box-shadow: 0 6px 20px rgba(8,166,203,0.35);
     }
 
     .btn-primary:hover {
+      background: #158fa6;
       transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(140,198,63,0.5);
+      box-shadow: 0 10px 28px rgba(8,166,203,0.45);
     }
 
     .btn-secondary {
-      background: #f4f6f8;
-      color: #546e7a;
-      border: 1.5px solid #e0e6ed;
+      background: #f1f8e9;
+      color: #4a7c20;
+      border: 1.5px solid #c6e48b;
     }
 
     .btn-secondary:hover {
-      background: #e8ecf0;
+      background: #e6f4d7;
       transform: translateY(-2px);
     }
 
@@ -130,24 +184,16 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       color: #b0bec5;
       font-size: 13px;
     }
 
-    .divider::before,
-    .divider::after {
+    .divider::before, .divider::after {
       content: '';
       flex: 1;
       height: 1px;
-      background: #e8ecf0;
-    }
-
-    .suggestion-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #546e7a;
-      margin-bottom: 14px;
+      background: #e8f0fe;
     }
 
     .cat-grid {
@@ -157,7 +203,7 @@
     }
 
     .cat-item {
-      background: #f8f9fa;
+      background: #f7faef;
       border-radius: 12px;
       padding: 12px 6px;
       text-align: center;
@@ -170,9 +216,9 @@
     }
 
     .cat-item:hover {
-      border-color: #96cb3f;
-      background: #f1f8e9;
-      color: #5a9223;
+      border-color: #08a6cb;
+      background: #e0f7fb;
+      color: #08a6cb;
     }
 
     .cat-item .emoji {
@@ -181,77 +227,77 @@
       margin-bottom: 5px;
     }
 
-    .footer-note {
-      font-size: 12px;
-      color: #cfd8dc;
-      margin-top: 28px;
+    .logo {
+      width: 110px;
+      height: auto;
+      margin: 28px auto 0;
+      display: block;
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
   <div class="card">
 
-    <!-- Cart icon -->
-    <div class="cart-icon-wrap">
-      <svg width="44" height="44" viewBox="0 0 24 24" fill="none"
-        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9"  cy="21" r="1" fill="white" stroke="none"/>
-        <circle cx="20" cy="21" r="1" fill="white" stroke="none"/>
-        <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/>
+    <!-- Floating cart illustration -->
+    <div class="cart-wrap">
+      <!-- Spilled items -->
+      <div class="item" style="width:14px;height:14px;background:#96cb3f;top:60px;left:8px;animation-delay:0.2s;"></div>
+      <div class="item" style="width:10px;height:10px;background:#08a6cb;top:75px;left:28px;animation-delay:0.5s;border-radius:3px;"></div>
+      <div class="item" style="width:12px;height:12px;background:#f97316;top:65px;right:10px;animation-delay:0.8s;"></div>
+      <div class="item" style="width:8px;height:8px;background:#96cb3f;top:80px;right:30px;animation-delay:0.3s;"></div>
+
+      <!-- Cart SVG -->
+      <svg class="cart-svg" width="140" height="90" viewBox="0 0 140 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Cart body -->
+        <path d="M20 15 L35 15 L52 62 A4 4 0 0 0 56 65 L118 65 A4 4 0 0 0 122 62 L135 28 L40 28" stroke="#08a6cb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- Cart bottom bar -->
+        <line x1="52" y1="65" x2="122" y2="65" stroke="#08a6cb" stroke-width="4" stroke-linecap="round"/>
+        <!-- Wheels -->
+        <circle cx="65" cy="80" r="8" fill="#96cb3f"/>
+        <circle cx="65" cy="80" r="4" fill="#fff"/>
+        <circle cx="110" cy="80" r="8" fill="#96cb3f"/>
+        <circle cx="110" cy="80" r="4" fill="#fff"/>
+        <!-- Quality badge -->
+        <circle cx="108" cy="36" r="14" fill="#08a6cb" stroke="#fff" stroke-width="2"/>
+        <path d="M102 36 L106 40 L114 32" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Speed lines -->
+        <line x1="8"  y1="30" x2="32" y2="30" stroke="#96cb3f" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+        <line x1="2"  y1="42" x2="26" y2="42" stroke="#96cb3f" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+        <line x1="8"  y1="54" x2="28" y2="54" stroke="#96cb3f" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/>
       </svg>
+
+      <div class="cart-shadow"></div>
     </div>
 
-    <!-- 404 code -->
-    <div class="code-404">404</div>
+    <!-- 404 number -->
+    <div class="code-404">4<span>0</span>4</div>
 
-    <!-- Title and message -->
-    <h1>عذراً! هذه الصفحة غير موجودة</h1>
-    <p>
-      ربما تم نقل الصفحة أو حذف الرابط.<br/>
-      لكن متجرنا مليء بأفضل المنتجات التي تنتظرك! 🛒
+    <h1>عذراً! الصفحة غير موجودة</h1>
+    <p class="sub">
+      ربما تم نقل هذه الصفحة أو حذفها.<br/>
+      لكن متجرنا مليء بأفضل المنتجات تنتظرك! 🛒
     </p>
 
-    <!-- Buttons -->
     <div class="btn-row">
-      <a href="/" class="btn btn-primary">
-        🏠 العودة للرئيسية
-      </a>
-      <a href="/" onclick="setTimeout(()=>document.querySelector('[placeholder]')&&document.querySelector('[placeholder]').focus(),300)" class="btn btn-secondary">
-        🔍 بحث المنتجات
-      </a>
+      <a href="/" class="btn btn-primary">🏠 العودة للرئيسية</a>
+      <a href="/" class="btn btn-secondary">🏷️ تصفح العروض</a>
     </div>
 
-    <div class="divider">أو تصفح أقسامنا مباشرة</div>
+    <div class="divider">أو اختر قسماً مباشرة</div>
 
-    <!-- Category quick links -->
     <div class="cat-grid">
-      <a href="/" class="cat-item">
-        <span class="emoji">🥦</span>خضار وفواكه
-      </a>
-      <a href="/" class="cat-item">
-        <span class="emoji">🥛</span>ألبان
-      </a>
-      <a href="/" class="cat-item">
-        <span class="emoji">🥩</span>لحوم
-      </a>
-      <a href="/" class="cat-item">
-        <span class="emoji">🥤</span>مشروبات
-      </a>
-      <a href="/" class="cat-item">
-        <span class="emoji">🍞</span>مخبوزات
-      </a>
-      <a href="/" class="cat-item">
-        <span class="emoji">🍫</span>مسليات
-      </a>
-      <a href="/" class="cat-item">
-        <span class="emoji">🌾</span>حبوب
-      </a>
-      <a href="/" class="cat-item">
-        <span class="emoji">🏷️</span>العروض
-      </a>
+      <a href="/" class="cat-item"><span class="emoji">🥦</span>خضار</a>
+      <a href="/" class="cat-item"><span class="emoji">🥛</span>ألبان</a>
+      <a href="/" class="cat-item"><span class="emoji">🥩</span>لحوم</a>
+      <a href="/" class="cat-item"><span class="emoji">🥤</span>مشروبات</a>
+      <a href="/" class="cat-item"><span class="emoji">🍞</span>مخبوزات</a>
+      <a href="/" class="cat-item"><span class="emoji">🍫</span>مسليات</a>
+      <a href="/" class="cat-item"><span class="emoji">🌾</span>حبوب</a>
+      <a href="/" class="cat-item"><span class="emoji">⭐</span>مميز</a>
     </div>
 
-    <p class="footer-note">توب كواليتي سوبر ماركت · جودة عالية بأسعار منافسة</p>
+    <img src="logo.png" alt="Top Quality" class="logo"/>
   </div>
 </body>
 </html>
