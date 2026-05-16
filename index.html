@@ -4195,10 +4195,17 @@
           <div style={{ fontSize:13, color:'#475569' }}>
             © {year} Top Quality Super Market — جميع الحقوق محفوظة
           </div>
-          <div style={{ display:'flex', gap:18, alignItems:'center' }}>
+          <div style={{ display:'flex', gap:18, alignItems:'center', flexWrap:'wrap' }}>
             <span style={{ fontSize:12, color:'#475569' }}>صُنع بـ ❤️ في فلسطين</span>
             <span style={{ fontSize:12, color:'#334155' }}>|</span>
             <span style={{ fontSize:12, color:'#475569' }}>مدعوم بالذكاء الاصطناعي 🤖</span>
+            <span style={{ fontSize:12, color:'#334155' }}>|</span>
+            <a href="https://suhaib-thaher.vercel.app/" target="_blank" rel="noopener noreferrer"
+              style={{ fontSize:12, color:'#96cb3f', textDecoration:'none', fontWeight:700, transition:'color 0.2s' }}
+              onMouseEnter={e=>e.target.style.color='#08a6cb'}
+              onMouseLeave={e=>e.target.style.color='#96cb3f'}>
+              👨‍💻 Suhaib Thaher
+            </a>
           </div>
         </div>
       </footer>
