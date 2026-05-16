@@ -4701,11 +4701,6 @@
                 {cartCount>0 && <span>{cartCount}</span>}
               </button>
               {winW>768 && (
-                <button onClick={()=>setDarkMode(d=>!d)} title={darkMode?'وضع فاتح':'وضع مظلم'} style={{ background:'var(--bg)', border:'none', borderRadius:11, padding:'9px 12px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.18s' }}>
-                  {darkMode ? <SunIcon size={19} color="#f0c030"/> : <MoonIcon size={19} color="#888"/>}
-                </button>
-              )}
-              {winW>768 && (
                 currentUser.isGuest ? (
                   <button onClick={onLogout} title="تسجيل الدخول" style={{ background:`linear-gradient(135deg,${GREEN},${TEAL})`, border:'none', borderRadius:11, padding:'8px 14px', cursor:'pointer', display:'flex', alignItems:'center', gap:6, transition:'all 0.18s', color:'#fff', fontFamily:'Almarai,sans-serif', fontSize:13, fontWeight:700 }}>
                     <UserIcon size={16} color="#fff"/> دخول / تسجيل
