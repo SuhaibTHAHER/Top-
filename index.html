@@ -4080,8 +4080,27 @@
 
   /* ─────────────────────────────────────────────────────────────────────── */
   /* ── SiteFooter ─────────────────────────────────────────────────────── */
-  function SiteFooter({ waNumber, storeOpen }) {
+  function SiteFooter({ waNumber, storeOpen, onNav }) {
     const year = new Date().getFullYear();
+    const nav = (action) => {
+      if (onNav) onNav(action);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    const linkStyle = (hovered) => ({
+      marginBottom:13, fontSize:14, color: hovered ? GREEN : '#94a3b8',
+      cursor:'pointer', display:'flex', alignItems:'center', gap:9,
+      transition:'color 0.18s', userSelect:'none',
+    });
+    function FooterLink({ emoji, label, action }) {
+      const [hov, setHov] = React.useState(false);
+      return (
+        <div style={linkStyle(hov)}
+          onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+          onClick={()=>nav(action)}>
+          <span style={{ fontSize:16 }}>{emoji}</span> {label}
+        </div>
+      );
+    }
     return (
       <footer style={{ background:'linear-gradient(135deg,#1a2535 0%,#0f1923 100%)', color:'#fff', marginTop:60, fontFamily:'Tajawal,sans-serif', direction:'rtl' }}>
         <div style={{ maxWidth:1200, margin:'0 auto', padding:'48px 24px 0' }}>
@@ -4116,17 +4135,11 @@
               <h4 style={{ fontWeight:800, fontSize:15, color:'#e2e8f0', marginBottom:18, paddingBottom:10, borderBottom:'1px solid #1e3048' }}>
                 🔗 روابط سريعة
               </h4>
-              {[
-                { label:'جميع المنتجات',        emoji:'🛍️' },
-                { label:'العروض والتخفيضات',    emoji:'🏷️' },
-                { label:'المنتجات المميزة',      emoji:'⭐' },
-                { label:'طلباتي السابقة',        emoji:'📦' },
-                { label:'برنامج نقاط الولاء',   emoji:'🎁' },
-              ].map(({ label, emoji }) => (
-                <div key={label} style={{ marginBottom:13, fontSize:14, color:'#94a3b8', cursor:'default', display:'flex', alignItems:'center', gap:9 }}>
-                  <span style={{ fontSize:16 }}>{emoji}</span> {label}
-                </div>
-              ))}
+              <FooterLink emoji="🛍️" label="جميع المنتجات"       action={{ type:'home' }}/>
+              <FooterLink emoji="🏷️" label="العروض والتخفيضات"   action={{ type:'discounts' }}/>
+              <FooterLink emoji="⭐" label="المنتجات المميزة"     action={{ type:'featured' }}/>
+              <FooterLink emoji="📦" label="طلباتي السابقة"       action={{ type:'orders' }}/>
+              <FooterLink emoji="🎁" label="برنامج نقاط الولاء"  action={{ type:'profile' }}/>
             </div>
 
             {/* عمود 3: الأقسام */}
@@ -4134,19 +4147,13 @@
               <h4 style={{ fontWeight:800, fontSize:15, color:'#e2e8f0', marginBottom:18, paddingBottom:10, borderBottom:'1px solid #1e3048' }}>
                 📦 الأقسام
               </h4>
-              {[
-                { label:'خضار وفواكه',     emoji:'🥦' },
-                { label:'ألبان ومنتجاتها', emoji:'🥛' },
-                { label:'لحوم ودواجن',     emoji:'🥩' },
-                { label:'مشروبات',         emoji:'🥤' },
-                { label:'مخبوزات',         emoji:'🍞' },
-                { label:'حبوب وبقوليات',  emoji:'🌾' },
-                { label:'مسليات',          emoji:'🍫' },
-              ].map(({ label, emoji }) => (
-                <div key={label} style={{ marginBottom:13, fontSize:14, color:'#94a3b8', cursor:'default', display:'flex', alignItems:'center', gap:9 }}>
-                  <span style={{ fontSize:16 }}>{emoji}</span> {label}
-                </div>
-              ))}
+              <FooterLink emoji="🥦" label="خضار وفواكه"    action={{ type:'cat', id:'produce'   }}/>
+              <FooterLink emoji="🥛" label="ألبان ومنتجاتها" action={{ type:'cat', id:'dairy'     }}/>
+              <FooterLink emoji="🥩" label="لحوم ودواجن"    action={{ type:'cat', id:'meat'      }}/>
+              <FooterLink emoji="🥤" label="مشروبات"         action={{ type:'cat', id:'beverages' }}/>
+              <FooterLink emoji="🍞" label="مخبوزات"         action={{ type:'cat', id:'bakery'    }}/>
+              <FooterLink emoji="🌾" label="حبوب وبقوليات"  action={{ type:'cat', id:'grains'    }}/>
+              <FooterLink emoji="🍫" label="مسليات"          action={{ type:'cat', id:'snacks'    }}/>
             </div>
 
             {/* عمود 4: ساعات العمل */}
@@ -4830,7 +4837,14 @@
           )}
         </main>
 
-        <SiteFooter waNumber={waNumber} storeOpen={storeOpen}/>
+        <SiteFooter waNumber={waNumber} storeOpen={storeOpen} onNav={action => {
+          if (action.type === 'home')      { setSelectedCat('all'); setShowFavs(false); setSearch(''); setFilters({minPrice:0,maxPrice:9999,discountOnly:false,inStockOnly:false,sort:'default',labels:[]}); }
+          if (action.type === 'cat')       { setSelectedCat(action.id); setShowFavs(false); setSearch(''); setFilters(f=>({...f,discountOnly:false})); }
+          if (action.type === 'discounts') { setSelectedCat('all'); setShowFavs(false); setSearch(''); setFilters(f=>({...f,discountOnly:true})); }
+          if (action.type === 'featured')  { setSelectedCat('all'); setShowFavs(false); setSearch(''); setFilters({minPrice:0,maxPrice:9999,discountOnly:false,inStockOnly:false,sort:'default',labels:[]}); }
+          if (action.type === 'orders')    { setShowOrders(true); }
+          if (action.type === 'profile')   { setShowProfile(true); }
+        }}/>
 
         {winW > 768 && (
           <button onClick={()=>setShowAI(true)} style={{ position:'fixed', bottom:compareList.length>0?86:28, left:28, zIndex:500, background:`linear-gradient(135deg,${TEAL},#0b7d96)`, color:'#fff', border:'none', borderRadius:26, padding:'14px 22px', cursor:'pointer', fontFamily:'Tajawal,sans-serif', fontSize:15, fontWeight:800, display:'flex', alignItems:'center', gap:9, boxShadow:`0 6px 24px rgba(31,159,179,0.45)`, transition:'all 0.25s' }}
